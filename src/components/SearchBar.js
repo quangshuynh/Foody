@@ -26,7 +26,7 @@ function SearchBar({ searchRestaurants }) {
     <div>
       <Input
         type="text"
-        placeholder="Search local restaurants in Rochester, NY..."
+        placeholder="Search added visited restaurants..."
         value={query}
         onChange={handleSearch}
       />

@@ -81,13 +81,13 @@ function AddRestaurant({ addRestaurant }) {
       <form onSubmit={handleSubmit}>
         <Input 
           type="text" 
-          placeholder="Restaurant Name" 
+          placeholder="Restaurant Name (e.g., Dogtown)" 
           value={name} 
           onChange={(e) => setName(e.target.value)}
         />
         <Input 
           type="text"
-          placeholder="Street Address (e.g., 123 Main St, Rochester, NY)" 
+          placeholder="Street Address (e.g., 691 Monroe Ave)" 
           value={address} 
           onChange={(e) => setAddress(e.target.value)}
         />

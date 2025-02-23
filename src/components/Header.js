@@ -11,7 +11,7 @@ const HeaderWrapper = styled.header`
 `;
 
 const Title = styled.h1`
-  font-size: 2.5rem;
+  font-size: 3.5rem;
   color: #00bcd4;
   margin: 0;
 `;

@@ -117,9 +117,7 @@ function App() {
       />
       <h2>Recommended Restaurants</h2>
       <RecommendedRestaurants recommendedRestaurants={recommendedRestaurants} />
-      <RestaurantMap
-        restaurants={[...restaurants, ...restaurantsToVisit, ...recommendedRestaurants]}
-      />
+      <RestaurantMap restaurants={[...restaurants, ...restaurantsToVisit, ...recommendedRestaurants]}/>
       <Footer />
     </AppContainer>
   );
