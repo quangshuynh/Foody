@@ -17,6 +17,8 @@ const Input = styled.input`
   border-radius: 5px;
   width: calc(100% - 24px);
   font-size: 1rem;
+  background: #262626;
+  color: #f5f5f5;
 `;
 
 const Button = styled.button`

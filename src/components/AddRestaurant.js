@@ -18,6 +18,8 @@ const Input = styled.input`
   border-radius: 5px;
   width: calc(100% - 24px);
   font-size: 1rem;
+  background: #262626;
+  color: #f5f5f5;
 `;
 
 const Button = styled.button`
@@ -81,13 +83,13 @@ function AddRestaurant({ addRestaurant }) {
       <form onSubmit={handleSubmit}>
         <Input 
           type="text" 
-          placeholder="Restaurant Name (e.g., Dogtown)" 
+          placeholder="Restaurant Name" 
           value={name} 
           onChange={(e) => setName(e.target.value)}
         />
         <Input 
           type="text"
-          placeholder="Street Address (e.g., 691 Monroe Ave)" 
+          placeholder="Street Address (e.g., 123 Main St, Rochester, NY)" 
           value={address} 
           onChange={(e) => setAddress(e.target.value)}
         />

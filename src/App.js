@@ -17,25 +17,50 @@ const AppContainer = styled.div`
   padding: 20px;
 `;
 
+const Dropdown = styled.select`
+  padding: 10px;
+  font-size: 1rem;
+  margin: 20px 0;
+  border: 2px solid #00bcd4;
+  border-radius: 8px;
+  background-color: #262626;
+  color: #f5f5f5;
+`;
+
 function App() {
   // visited restaurants list
-  const [restaurants, setRestaurants] = useState([
-    {
-      id: 1,
-      name: 'Dogtown',
-      address: '691 Monroe Ave, Rochester, NY',
-      location: { lat: 43.1438, lng: -77.5923 },
-      rating: 4,
-      goAgain: true,
-    },
-  ]);
-  const [filteredRestaurants, setFilteredRestaurants] = useState(restaurants);
+  const [restaurants, setRestaurants] = useState(() => {
+    const stored = localStorage.getItem('visitedRestaurants');
+    return stored ? JSON.parse(stored) : [
+      {
+        id: 1,
+        name: 'Dogtown',
+        address: '691 Monroe Ave, Rochester, NY',
+        location: { lat: 43.1438, lng: -77.5923 },
+        rating: 4,
+        goAgain: true,
+        dateAdded: new Date(), 
+      },
+    ];
+  });
 
-  // restaurants to visit list (wishlist)
-  const [restaurantsToVisit, setRestaurantsToVisit] = useState([]);
+  const [restaurantsToVisit, setRestaurantsToVisit] = useState(() => {
+    const stored = localStorage.getItem('restaurantsToVisit');
+    return stored ? JSON.parse(stored) : [];
+  });
 
-  // recommended restaurants – simulated fetch (in production, replace with real API/scraping)
   const [recommendedRestaurants, setRecommendedRestaurants] = useState([]);
+  const [filteredRestaurants, setFilteredRestaurants] = useState(restaurants);
+  const [selectedSection, setSelectedSection] = useState('visited');
+
+  useEffect(() => {
+    localStorage.setItem('visitedRestaurants', JSON.stringify(restaurants));
+    setFilteredRestaurants(restaurants);
+  }, [restaurants]);
+
+  useEffect(() => {
+    localStorage.setItem('restaurantsToVisit', JSON.stringify(restaurantsToVisit));
+  }, [restaurantsToVisit]);
 
   useEffect(() => {
     setTimeout(() => {
@@ -45,20 +70,22 @@ function App() {
           name: 'Kai poop',
           address: '2 Scottsville Rd, Rochester, NY',
           location: { lat: 43.1258, lng: -77.6424 },
+          dateAdded: new Date()
         },
         {
           id: 102,
           name: 'Carlton Gibson Hall',
           address: 'Latimore Pl, Rochester, NY',
           location: { lat: 43.0857, lng: -77.6672 },
+          dateAdded: new Date()
         },
       ]);
     }, 1000);
   }, []);
 
   const addRestaurant = (restaurant) => {
-    const newRestaurant = { ...restaurant, id: Date.now() };
-    const updatedRestaurants = [...restaurants, newRestaurant];
+    const newRestaurant = { ...restaurant, id: Date.now(), dateAdded: new Date() };
+    const updatedRestaurants = [newRestaurant, ...restaurants];
     setRestaurants(updatedRestaurants);
     setFilteredRestaurants(updatedRestaurants);
   };
@@ -89,8 +116,8 @@ function App() {
   };
 
   const addToVisit = (restaurant) => {
-    const newRestaurant = { ...restaurant, id: Date.now() };
-    setRestaurantsToVisit([...restaurantsToVisit, newRestaurant]);
+    const newRestaurant = { ...restaurant, id: Date.now(), dateAdded: new Date() };
+    setRestaurantsToVisit([newRestaurant, ...restaurantsToVisit]);
   };
 
   const removeToVisit = (id) => {
@@ -101,23 +128,42 @@ function App() {
   return (
     <AppContainer>
       <Header title="Foody" />
-      <SearchBar searchRestaurants={searchRestaurants} />
-      <h2>Visited Restaurants</h2>
-      <RestaurantList
-        restaurants={filteredRestaurants}
-        updateRestaurant={updateRestaurant}
-        addRestaurant={addRestaurant}
-        removeRestaurant={removeRestaurant}
+      <Dropdown value={selectedSection} onChange={(e) => setSelectedSection(e.target.value)}>
+        <option value="visited">Visited Restaurants</option>
+        <option value="toVisit">Restaurants to Visit</option>
+        <option value="recommended">Recommended Restaurants</option>
+      </Dropdown>
+      {selectedSection === 'visited' && (
+        <>
+          <SearchBar searchRestaurants={searchRestaurants} />
+          <h2>Visited Restaurants</h2>
+          <RestaurantList
+            restaurants={filteredRestaurants}
+            updateRestaurant={updateRestaurant}
+            addRestaurant={addRestaurant}
+            removeRestaurant={removeRestaurant}
+          />
+        </>
+      )}
+      {selectedSection === 'toVisit' && (
+        <>
+          <h2>Restaurants to Visit</h2>
+          <RestaurantsToVisit
+            restaurantsToVisit={restaurantsToVisit}
+            addToVisit={addToVisit}
+            removeToVisit={removeToVisit}
+          />
+        </>
+      )}
+      {selectedSection === 'recommended' && (
+        <>
+          <h2>Recommended Restaurants</h2>
+          <RecommendedRestaurants recommendedRestaurants={recommendedRestaurants} />
+        </>
+      )}
+      <RestaurantMap
+        restaurants={[...restaurants, ...restaurantsToVisit, ...recommendedRestaurants]}
       />
-      <h2>Restaurants to Visit</h2>
-      <RestaurantsToVisit
-        restaurantsToVisit={restaurantsToVisit}
-        addToVisit={addToVisit}
-        removeToVisit={removeToVisit}
-      />
-      <h2>Recommended Restaurants</h2>
-      <RecommendedRestaurants recommendedRestaurants={recommendedRestaurants} />
-      <RestaurantMap restaurants={[...restaurants, ...restaurantsToVisit, ...recommendedRestaurants]}/>
       <Footer />
     </AppContainer>
   );

@@ -26,6 +26,11 @@ const IconContainer = styled.div`
   }
 `;
 
+const DateText = styled.p`
+  font-size: 0.8rem;
+  color: #aaa;
+`;
+
 function VisitItem({ restaurant, removeToVisit }) {
   const handleRemove = () => {
     if (window.confirm('Are you sure you want to remove this restaurant?')) {
@@ -40,6 +45,9 @@ function VisitItem({ restaurant, removeToVisit }) {
       </IconContainer>
       <h3>{restaurant.name}</h3>
       {restaurant.address && <p>{restaurant.address}</p>}
+      {restaurant.dateAdded && (
+        <DateText>Added on: {new Date(restaurant.dateAdded).toLocaleString()}</DateText>
+      )}
     </ItemContainer>
   );
 }

@@ -54,6 +54,11 @@ const Input = styled.input`
   color: #f5f5f5;
 `;
 
+const DateText = styled.p`
+  font-size: 0.8rem;
+  color: #aaa;
+`;
+
 function RestaurantItem({ restaurant, updateRestaurant, removeRestaurant }) {
   const [localRating, setLocalRating] = useState(restaurant.rating);
   const [isEditing, setIsEditing] = useState(false);
@@ -96,7 +101,6 @@ function RestaurantItem({ restaurant, updateRestaurant, removeRestaurant }) {
     setEditLoading(true);
     setEditError('');
     try {
-      // geocode the new address if changed
       if (editAddress !== restaurant.address) {
         const res = await fetch(
           `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(editAddress)}`
@@ -115,7 +119,6 @@ function RestaurantItem({ restaurant, updateRestaurant, removeRestaurant }) {
           setEditError('Address not found. Please enter a valid address.');
         }
       } else {
-        // if the address wasnt changed, just update the name
         updateRestaurant({ ...restaurant, name: editName });
         setIsEditing(false);
       }
@@ -157,6 +160,7 @@ function RestaurantItem({ restaurant, updateRestaurant, removeRestaurant }) {
         <>
           <h3>{restaurant.name}</h3>
           {restaurant.address && <p>{restaurant.address}</p>}
+          <DateText>Added on: {new Date(restaurant.dateAdded).toLocaleString()}</DateText>
           <Rating rating={localRating} onRatingChange={handleRatingChange} />
           <p>{restaurant.goAgain ? 'Would go again!' : 'Not planning a return.'}</p>
           <Button onClick={toggleGoAgain}>
