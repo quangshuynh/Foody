@@ -22,9 +22,9 @@ function App() {
   const [restaurants, setRestaurants] = useState([
     {
       id: 1,
-      name: 'The Food Hub',
-      address: '123 Main St, Rochester, NY',
-      location: { lat: 43.1566, lng: -77.6088 },
+      name: 'Dogtown',
+      address: '691 Monroe Ave, Rochester, NY',
+      location: { lat: 43.1438, lng: -77.5923 },
       rating: 4,
       goAgain: true,
     },
@@ -42,15 +42,15 @@ function App() {
       setRecommendedRestaurants([
         {
           id: 101,
-          name: 'Recommended Bistro',
-          address: '456 Elm St, Rochester, NY',
-          location: { lat: 43.1600, lng: -77.6100 },
+          name: 'Kai poop',
+          address: '2 Scottsville Rd, Rochester, NY',
+          location: { lat: 43.1258, lng: -77.6424 },
         },
         {
           id: 102,
-          name: 'Taste of Rochester',
-          address: '789 Maple Ave, Rochester, NY',
-          location: { lat: 43.1500, lng: -77.6200 },
+          name: 'Carlton Gibson Hall',
+          address: 'Latimore Pl, Rochester, NY',
+          location: { lat: 43.0857, lng: -77.6672 },
         },
       ]);
     }, 1000);
