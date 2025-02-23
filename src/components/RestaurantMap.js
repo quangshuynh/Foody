@@ -18,7 +18,7 @@ const MapWrapper = styled.div`
 `;
 
 function RestaurantMap({ restaurants }) {
-  const position = [43.1566, -77.6088]; 
+  const position = [43.1566, -77.6088]; // center on Rochester, NY
   return (
     <MapWrapper>
       <MapContainer center={position} zoom={13} style={{ height: '100%', width: '100%' }}>
@@ -29,7 +29,8 @@ function RestaurantMap({ restaurants }) {
         {restaurants.map((restaurant) => (
           <Marker key={restaurant.id} position={[restaurant.location.lat, restaurant.location.lng]}>
             <Popup>
-              <strong>{restaurant.name}</strong><br />
+              <strong>{restaurant.name}</strong>
+              <br />
               {restaurant.address}
             </Popup>
           </Marker>

@@ -8,7 +8,6 @@ const FormContainer = styled.div`
   margin: 20px auto;
   width: 80%;
   max-width: 600px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
 `;
 
 const Input = styled.input`
@@ -34,7 +33,7 @@ const Button = styled.button`
   }
 `;
 
-function AddRestaurant({ addRestaurant }) {
+function AddToVisit({ addToVisit }) {
   const [name, setName] = useState('');
   const [address, setAddress] = useState('');
   const [error, setError] = useState('');
@@ -59,10 +58,8 @@ function AddRestaurant({ addRestaurant }) {
           name,
           address,
           location: { lat: parseFloat(lat), lng: parseFloat(lon) },
-          rating: 0,
-          goAgain: false,
         };
-        addRestaurant(newRestaurant);
+        addToVisit(newRestaurant);
         setName('');
         setAddress('');
       } else {
@@ -76,7 +73,7 @@ function AddRestaurant({ addRestaurant }) {
 
   return (
     <FormContainer>
-      <h2>Add a Restaurant</h2>
+      <h3>Add a Restaurant to Visit</h3>
       {error && <p style={{ color: '#ff4081' }}>{error}</p>}
       <form onSubmit={handleSubmit}>
         <Input 
@@ -92,11 +89,11 @@ function AddRestaurant({ addRestaurant }) {
           onChange={(e) => setAddress(e.target.value)}
         />
         <Button type="submit" disabled={loading}>
-          {loading ? 'Adding...' : 'Add Restaurant'}
+          {loading ? 'Adding...' : 'Add to Visit'}
         </Button>
       </form>
     </FormContainer>
   );
 }
 
-export default AddRestaurant;
+export default AddToVisit;
