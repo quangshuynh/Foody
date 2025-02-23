@@ -34,7 +34,7 @@ function App() {
   // restaurants to visit list (wishlist)
   const [restaurantsToVisit, setRestaurantsToVisit] = useState([]);
 
-  // Recommended restaurants – simulated fetch (in production, replace with real API/scraping)
+  // recommended restaurants – simulated fetch (in production, replace with real API/scraping)
   const [recommendedRestaurants, setRecommendedRestaurants] = useState([]);
 
   useEffect(() => {
@@ -71,6 +71,12 @@ function App() {
     setFilteredRestaurants(updatedRestaurants);
   };
 
+  const removeRestaurant = (id) => {
+    const updatedRestaurants = restaurants.filter((rest) => rest.id !== id);
+    setRestaurants(updatedRestaurants);
+    setFilteredRestaurants(updatedRestaurants);
+  };
+
   const searchRestaurants = (query) => {
     if (query.trim() === '') {
       setFilteredRestaurants(restaurants);
@@ -87,6 +93,11 @@ function App() {
     setRestaurantsToVisit([...restaurantsToVisit, newRestaurant]);
   };
 
+  const removeToVisit = (id) => {
+    const updatedToVisit = restaurantsToVisit.filter((r) => r.id !== id);
+    setRestaurantsToVisit(updatedToVisit);
+  };
+
   return (
     <AppContainer>
       <Header title="Foody" />
@@ -96,13 +107,15 @@ function App() {
         restaurants={filteredRestaurants}
         updateRestaurant={updateRestaurant}
         addRestaurant={addRestaurant}
+        removeRestaurant={removeRestaurant}
       />
       <h2>Restaurants to Visit</h2>
       <RestaurantsToVisit
         restaurantsToVisit={restaurantsToVisit}
         addToVisit={addToVisit}
+        removeToVisit={removeToVisit}
       />
-      <h2>Recommended Restaurants (change to real API/scraping later)</h2>
+      <h2>Recommended Restaurants</h2>
       <RecommendedRestaurants recommendedRestaurants={recommendedRestaurants} />
       <RestaurantMap
         restaurants={[...restaurants, ...restaurantsToVisit, ...recommendedRestaurants]}

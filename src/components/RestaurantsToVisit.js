@@ -7,12 +7,12 @@ const Container = styled.div`
   margin: 20px 0;
 `;
 
-function RestaurantsToVisit({ restaurantsToVisit, addToVisit }) {
+function RestaurantsToVisit({ restaurantsToVisit, addToVisit, removeToVisit }) {
   return (
     <Container>
       <AddToVisit addToVisit={addToVisit} />
       {restaurantsToVisit.map((restaurant) => (
-        <VisitItem key={restaurant.id} restaurant={restaurant} />
+        <VisitItem key={restaurant.id} restaurant={restaurant} removeToVisit={removeToVisit} />
       ))}
     </Container>
   );

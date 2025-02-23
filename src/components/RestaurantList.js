@@ -7,7 +7,7 @@ const ListContainer = styled.div`
   margin: 20px 0;
 `;
 
-function RestaurantList({ restaurants, updateRestaurant, addRestaurant }) {
+function RestaurantList({ restaurants, updateRestaurant, addRestaurant, removeRestaurant }) {
   return (
     <ListContainer>
       <AddRestaurant addRestaurant={addRestaurant} />
@@ -16,6 +16,7 @@ function RestaurantList({ restaurants, updateRestaurant, addRestaurant }) {
           key={restaurant.id}
           restaurant={restaurant}
           updateRestaurant={updateRestaurant}
+          removeRestaurant={removeRestaurant}
         />
       ))}
     </ListContainer>
