@@ -2,6 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 
 const HeaderWrapper = styled.header`
+  font-family: 'eracake', sans-serif;
   background-color: #262626;
   padding: 20px;
   border-radius: 10px;
