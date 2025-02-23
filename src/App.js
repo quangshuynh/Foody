@@ -84,8 +84,17 @@ function App() {
   }, []);
 
   const addRestaurant = (restaurant) => {
+    const duplicate = restaurants.some(
+      (r) =>
+        r.name.toLowerCase() === restaurant.name.toLowerCase() ||
+        r.address.toLowerCase() === restaurant.address.toLowerCase()
+    );
+    if (duplicate) {
+      alert("This restaurant already exists in your visited list!");
+      return;
+    }
     const newRestaurant = { ...restaurant, id: Date.now(), dateAdded: new Date() };
-    const updatedRestaurants = [newRestaurant, ...restaurants];
+    const updatedRestaurants = [...restaurants, newRestaurant];
     setRestaurants(updatedRestaurants);
     setFilteredRestaurants(updatedRestaurants);
   };
@@ -116,8 +125,17 @@ function App() {
   };
 
   const addToVisit = (restaurant) => {
+    const duplicate = restaurantsToVisit.some(
+      (r) =>
+        r.name.toLowerCase() === restaurant.name.toLowerCase() ||
+        r.address.toLowerCase() === restaurant.address.toLowerCase()
+    );
+    if (duplicate) {
+      alert("This restaurant already exists in your 'to visit' list!");
+      return;
+    }
     const newRestaurant = { ...restaurant, id: Date.now(), dateAdded: new Date() };
-    setRestaurantsToVisit([newRestaurant, ...restaurantsToVisit]);
+    setRestaurantsToVisit([...restaurantsToVisit, newRestaurant]);
   };
 
   const removeToVisit = (id) => {
