@@ -1,70 +1,36 @@
-# Getting Started with Create React App
+# Foody
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+**Foody** is a modern, fun React web application that helps you and your friends explore the best food spots in Rochester, NY. With Foody, you can:
 
-## Available Scripts
+- **Add Visited Restaurants:** Log restaurants you’ve been to, rate them, and indicate if you’d go again
+- **Restaurants to Visit:** Keep a wishlist of restaurants you want to try
+- **Recommended Restaurants:** View a list of recommended restaurants (simulated scraping for now)
+- **Search & Map Integration:** Easily search restaurants by name and see all locations on an interactive map using OpenStreetMap via React Leaflet
 
-In the project directory, you can run:
+## Features
 
-### `npm start`
+- **Visited Restaurants:**  
+  Track restaurants you’ve visited along with ratings and “go again” options
+  
+- **Restaurants to Visit (Wishlist):**  
+  Maintain a list of restaurants you want to visit in the future
+  
+- **Recommended Restaurants:**  
+  A curated list of highly recommended eateries in Rochester (simulated data for demo purposes now)
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+- **Search Functionality:**  
+  Filter restaurants by name for quick access
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+- **Interactive Map:**  
+  Visualize restaurant locations on a map. Addresses are converted into coordinates using the Nominatim API (OpenStreetMap)
 
-### `npm test`
+- **Modern & Fun UI:**  
+  A dark theme with vibrant accents that gives the site a fresh, modern, and playful vibe.
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## Technologies Used
 
-### `npm run build`
-
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+- **React:** Frontend library for building user interfaces
+- **Styled Components:** For modern, component-level styling
+- **React Leaflet & Leaflet:** For interactive map integration
+- **Nominatim API:** For geocoding street addresses to latitude/longitude
+- **React Router:** (Optional) For navigation between different sections
