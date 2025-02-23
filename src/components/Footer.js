@@ -13,7 +13,7 @@ const FooterWrapper = styled.footer`
 function Footer() {
   return (
     <FooterWrapper>
-      made by Quang
+      © {new Date().getFullYear()} <strong>Quang Huynh</strong>
     </FooterWrapper>
   );
 }
