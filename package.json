@@ -1,5 +1,6 @@
 {
   "name": "foody",
+  "homepage": "https://quangshuynh.github.io/foody",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
