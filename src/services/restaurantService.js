@@ -1,10 +1,9 @@
-import { readJSONFile, writeJSONFile } from './fileService';
+import { readFromStorage, writeToStorage } from './fileService';
 
 const STORAGE_KEY = 'visitedRestaurants';
 
 export const fetchVisitedRestaurants = async () => {
-  const data = localStorage.getItem(STORAGE_KEY);
-  return data ? JSON.parse(data) : [];
+  return readFromStorage(STORAGE_KEY) || [];
 };
 
 export const updateRestaurant = async (restaurant) => {
@@ -13,7 +12,7 @@ export const updateRestaurant = async (restaurant) => {
     const index = restaurants.findIndex(r => r.id === restaurant.id);
     if (index !== -1) {
       restaurants[index] = restaurant;
-      await writeJSONFile(STORAGE_KEY, restaurants);
+      await writeToStorage(STORAGE_KEY, restaurants);
       return restaurant;
     }
     throw new Error('Restaurant not found');
@@ -32,13 +31,13 @@ export const addRestaurant = async (restaurant) => {
     averageRating: 0
   };
   restaurants.push(newRestaurant);
-  await writeJSONFile(STORAGE_KEY, restaurants);
+  await writeToStorage(STORAGE_KEY, restaurants);
   return newRestaurant;
 };
 
 export const deleteRestaurant = async (id) => {
   const restaurants = await fetchVisitedRestaurants();
   const filtered = restaurants.filter(r => r.id !== id);
-  await writeJSONFile(STORAGE_KEY, filtered);
+  await writeToStorage(STORAGE_KEY, filtered);
   return true;
 };

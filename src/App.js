@@ -47,19 +47,13 @@ const Dropdown = styled.select`
 function App() {
   // visited restaurants list
   const [restaurants, setRestaurants] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-
   useEffect(() => {
     const loadRestaurants = async () => {
       try {
         const data = await fetchVisitedRestaurants();
         setRestaurants(data);
       } catch (err) {
-        setError('Failed to load restaurants');
-        console.error(err);
-      } finally {
-        setLoading(false);
+        console.error('Failed to load restaurants:', err);
       }
     };
     loadRestaurants();
