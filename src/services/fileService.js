@@ -1,7 +1,7 @@
-import { getData, updateData, initializeStore } from './dataStore';
+import { getData, updateData } from './dataStore';
 
 export const initializeStorage = () => {
-  return initializeStore();
+  return getData('users'); // This will trigger store initialization
 };
 
 export const readFromStorage = (key) => {

@@ -1,12 +1,23 @@
-import initialData from '../data/db.json';
-
 // In-memory data store
 let store = null;
 
+// Default initial data
+const defaultData = {
+  users: [{
+    id: "1",
+    username: "admin",
+    password: "8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918", // admin
+    role: "user",
+    createdAt: new Date().toISOString()
+  }],
+  visited: [],
+  toVisit: []
+};
+
 // Initialize store with data
-const initializeStore = () => {
+export const initializeStore = () => {
   if (!store) {
-    store = { ...initialData };
+    store = { ...defaultData };
   }
   return store;
 };
