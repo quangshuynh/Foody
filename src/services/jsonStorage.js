@@ -1,7 +1,5 @@
-import fs from 'fs';
-import path from 'path';
-
-const DATA_FILE = path.join(process.cwd(), 'data.json');
+const DB_NAME = 'foodyDB';
+const STORE_NAME = 'appData';
 
 const defaultData = {
   users: [{
@@ -31,33 +29,82 @@ const defaultData = {
   ]
 };
 
-export const initializeJsonStorage = () => {
-  if (!fs.existsSync(DATA_FILE)) {
-    fs.writeFileSync(DATA_FILE, JSON.stringify(defaultData, null, 2));
-  }
+const openDB = () => {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open(DB_NAME, 1);
+
+    request.onerror = () => reject(request.error);
+    request.onsuccess = () => resolve(request.result);
+
+    request.onupgradeneeded = (event) => {
+      const db = event.target.result;
+      if (!db.objectStoreNames.contains(STORE_NAME)) {
+        db.createObjectStore(STORE_NAME);
+      }
+    };
+  });
 };
 
-export const readJsonData = () => {
+export const initializeJsonStorage = async () => {
+  const db = await openDB();
+  const tx = db.transaction(STORE_NAME, 'readwrite');
+  const store = tx.objectStore(STORE_NAME);
+  
+  const request = store.get('appData');
+  
+  request.onsuccess = () => {
+    if (!request.result) {
+      store.put(defaultData, 'appData');
+    }
+  };
+  
+  return new Promise((resolve, reject) => {
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => reject(tx.error);
+  });
+};
+
+export const readJsonData = async () => {
   try {
-    return JSON.parse(fs.readFileSync(DATA_FILE, 'utf8'));
+    const db = await openDB();
+    const tx = db.transaction(STORE_NAME, 'readonly');
+    const store = tx.objectStore(STORE_NAME);
+    
+    return new Promise((resolve, reject) => {
+      const request = store.get('appData');
+      request.onsuccess = () => resolve(request.result || defaultData);
+      request.onerror = () => reject(request.error);
+    });
   } catch (error) {
-    console.error('Error reading JSON file:', error);
+    console.error('Error reading data:', error);
     return defaultData;
   }
 };
 
-export const writeJsonData = (data) => {
+export const writeJsonData = async (data) => {
   try {
-    fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2));
-    return true;
+    const db = await openDB();
+    const tx = db.transaction(STORE_NAME, 'readwrite');
+    const store = tx.objectStore(STORE_NAME);
+    
+    return new Promise((resolve, reject) => {
+      const request = store.put(data, 'appData');
+      tx.oncomplete = () => resolve(true);
+      tx.onerror = () => reject(tx.error);
+    });
   } catch (error) {
-    console.error('Error writing JSON file:', error);
+    console.error('Error writing data:', error);
     return false;
   }
 };
 
-export const updateJsonData = (key, value) => {
-  const data = readJsonData();
-  data[key] = value;
-  return writeJsonData(data);
+export const updateJsonData = async (key, value) => {
+  try {
+    const data = await readJsonData();
+    data[key] = value;
+    return await writeJsonData(data);
+  } catch (error) {
+    console.error('Error updating data:', error);
+    return false;
+  }
 };

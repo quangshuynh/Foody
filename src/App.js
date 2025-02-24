@@ -57,7 +57,7 @@ function App() {
   // visited restaurants list
   const [restaurants, setRestaurants] = useState([]);
   useEffect(() => {
-    initializeJsonStorage();
+    initializeJsonStorage().catch(console.error);
     const loadRestaurants = async () => {
       try {
         const data = await fetchVisitedRestaurants();
@@ -83,7 +83,7 @@ function App() {
   useEffect(() => {
     const loadAllData = async () => {
       try {
-        const data = readJsonData();
+        const data = await readJsonData();
         setRestaurantsToVisit(data.toVisit || []);
         setRecommendedRestaurants(data.recommended || []);
       } catch (err) {
