@@ -1,15 +1,24 @@
 import React from 'react';
 import styled from 'styled-components';
-import { useAuth } from '../contexts/AuthContext'; // adjust the path as needed
+import { useAuth } from '../contexts/AuthContext'; 
 
 const NavContainer = styled.nav`
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000; 
   display: flex;
+  justify-content: space-between;
   align-items: center;
-  justify-content: space-between; /* space between nav items and auth buttons */
   background: rgba(38, 38, 38, 0.95);
   padding: 15px 20px;
-  border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  
+  @media (max-width: 600px) {
+    flex-direction: column;
+    align-items: flex-start;
+  }
 `;
 
 const NavItems = styled.div`
@@ -25,9 +34,10 @@ const NavItem = styled.button`
   margin: 0 10px;
   cursor: pointer;
   padding: 10px 15px;
-  border-bottom: ${(props) => (props.active ? '3px solid #00bcd4' : '3px solid transparent')};
+  border-bottom: ${(props) =>
+    props.active ? '3px solid #00bcd4' : '3px solid transparent'};
   transition: color 0.3s ease, transform 0.3s ease, border-bottom 0.3s ease;
-  
+
   &:hover {
     color: #00bcd4;
     transform: translateY(-2px);
@@ -38,6 +48,12 @@ const NavItem = styled.button`
 const AuthButtons = styled.div`
   display: flex;
   align-items: center;
+  margin-right: 40px; 
+  
+  @media (max-width: 600px) {
+    margin-right: 0;
+    margin-top: 10px;
+  }
 `;
 
 const AuthButton = styled.button`
@@ -57,17 +73,26 @@ const AuthButton = styled.button`
 
 const Navbar = ({ selectedSection, setSelectedSection, onShowLogin, onShowRegister, onLogout }) => {
   const { isGuest } = useAuth();
-  
+
   return (
     <NavContainer>
       <NavItems>
-        <NavItem active={selectedSection === 'visited'} onClick={() => setSelectedSection('visited')}>
+        <NavItem
+          active={selectedSection === 'visited'}
+          onClick={() => setSelectedSection('visited')}
+        >
           Visited
         </NavItem>
-        <NavItem active={selectedSection === 'toVisit'} onClick={() => setSelectedSection('toVisit')}>
+        <NavItem
+          active={selectedSection === 'toVisit'}
+          onClick={() => setSelectedSection('toVisit')}
+        >
           To Visit
         </NavItem>
-        <NavItem active={selectedSection === 'recommended'} onClick={() => setSelectedSection('recommended')}>
+        <NavItem
+          active={selectedSection === 'recommended'}
+          onClick={() => setSelectedSection('recommended')}
+        >
           Recommended
         </NavItem>
       </NavItems>

@@ -15,20 +15,6 @@ import Footer from './components/Footer';
 import ModalOverlay from './components/ModalOverlay'
 import Navbar from './components/Navbar';
 
-
-const Button = styled.button`
-  background: #00bcd4;
-  border: none;
-  color: white;
-  padding: 10px 15px;
-  border-radius: 5px;
-  cursor: pointer;
-  margin: 5px;
-  &:hover {
-    background: #00a1b5;
-  }
-`;
-
 const AppContainer = styled.div`
   font-family: 'Roboto', sans-serif;
   background: #1f1f1f;
@@ -36,24 +22,7 @@ const AppContainer = styled.div`
   text-align: center;
   min-height: 100vh;
   padding: 20px;
-`;
-
-const Dropdown = styled.select`
-  padding: 10px;
-  font-size: 1rem;
-  margin: 20px 0;
-  border: 2px solid #00bcd4;
-  border-radius: 8px;
-  background-color: #262626;
-  color: #f5f5f5;
-`;
-
-const AuthButtonContainer = styled.div`
-  position: absolute;
-  top: 27px;
-  right: 27px;
-  display: flex;
-  gap: 10px;
+  margin-top: 65px; 
 `;
 
 function App() {
@@ -164,20 +133,19 @@ function App() {
     setRestaurantsToVisit(updatedToVisit);
   };
 
-  const { isAuthenticated, isGuest, setUser } = useAuth();
+  const { isAuthenticated, setUser } = useAuth();
+  const [showLogin, setShowLogin] = useState(false);
+  const [showRegister, setShowRegister] = useState(false);
 
   const handleLogout = () => {
     setUser(null);
     localStorage.removeItem('user');
     localStorage.removeItem('token');
   };
-  const [showLogin, setShowLogin] = useState(false);
-  const [showRegister, setShowRegister] = useState(false);
 
   return (
-    <AppContainer>
-      <Header
-        title="Foody"
+    <>
+      <Navbar
         selectedSection={selectedSection}
         setSelectedSection={setSelectedSection}
         onShowLogin={() => {
@@ -190,42 +158,64 @@ function App() {
         }}
         onLogout={handleLogout}
       />
-      {showLogin && (<ModalOverlay onClick={() => setShowLogin(false)}><div onClick={(e) => e.stopPropagation()}><LoginForm onSuccess={() => setShowLogin(false)} /></div></ModalOverlay>)}
-      {showRegister && (<ModalOverlay onClick={() => setShowRegister(false)}><div onClick={(e) => e.stopPropagation()}><RegisterForm onSuccess={() => setShowRegister(false)} /></div></ModalOverlay>)}
-      {selectedSection === 'visited' && (
-        <>
-          <SearchBar searchRestaurants={searchRestaurants} />
-          <h2>Visited Restaurants</h2>
-          <RestaurantList
-            restaurants={filteredRestaurants}
-            updateRestaurant={isAuthenticated ? updateRestaurant : null}
-            addRestaurant={isAuthenticated ? addRestaurant : null}
-            removeRestaurant={isAuthenticated ? removeRestaurant : null}
-          />
-        </>
-      )}
 
-      {selectedSection === 'toVisit' && (
-        <>
-          <h2>Restaurants to Visit</h2>
-          <RestaurantsToVisit
-            restaurantsToVisit={restaurantsToVisit}
-            addToVisit={addToVisit}
-            removeToVisit={removeToVisit}
-          />
-        </>
-      )}
+      <AppContainer>
+        {showLogin && (
+          <ModalOverlay onClick={() => setShowLogin(false)}>
+            <div onClick={(e) => e.stopPropagation()}>
+              <LoginForm onSuccess={() => setShowLogin(false)} />
+            </div>
+          </ModalOverlay>
+        )}
+        {showRegister && (
+          <ModalOverlay onClick={() => setShowRegister(false)}>
+            <div onClick={(e) => e.stopPropagation()}>
+              <RegisterForm onSuccess={() => setShowRegister(false)} />
+            </div>
+          </ModalOverlay>
+        )}
 
-      {selectedSection === 'recommended' && (
-        <>
-          <h2>Recommended Restaurants</h2>
-          <RecommendedRestaurants recommendedRestaurants={recommendedRestaurants} />
-        </>
-      )}
+      <Header
+        title="Foody"
+        selectedSection={selectedSection}
+        setSelectedSection={setSelectedSection}
+        onShowLogin={() => { setShowLogin(true); setShowRegister(false); }}
+        onShowRegister={() => { setShowRegister(true); setShowLogin(false); }}
+        onLogout={handleLogout}
+      />
 
-      <RestaurantMap restaurants={[...restaurants, ...restaurantsToVisit, ...recommendedRestaurants]} />
-      <Footer />
-    </AppContainer>
+        {selectedSection === 'visited' && (
+          <>
+            <SearchBar searchRestaurants={searchRestaurants} />
+            <h2>Visited Restaurants</h2>
+            <RestaurantList
+              restaurants={filteredRestaurants}
+              updateRestaurant={isAuthenticated ? updateRestaurant : null}
+              addRestaurant={isAuthenticated ? addRestaurant : null}
+              removeRestaurant={isAuthenticated ? removeRestaurant : null}
+            />
+          </>
+        )}
+        {selectedSection === 'toVisit' && (
+          <>
+            <h2>Restaurants to Visit</h2>
+            <RestaurantsToVisit
+              restaurantsToVisit={restaurantsToVisit}
+              addToVisit={addToVisit}
+              removeToVisit={removeToVisit}
+            />
+          </>
+        )}
+        {selectedSection === 'recommended' && (
+          <>
+            <h2>Recommended Restaurants</h2>
+            <RecommendedRestaurants recommendedRestaurants={recommendedRestaurants} />
+          </>
+        )}
+        <RestaurantMap restaurants={[...restaurants, ...restaurantsToVisit, ...recommendedRestaurants]} />
+        <Footer />
+      </AppContainer>
+    </>
   );
 }
 
