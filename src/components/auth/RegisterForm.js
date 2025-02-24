@@ -11,11 +11,11 @@ const FormContainer = styled.div`
   border-radius: 8px;
   display: flex;
   flex-direction: column;
-  align-items: center; // Centers horizontally
+  align-items: center; 
 `;
 
 const Input = styled.input`
-  width: 80%; // Adjust to your preferred width
+  width: 80%;
   padding: 10px;
   margin: 10px 0;
   background: #262626;
@@ -25,7 +25,7 @@ const Input = styled.input`
 `;
 
 const Button = styled.button`
-  width: 80%; // Match this width to your inputs
+  width: 80%;
   padding: 10px;
   background: #00bcd4;
   border: none;

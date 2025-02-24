@@ -16,6 +16,7 @@ const FormContainer = styled.div`
 
 const Input = styled.input`
   width: 80%; 
+  padding: 10px;
   margin: 10px 0;
   background: #262626;
   border: 1px solid #00bcd4;
@@ -24,7 +25,7 @@ const Input = styled.input`
 `;
 
 const Button = styled.button`
-  width: 80%;
+  width: 80%; 
   padding: 10px;
   background: #00bcd4;
   border: none;
