@@ -4,6 +4,7 @@ import Rating from './Rating';
 import Comments from './Comments';
 import { FaTrash, FaEdit, FaStar, FaComment } from 'react-icons/fa';
 import { getCurrentUser } from '../services/authService';
+import { updateRestaurant as updateRestaurantApi } from '../services/restaurantService';
 
 const ItemContainer = styled.div`
   background: #2a2a2a;
@@ -62,20 +63,56 @@ const DateText = styled.p`
 `;
 
 function RestaurantItem({ restaurant, updateRestaurant, removeRestaurant }) {
-  const [localRating, setLocalRating] = useState(restaurant.rating);
   const [isEditing, setIsEditing] = useState(false);
   const [editName, setEditName] = useState(restaurant.name);
   const [editAddress, setEditAddress] = useState(restaurant.address);
   const [editError, setEditError] = useState('');
   const [editLoading, setEditLoading] = useState(false);
+  const [showComments, setShowComments] = useState(false);
+  const [showRatingModal, setShowRatingModal] = useState(false);
+  const currentUser = getCurrentUser();
 
-  const handleRatingChange = (newRating) => {
-    setLocalRating(newRating);
-    updateRestaurant({ ...restaurant, rating: newRating });
-  };
+  const handleRatingSubmit = async (rating, wouldReturn) => {
+    const currentUser = getCurrentUser();
+    if (!currentUser) {
+      alert('Please log in to rate this restaurant');
+      return;
+    }
 
-  const toggleGoAgain = () => {
-    updateRestaurant({ ...restaurant, goAgain: !restaurant.goAgain });
+    const newRating = {
+      userId: currentUser.id,
+      username: currentUser.username,
+      rating,
+      wouldReturn,
+      date: new Date().toISOString()
+    };
+
+    const existingRatingIndex = restaurant.ratings.findIndex(r => r.userId === currentUser.id);
+    let updatedRatings;
+    
+    if (existingRatingIndex !== -1) {
+      updatedRatings = [...restaurant.ratings];
+      updatedRatings[existingRatingIndex] = newRating;
+    } else {
+      updatedRatings = [...restaurant.ratings, newRating];
+    }
+
+    const averageRating = updatedRatings.reduce((acc, r) => acc + r.rating, 0) / updatedRatings.length;
+
+    const updatedRestaurant = {
+      ...restaurant,
+      ratings: updatedRatings,
+      averageRating: Math.round(averageRating * 10) / 10
+    };
+
+    try {
+      await updateRestaurantApi(updatedRestaurant);
+      updateRestaurant(updatedRestaurant);
+      setShowRatingModal(false);
+    } catch (error) {
+      console.error('Failed to update rating:', error);
+      alert('Failed to update rating. Please try again.');
+    }
   };
 
   const handleRemove = () => {
@@ -136,6 +173,25 @@ function RestaurantItem({ restaurant, updateRestaurant, removeRestaurant }) {
         <FaEdit onClick={handleEdit} title="Edit" />
         <FaTrash onClick={handleRemove} title="Remove" />
       </IconContainer>
+      <IconContainer>
+        {currentUser && (
+          <>
+            <FaEdit onClick={handleEdit} title="Edit" />
+            <FaStar onClick={() => setShowRatingModal(true)} title="Rate" />
+            <FaComment onClick={() => setShowComments(!showComments)} title="Comments" />
+            <FaTrash onClick={handleRemove} title="Remove" />
+          </>
+        )}
+      </IconContainer>
+
+      {showRatingModal && (
+        <RatingModal
+          onSubmit={handleRatingSubmit}
+          onClose={() => setShowRatingModal(false)}
+          currentRating={restaurant.ratings.find(r => r?.userId === currentUser?.id)?.rating || 0}
+        />
+      )}
+
       {isEditing ? (
         <>
           <Input
@@ -163,11 +219,14 @@ function RestaurantItem({ restaurant, updateRestaurant, removeRestaurant }) {
           <h3>{restaurant.name}</h3>
           {restaurant.address && <p>{restaurant.address}</p>}
           <DateText>Added on: {new Date(restaurant.dateAdded).toLocaleString()}</DateText>
-          <Rating rating={localRating} onRatingChange={handleRatingChange} />
-          <p>{restaurant.goAgain ? 'Would go again!' : 'Not planning a return.'}</p>
-          <Button onClick={toggleGoAgain}>
-            {restaurant.goAgain ? 'Change to No' : 'Change to Yes'}
-          </Button>
+          <Rating rating={restaurant.averageRating} />
+          {showComments && (
+            <Comments
+              comments={restaurant.ratings.filter(r => r.comment)}
+              onAddComment={(comment) => handleRatingSubmit(comment.rating, comment.wouldReturn, comment.comment)}
+              restaurantId={restaurant.id}
+            />
+          )}
         </>
       )}
     </ItemContainer>
