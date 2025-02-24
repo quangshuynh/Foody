@@ -1,14 +1,16 @@
 {
-    "visited": [
-      {
-        "id": 1,
-        "name": "Dogtown",
-        "address": "691 Monroe Ave, Rochester, NY",
-        "location": { "lat": 43.1438, "lng": -77.5923 },
-        "rating": 5,
-        "goAgain": true
-      }
-    ],
-    "toVisit": []
-  }
+  "visited": [
+    {
+      "id": 1,
+      "name": "Dogtown",
+      "address": "691 Monroe Ave, Rochester, NY",
+      "location": { "lat": 43.1438, "lng": -77.5923 },
+      "rating": 5,
+      "goAgain": true,
+      "dateAdded": "2024-02-23T12:00:00.000Z",
+      "comments": []
+    }
+  ],
+  "toVisit": []
+}
   

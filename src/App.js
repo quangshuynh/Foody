@@ -1,4 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { fetchVisitedRestaurants, updateRestaurant as updateRestaurantApi, 
+         addRestaurant as addRestaurantApi, deleteRestaurant as deleteRestaurantApi } from './services/restaurantService';
 import styled from 'styled-components';
 import Header from './components/Header';
 import SearchBar from './components/SearchBar';
@@ -29,20 +31,24 @@ const Dropdown = styled.select`
 
 function App() {
   // visited restaurants list
-  const [restaurants, setRestaurants] = useState(() => {
-    const stored = localStorage.getItem('visitedRestaurants');
-    return stored ? JSON.parse(stored) : [
-      {
-        id: 1,
-        name: 'Dogtown',
-        address: '691 Monroe Ave, Rochester, NY',
-        location: { lat: 43.1438, lng: -77.5923 },
-        rating: 4,
-        goAgain: true,
-        dateAdded: new Date(), 
-      },
-    ];
-  });
+  const [restaurants, setRestaurants] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const loadRestaurants = async () => {
+      try {
+        const data = await fetchVisitedRestaurants();
+        setRestaurants(data);
+      } catch (err) {
+        setError('Failed to load restaurants');
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadRestaurants();
+  }, []);
 
   const [restaurantsToVisit, setRestaurantsToVisit] = useState(() => {
     const stored = localStorage.getItem('restaurantsToVisit');
@@ -55,7 +61,6 @@ function App() {
 
   useEffect(() => {
     const sortedRestaurants = [...restaurants].sort((a, b) => new Date(b.dateAdded) - new Date(a.dateAdded));
-    localStorage.setItem('visitedRestaurants', JSON.stringify(sortedRestaurants));
     setFilteredRestaurants(sortedRestaurants);
   }, [restaurants]);
   
@@ -85,7 +90,7 @@ function App() {
     }, 1000);
   }, []);
 
-  const addRestaurant = (restaurant) => {
+  const addRestaurant = async (restaurant) => {
     const duplicate = restaurants.some(
       (r) =>
         r.name.toLowerCase() === restaurant.name.toLowerCase() ||
@@ -95,10 +100,14 @@ function App() {
       alert("This restaurant already exists in your visited list!");
       return;
     }
-    const newRestaurant = { ...restaurant, id: Date.now(), dateAdded: new Date() };
-    const updatedRestaurants = [...restaurants, newRestaurant];
-    setRestaurants(updatedRestaurants);
-    setFilteredRestaurants(updatedRestaurants);
+    try {
+      const newRestaurant = { ...restaurant, dateAdded: new Date().toISOString() };
+      const savedRestaurant = await addRestaurantApi(newRestaurant);
+      setRestaurants(prev => [...prev, savedRestaurant]);
+    } catch (err) {
+      console.error('Failed to add restaurant:', err);
+      alert('Failed to add restaurant. Please try again.');
+    }
   };
 
   const updateRestaurant = (updatedRestaurant) => {
