@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import Rating from './Rating';
 import Comments from './Comments';
 import { FaTrash, FaEdit, FaStar, FaComment } from 'react-icons/fa';
-import { getCurrentUser } from '../services/authService';
+import { useAuth } from '../contexts/AuthContext';
 import { updateRestaurant as updateRestaurantApi } from '../services/restaurantService';
 
 const ItemContainer = styled.div`
@@ -70,7 +70,7 @@ function RestaurantItem({ restaurant, updateRestaurant, removeRestaurant }) {
   const [editLoading, setEditLoading] = useState(false);
   const [showComments, setShowComments] = useState(false);
   const [showRatingModal, setShowRatingModal] = useState(false);
-  const currentUser = getCurrentUser();
+  const { user, isAuthenticated } = useAuth();
 
   const handleRatingSubmit = async (rating, wouldReturn) => {
     const currentUser = getCurrentUser();

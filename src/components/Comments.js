@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import { FaThumbsUp, FaThumbsDown, FaStar } from 'react-icons/fa';
-import { getCurrentUser } from '../services/authService';
+import { useAuth } from '../contexts/AuthContext';
 
 const CommentsContainer = styled.div`
   margin-top: 20px;
@@ -48,11 +48,11 @@ function Comments({ comments, onAddComment, onUpdateComment }) {
   const [newComment, setNewComment] = useState('');
   const [rating, setRating] = useState(5);
   const [wouldReturn, setWouldReturn] = useState(true);
-  const currentUser = getCurrentUser();
+  const { user, isAuthenticated } = useAuth();
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!currentUser) {
+    if (!isAuthenticated) {
       alert('Please log in to add a comment');
       return;
     }

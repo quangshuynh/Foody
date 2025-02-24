@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { AuthProvider } from './contexts/AuthContext';
 import { fetchVisitedRestaurants, updateRestaurant as updateRestaurantApi, 
          addRestaurant as addRestaurantApi, deleteRestaurant as deleteRestaurantApi } from './services/restaurantService';
 import styled from 'styled-components';
@@ -155,7 +156,8 @@ function App() {
   };
 
   return (
-    <AppContainer>
+    <AuthProvider>
+      <AppContainer>
       <Header title="Foody" />
       <Dropdown value={selectedSection} onChange={(e) => setSelectedSection(e.target.value)}>
         <option value="visited">Visited Restaurants</option>
@@ -194,7 +196,8 @@ function App() {
         restaurants={[...restaurants, ...restaurantsToVisit, ...recommendedRestaurants]}
       />
       <Footer />
-    </AppContainer>
+      </AppContainer>
+    </AuthProvider>
   );
 }
 

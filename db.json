@@ -4,7 +4,8 @@
       "id": 1,
       "username": "admin",
       "password": "hashed_password_here",
-      "role": "user"
+      "role": "user",
+      "createdAt": "2024-02-23T12:00:00.000Z"
     }
   ],
   "visited": [
