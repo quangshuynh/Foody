@@ -8,7 +8,7 @@ const StarsContainer = styled.div`
 `;
 
 const StarIcon = styled(FaStar)`
-  color: ${props => props.filled ? '#ffd700' : '#4a4a4a'};
+  color: ${props => props.$filled ? '#ffd700' : '#4a4a4a'};
   margin: 0 2px;
 `;
 
@@ -18,7 +18,7 @@ function Rating({ rating }) {
       {[1, 2, 3, 4, 5].map((star) => (
         <StarIcon 
           key={star} 
-          filled={star <= rating} 
+          $filled={star <= rating} 
         />
       ))}
     </StarsContainer>
