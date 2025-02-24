@@ -23,7 +23,7 @@ function Comments({ comments, onAddComment, onUpdateComment }) {
       {comments && comments.length > 0 ? (
         comments.map((comment, index) => (
           <CommentItem key={index}>
-            <strong>{comment.username}</strong> - {new Date(comment.date).toLocaleDateString()}
+            <strong>{comment.username}</strong> - {new Date(comment.date).toLocaleString()}
             <div>
               {[1, 2, 3, 4, 5].map((star) => (
                 <FaStar key={star} color={star <= comment.rating ? '#ffd700' : '#4a4a4a'} />
