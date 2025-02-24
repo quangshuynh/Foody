@@ -181,13 +181,13 @@ function App() {
               setShowLogin(!showLogin);
               setShowRegister(false);
             }}>
-              {showLogin ? 'Hide Login' : 'Login'}
+              {showLogin ? 'Logging in...' : 'Login'}
             </Button>
             <Button onClick={() => {
               setShowRegister(!showRegister);
               setShowLogin(false);
             }} style={{ marginLeft: '10px' }}>
-              {showRegister ? 'Hide Register' : 'Register'}
+              {showRegister ? 'Registering...' : 'Register'}
             </Button>
           </div>
         ) : (
