@@ -184,7 +184,7 @@ function RestaurantItem({ restaurant, updateRestaurant, removeRestaurant }) {
         <RatingModal
           onSubmit={handleRatingSubmit}
           onClose={() => setShowRatingModal(false)}
-          currentRating={restaurant.ratings.find(r => r?.userId === user?.id)?.rating || 0}
+          currentRating={(restaurant.ratings || []).find(r => r?.userId === user?.id)?.rating || 0}
         />
       )}
 
