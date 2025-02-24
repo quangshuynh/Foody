@@ -9,11 +9,13 @@ const FormContainer = styled.div`
   padding: 20px;
   background: #2a2a2a;
   border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center; 
 `;
 
 const Input = styled.input`
-  width: 100%;
-  padding: 10px;
+  width: 80%; 
   margin: 10px 0;
   background: #262626;
   border: 1px solid #00bcd4;
@@ -22,7 +24,7 @@ const Input = styled.input`
 `;
 
 const Button = styled.button`
-  width: 100%;
+  width: 80%;
   padding: 10px;
   background: #00bcd4;
   border: none;
@@ -38,7 +40,9 @@ const Button = styled.button`
 const ErrorMessage = styled.p`
   color: #ff4081;
   margin: 10px 0;
+  text-align: center;
 `;
+
 
 function LoginForm({ onSuccess }) {
   const [username, setUsername] = useState('');

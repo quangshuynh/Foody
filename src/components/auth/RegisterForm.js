@@ -9,10 +9,13 @@ const FormContainer = styled.div`
   padding: 20px;
   background: #2a2a2a;
   border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center; // Centers horizontally
 `;
 
 const Input = styled.input`
-  width: 100%;
+  width: 80%; // Adjust to your preferred width
   padding: 10px;
   margin: 10px 0;
   background: #262626;
@@ -22,7 +25,7 @@ const Input = styled.input`
 `;
 
 const Button = styled.button`
-  width: 100%;
+  width: 80%; // Match this width to your inputs
   padding: 10px;
   background: #00bcd4;
   border: none;
@@ -38,7 +41,9 @@ const Button = styled.button`
 const ErrorMessage = styled.p`
   color: #ff4081;
   margin: 10px 0;
+  text-align: center;
 `;
+
 
 function RegisterForm({ onSuccess }) {
   const [username, setUsername] = useState('');

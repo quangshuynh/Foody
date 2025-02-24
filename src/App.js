@@ -12,6 +12,7 @@ import RestaurantsToVisit from './components/RestaurantsToVisit';
 import RecommendedRestaurants from './components/RecommendedRestaurants';
 import RestaurantMap from './components/RestaurantMap';
 import Footer from './components/Footer';
+import ModalOverlay from './components/ModalOverlay'
 
 const Button = styled.button`
   background: #00bcd4;
@@ -195,8 +196,8 @@ function App() {
           </Button>
         )}
         </AuthButtonContainer>
-        {showLogin && <LoginForm onSuccess={() => setShowLogin(false)} />}
-        {showRegister && <RegisterForm onSuccess={() => setShowRegister(false)} />}
+        {showLogin && (<ModalOverlay onClick={() => setShowLogin(false)}><div onClick={(e) => e.stopPropagation()}><LoginForm onSuccess={() => setShowLogin(false)} /></div></ModalOverlay>)}
+        {showRegister && (<ModalOverlay onClick={() => setShowRegister(false)}><div onClick={(e) => e.stopPropagation()}><RegisterForm onSuccess={() => setShowRegister(false)} /></div></ModalOverlay>)}
       <Header title="Foody" />
       <Dropdown value={selectedSection} onChange={(e) => setSelectedSection(e.target.value)}>
         <option value="visited">Visited Restaurants</option>
