@@ -1,5 +1,6 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import { getCurrentUser } from '../services/authService';
+import { initializeStorage } from '../services/fileService';
 
 const AuthContext = createContext(null);
 
@@ -8,6 +9,7 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    initializeStorage();
     const user = getCurrentUser();
     setUser(user);
     setLoading(false);

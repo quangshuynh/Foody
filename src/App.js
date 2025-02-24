@@ -3,6 +3,7 @@ import { useAuth } from './contexts/AuthContext';
 import LoginForm from './components/auth/LoginForm';
 import RegisterForm from './components/auth/RegisterForm';
 import { fetchVisitedRestaurants, addRestaurant as addRestaurantApi } from './services/restaurantService';
+import { initializeStorage } from './services/fileService';
 import styled from 'styled-components';
 import Header from './components/Header';
 import SearchBar from './components/SearchBar';
@@ -56,6 +57,7 @@ function App() {
   // visited restaurants list
   const [restaurants, setRestaurants] = useState([]);
   useEffect(() => {
+    initializeStorage();
     const loadRestaurants = async () => {
       try {
         const data = await fetchVisitedRestaurants();

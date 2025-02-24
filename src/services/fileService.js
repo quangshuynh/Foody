@@ -1,31 +1,47 @@
-export const readFromStorage = (key) => {
-  try {
-    const data = localStorage.getItem(key);
-    if (!data && key === 'users') {
-      // Initialize with default admin user if no users exist
-      const defaultUsers = [{
-        id: "1",
-        username: "admin",
-        password: "admin123",
-        role: "user",
-        createdAt: new Date().toISOString()
-      }];
-      localStorage.setItem(key, JSON.stringify(defaultUsers));
-      return defaultUsers;
+import initialData from '../data/db.json';
+
+let localData = null;
+
+export const initializeStorage = () => {
+  if (!localData) {
+    try {
+      const savedData = localStorage.getItem('appData');
+      if (savedData) {
+        localData = JSON.parse(savedData);
+      } else {
+        localData = { ...initialData };
+        localStorage.setItem('appData', JSON.stringify(localData));
+      }
+    } catch (error) {
+      console.error('Failed to initialize storage:', error);
+      localData = { ...initialData };
     }
-    return data ? JSON.parse(data) : null;
-  } catch (error) {
-    console.error(`Error reading from storage:`, error);
-    return null;
   }
+  return localData;
+};
+
+export const readFromStorage = (key) => {
+  if (!localData) {
+    initializeStorage();
+  }
+  return localData[key] || null;
 };
 
 export const writeToStorage = async (key, data) => {
   try {
-    localStorage.setItem(key, JSON.stringify(data));
+    if (!localData) {
+      initializeStorage();
+    }
+    localData[key] = data;
+    localStorage.setItem('appData', JSON.stringify(localData));
     return true;
   } catch (error) {
     console.error(`Error writing to storage:`, error);
     return false;
   }
+};
+
+export const clearStorage = () => {
+  localStorage.removeItem('appData');
+  localData = null;
 };
