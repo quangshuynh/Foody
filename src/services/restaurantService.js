@@ -28,16 +28,21 @@ export const updateRestaurant = async (restaurant) => {
 };
 
 export const addRestaurant = async (restaurant) => {
-  const restaurants = await fetchVisitedRestaurants();
-  const newRestaurant = {
-    ...restaurant,
-    id: Date.now().toString(),
-    ratings: [],
-    averageRating: 0
-  };
-  restaurants.push(newRestaurant);
-  await writeToStorage(STORAGE_KEY, restaurants);
-  return newRestaurant;
+  try {
+    const restaurants = await fetchVisitedRestaurants();
+    const newRestaurant = {
+      ...restaurant,
+      id: Date.now().toString(),
+      ratings: [],
+      averageRating: 0
+    };
+    restaurants.push(newRestaurant);
+    await writeToStorage(STORAGE_KEY, restaurants);
+    return newRestaurant;
+  } catch (error) {
+    console.error('Add restaurant error:', error);
+    throw error;
+  }
 };
 
 export const deleteRestaurant = async (id) => {

@@ -14,6 +14,7 @@ const hashPassword = async (password) => {
 
 export const register = async (username, password) => {
   const users = readFromStorage(USERS_KEY) || [];
+  await writeToStorage(USERS_KEY, users);
 
   if (users.find(u => u.username === username)) {
     throw new Error('Username already exists');
