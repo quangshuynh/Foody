@@ -30,6 +30,18 @@ const StarContainer = styled.div`
   margin: 20px 0;
 `;
 
+const TextArea = styled.textarea`
+  width: 100%;
+  min-height: 100px;
+  padding: 10px;
+  margin: 10px 0;
+  background: #262626;
+  color: #f5f5f5;
+  border: 1px solid #00bcd4;
+  border-radius: 5px;
+  resize: vertical;
+`;
+
 const Button = styled.button`
   background: ${props => props.primary ? '#00bcd4' : '#ff4081'};
   border: none;

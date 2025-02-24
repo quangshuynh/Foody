@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import Rating from './Rating';
 import Comments from './Comments';
 import { FaTrash, FaEdit, FaStar, FaComment } from 'react-icons/fa';
+import RatingModal from './RatingModal';
 import { useAuth } from '../contexts/AuthContext';
 import { updateRestaurant as updateRestaurantApi } from '../services/restaurantService';
 
@@ -183,7 +184,7 @@ function RestaurantItem({ restaurant, updateRestaurant, removeRestaurant }) {
         <RatingModal
           onSubmit={handleRatingSubmit}
           onClose={() => setShowRatingModal(false)}
-          currentRating={restaurant.ratings.find(r => r?.userId === currentUser?.id)?.rating || 0}
+          currentRating={restaurant.ratings.find(r => r?.userId === user?.id)?.rating || 0}
         />
       )}
 

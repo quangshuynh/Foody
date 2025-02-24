@@ -1,10 +1,8 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { AuthProvider } from './contexts/AuthContext';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from './contexts/AuthContext';
 import LoginForm from './components/auth/LoginForm';
 import RegisterForm from './components/auth/RegisterForm';
-import { fetchVisitedRestaurants, updateRestaurant as updateRestaurantApi, 
-         addRestaurant as addRestaurantApi, deleteRestaurant as deleteRestaurantApi } from './services/restaurantService';
+import { fetchVisitedRestaurants, addRestaurant as addRestaurantApi } from './services/restaurantService';
 import styled from 'styled-components';
 import Header from './components/Header';
 import SearchBar from './components/SearchBar';
@@ -182,8 +180,7 @@ function App() {
   const [showRegister, setShowRegister] = useState(false);
 
   return (
-    <AuthProvider>
-      <AppContainer>
+    <AppContainer>
         {isGuest ? (
           <div style={{ marginBottom: '20px' }}>
             <Button onClick={() => {
@@ -245,7 +242,6 @@ function App() {
       />
       <Footer />
       </AppContainer>
-    </AuthProvider>
   );
 }
 
