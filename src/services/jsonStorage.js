@@ -52,11 +52,14 @@ export const initializeJsonStorage = async () => {
   
   const request = store.get('appData');
   
-  request.onsuccess = () => {
-    if (!request.result) {
-      store.put(defaultData, 'appData');
-    }
-  };
+  const existingData = await new Promise((resolve) => {
+    const request = store.get('appData');
+    request.onsuccess = () => resolve(request.result);
+  });
+
+  if (!existingData) {
+    store.put(defaultData, 'appData');
+  }
   
   return new Promise((resolve, reject) => {
     tx.oncomplete = () => resolve();

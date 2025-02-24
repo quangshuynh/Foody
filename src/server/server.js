@@ -61,11 +61,29 @@ app.put('/api/data/:key', (req, res) => {
   try {
     const { key } = req.params;
     const { value } = req.body;
-    const data = fs.readJsonSync(DATA_FILE);
+    
+    // Ensure data directory exists
+    const dir = path.dirname(DATA_FILE);
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+    }
+    
+    // Read existing data or create new
+    let data = {};
+    if (fs.existsSync(DATA_FILE)) {
+      data = fs.readJsonSync(DATA_FILE);
+    } else {
+      data = defaultData;
+    }
+    
+    // Update data
     data[key] = value;
+    
+    // Write back to file
     fs.writeJsonSync(DATA_FILE, data, { spaces: 2 });
     res.json({ success: true });
   } catch (error) {
+    console.error('Error updating data:', error);
     res.status(500).json({ error: 'Failed to update data' });
   }
 });
