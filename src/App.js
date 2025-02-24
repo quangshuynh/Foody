@@ -1,5 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { AuthProvider } from './contexts/AuthContext';
+import { useAuth } from './contexts/AuthContext';
+import LoginForm from './components/auth/LoginForm';
+import RegisterForm from './components/auth/RegisterForm';
 import { fetchVisitedRestaurants, updateRestaurant as updateRestaurantApi, 
          addRestaurant as addRestaurantApi, deleteRestaurant as deleteRestaurantApi } from './services/restaurantService';
 import styled from 'styled-components';
@@ -155,9 +158,31 @@ function App() {
     setRestaurantsToVisit(updatedToVisit);
   };
 
+  const { isAuthenticated, isGuest } = useAuth();
+  const [showLogin, setShowLogin] = useState(false);
+  const [showRegister, setShowRegister] = useState(false);
+
   return (
     <AuthProvider>
       <AppContainer>
+        {isGuest && (
+          <div style={{ marginBottom: '20px' }}>
+            <Button onClick={() => {
+              setShowLogin(!showLogin);
+              setShowRegister(false);
+            }}>
+              {showLogin ? 'Hide Login' : 'Login'}
+            </Button>
+            <Button onClick={() => {
+              setShowRegister(!showRegister);
+              setShowLogin(false);
+            }} style={{ marginLeft: '10px' }}>
+              {showRegister ? 'Hide Register' : 'Register'}
+            </Button>
+          </div>
+        )}
+        {showLogin && <LoginForm onSuccess={() => setShowLogin(false)} />}
+        {showRegister && <RegisterForm onSuccess={() => setShowRegister(false)} />}
       <Header title="Foody" />
       <Dropdown value={selectedSection} onChange={(e) => setSelectedSection(e.target.value)}>
         <option value="visited">Visited Restaurants</option>

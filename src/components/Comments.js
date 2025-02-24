@@ -57,8 +57,8 @@ function Comments({ comments, onAddComment, onUpdateComment }) {
       return;
     }
     onAddComment({
-      userId: currentUser.id,
-      username: currentUser.username,
+      userId: user.id,
+      username: user.username,
       comment: newComment,
       rating,
       wouldReturn,
@@ -87,7 +87,7 @@ function Comments({ comments, onAddComment, onUpdateComment }) {
         </CommentItem>
       ))}
       
-      {currentUser && (
+      {isAuthenticated && (
         <CommentForm onSubmit={handleSubmit}>
           <TextArea
             value={newComment}

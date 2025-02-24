@@ -32,7 +32,10 @@ export const updateRestaurant = async (restaurant) => {
 export const addRestaurant = async (restaurant) => {
   const response = await fetch(`${API_URL}/visited`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${localStorage.getItem('token')}`
+    },
     body: JSON.stringify(restaurant)
   });
   if (!response.ok) throw new Error('Failed to add restaurant');
@@ -41,7 +44,10 @@ export const addRestaurant = async (restaurant) => {
 
 export const deleteRestaurant = async (id) => {
   const response = await fetch(`${API_URL}/visited/${id}`, {
-    method: 'DELETE'
+    method: 'DELETE',
+    headers: {
+      'Authorization': `Bearer ${localStorage.getItem('token')}`
+    }
   });
   if (!response.ok) throw new Error('Failed to delete restaurant');
   return true;

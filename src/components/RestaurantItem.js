@@ -72,22 +72,21 @@ function RestaurantItem({ restaurant, updateRestaurant, removeRestaurant }) {
   const [showRatingModal, setShowRatingModal] = useState(false);
   const { user, isAuthenticated } = useAuth();
 
-  const handleRatingSubmit = async (rating, wouldReturn) => {
-    const currentUser = getCurrentUser();
-    if (!currentUser) {
+  const handleRatingSubmit = async (rating, wouldReturn, comment = '') => {
+    if (!user) {
       alert('Please log in to rate this restaurant');
       return;
     }
 
     const newRating = {
-      userId: currentUser.id,
-      username: currentUser.username,
+      userId: user.id,
+      username: user.username,
       rating,
       wouldReturn,
       date: new Date().toISOString()
     };
 
-    const existingRatingIndex = restaurant.ratings.findIndex(r => r.userId === currentUser.id);
+    const existingRatingIndex = restaurant.ratings.findIndex(r => r.userId === user.id);
     let updatedRatings;
     
     if (existingRatingIndex !== -1) {
@@ -169,10 +168,6 @@ function RestaurantItem({ restaurant, updateRestaurant, removeRestaurant }) {
 
   return (
     <ItemContainer>
-      <IconContainer>
-        <FaEdit onClick={handleEdit} title="Edit" />
-        <FaTrash onClick={handleRemove} title="Remove" />
-      </IconContainer>
       <IconContainer>
         {currentUser && (
           <>
