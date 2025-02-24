@@ -218,7 +218,7 @@ function RestaurantItem({ restaurant, updateRestaurant, removeRestaurant }) {
           <Rating rating={restaurant.averageRating} />
           {showComments && (
             <Comments
-              comments={restaurant.ratings.filter(r => r.comment)}
+              comments={(restaurant.ratings || []).filter(r => r?.comment)}
               onAddComment={(comment) => handleRatingSubmit(comment.rating, comment.wouldReturn, comment.comment)}
               restaurantId={restaurant.id}
             />

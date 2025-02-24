@@ -51,8 +51,8 @@
         "lat": 51.5074456,
         "lng": -0.1277653
       },
-      "rating": 0,
-      "goAgain": false,
+      "ratings": [],
+      "averageRating": 0,
       "dateAdded": "2025-02-24T01:05:59.793Z"
     }
   ],
