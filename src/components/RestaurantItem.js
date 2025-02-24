@@ -169,7 +169,7 @@ function RestaurantItem({ restaurant, updateRestaurant, removeRestaurant }) {
   return (
     <ItemContainer>
       <IconContainer>
-        {currentUser && (
+        {isAuthenticated && (
           <>
             <FaEdit onClick={handleEdit} title="Edit" />
             <FaStar onClick={() => setShowRatingModal(true)} title="Rate" />

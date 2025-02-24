@@ -46,13 +46,14 @@ const Button = styled.button`
 function RatingModal({ onSubmit, onClose, currentRating = 0 }) {
   const [rating, setRating] = useState(currentRating);
   const [wouldReturn, setWouldReturn] = useState(true);
+  const [comment, setComment] = useState('');
 
   const handleSubmit = () => {
     if (rating === 0) {
       alert('Please select a rating');
       return;
     }
-    onSubmit(rating, wouldReturn);
+    onSubmit(rating, wouldReturn, comment);
   };
 
   return (
@@ -84,6 +85,11 @@ function RatingModal({ onSubmit, onClose, currentRating = 0 }) {
             <FaThumbsDown /> Would Not Return
           </Button>
         </div>
+        <TextArea
+          value={comment}
+          onChange={(e) => setComment(e.target.value)}
+          placeholder="Add your comment (optional)..."
+        />
         <div style={{ marginTop: '20px' }}>
           <Button primary onClick={handleSubmit}>Submit Rating</Button>
           <Button onClick={onClose}>Cancel</Button>

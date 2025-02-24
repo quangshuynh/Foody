@@ -14,6 +14,19 @@ import RecommendedRestaurants from './components/RecommendedRestaurants';
 import RestaurantMap from './components/RestaurantMap';
 import Footer from './components/Footer';
 
+const Button = styled.button`
+  background: #00bcd4;
+  border: none;
+  color: white;
+  padding: 10px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+  margin: 5px;
+  &:hover {
+    background: #00a1b5;
+  }
+`;
+
 const AppContainer = styled.div`
   font-family: 'Roboto', sans-serif;
   background: #1f1f1f;
@@ -158,14 +171,20 @@ function App() {
     setRestaurantsToVisit(updatedToVisit);
   };
 
-  const { isAuthenticated, isGuest } = useAuth();
+  const { isAuthenticated, isGuest, setUser } = useAuth();
+
+  const handleLogout = () => {
+    setUser(null);
+    localStorage.removeItem('user');
+    localStorage.removeItem('token');
+  };
   const [showLogin, setShowLogin] = useState(false);
   const [showRegister, setShowRegister] = useState(false);
 
   return (
     <AuthProvider>
       <AppContainer>
-        {isGuest && (
+        {isGuest ? (
           <div style={{ marginBottom: '20px' }}>
             <Button onClick={() => {
               setShowLogin(!showLogin);
@@ -180,6 +199,10 @@ function App() {
               {showRegister ? 'Hide Register' : 'Register'}
             </Button>
           </div>
+        ) : (
+          <Button onClick={handleLogout} style={{ marginBottom: '20px' }}>
+            Logout
+          </Button>
         )}
         {showLogin && <LoginForm onSuccess={() => setShowLogin(false)} />}
         {showRegister && <RegisterForm onSuccess={() => setShowRegister(false)} />}
