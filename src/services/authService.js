@@ -1,26 +1,8 @@
 const TOKEN_KEY = 'auth_token';
 const USERS_KEY = 'users';
 
-// Initialize users from db.json if not exists
-const initializeUsers = () => {
-  const users = localStorage.getItem(USERS_KEY);
-  if (!users) {
-    const initialUsers = [
-      {
-        id: "1",
-        username: "admin",
-        password: "admin123",
-        role: "user",
-        createdAt: new Date().toISOString()
-      }
-    ];
-    localStorage.setItem(USERS_KEY, JSON.stringify(initialUsers));
-  }
-};
-
 export const register = async (username, password) => {
-  initializeUsers();
-  const users = JSON.parse(localStorage.getItem(USERS_KEY) || '[]');
+  const users = readFromStorage(USERS_KEY) || [];
 
   if (users.find(u => u.username === username)) {
     throw new Error('Username already exists');
@@ -45,8 +27,7 @@ export const register = async (username, password) => {
 };
 
 export const login = async (username, password) => {
-  initializeUsers();
-  const users = JSON.parse(localStorage.getItem(USERS_KEY) || '[]');
+  const users = readFromStorage(USERS_KEY) || [];
   const user = users.find(u => u.username === username && u.password === password);
 
   if (!user) {
