@@ -1,7 +1,6 @@
-import React, { useState } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 import { FaThumbsUp, FaThumbsDown, FaStar } from 'react-icons/fa';
-import { useAuth } from '../contexts/AuthContext';
 
 const CommentsContainer = styled.div`
   margin-top: 20px;
@@ -18,8 +17,6 @@ const CommentItem = styled.div`
 
 
 function Comments({ comments, onAddComment, onUpdateComment }) {
-  const { isAuthenticated } = useAuth();
-
   return (
     <CommentsContainer>
       <h4>Comments</h4>
