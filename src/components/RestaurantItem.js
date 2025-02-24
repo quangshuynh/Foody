@@ -87,14 +87,15 @@ function RestaurantItem({ restaurant, updateRestaurant, removeRestaurant }) {
       date: new Date().toISOString()
     };
 
-    const existingRatingIndex = restaurant.ratings.findIndex(r => r.userId === user.id);
+    const ratings = restaurant.ratings || [];
+    const existingRatingIndex = ratings.findIndex(r => r.userId === user.id);
     let updatedRatings;
     
     if (existingRatingIndex !== -1) {
-      updatedRatings = [...restaurant.ratings];
+      updatedRatings = [...ratings];
       updatedRatings[existingRatingIndex] = newRating;
     } else {
-      updatedRatings = [...restaurant.ratings, newRating];
+      updatedRatings = [...ratings, newRating];
     }
 
     const averageRating = updatedRatings.reduce((acc, r) => acc + r.rating, 0) / updatedRatings.length;

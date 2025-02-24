@@ -11,9 +11,14 @@ export const updateRestaurant = async (restaurant) => {
     const restaurants = await fetchVisitedRestaurants();
     const index = restaurants.findIndex(r => r.id === restaurant.id);
     if (index !== -1) {
-      restaurants[index] = restaurant;
+      const updatedRestaurant = {
+        ...restaurant,
+        ratings: restaurant.ratings || [],
+        averageRating: restaurant.averageRating || 0
+      };
+      restaurants[index] = updatedRestaurant;
       await writeToStorage(STORAGE_KEY, restaurants);
-      return restaurant;
+      return updatedRestaurant;
     }
     throw new Error('Restaurant not found');
   } catch (error) {
