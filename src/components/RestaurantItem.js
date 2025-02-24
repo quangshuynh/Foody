@@ -84,6 +84,7 @@ function RestaurantItem({ restaurant, updateRestaurant, removeRestaurant }) {
       username: user.username,
       rating,
       wouldReturn,
+      comment,
       date: new Date().toISOString()
     };
 

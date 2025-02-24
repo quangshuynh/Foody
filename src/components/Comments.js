@@ -23,22 +23,26 @@ function Comments({ comments, onAddComment, onUpdateComment }) {
   return (
     <CommentsContainer>
       <h4>Comments</h4>
-      {comments.map((comment, index) => (
-        <CommentItem key={index}>
-          <strong>{comment.username}</strong> - {new Date(comment.date).toLocaleDateString()}
-          <div>
-            {[1, 2, 3, 4, 5].map((star) => (
-              <FaStar key={star} color={star <= comment.rating ? '#ffd700' : '#4a4a4a'} />
-            ))}
-          </div>
-          <p>{comment.comment}</p>
-          {comment.wouldReturn ? (
-            <FaThumbsUp color="#00bcd4" />
-          ) : (
-            <FaThumbsDown color="#ff4081" />
-          )}
-        </CommentItem>
-      ))}
+      {comments && comments.length > 0 ? (
+        comments.map((comment, index) => (
+          <CommentItem key={index}>
+            <strong>{comment.username}</strong> - {new Date(comment.date).toLocaleDateString()}
+            <div>
+              {[1, 2, 3, 4, 5].map((star) => (
+                <FaStar key={star} color={star <= comment.rating ? '#ffd700' : '#4a4a4a'} />
+              ))}
+            </div>
+            {comment.comment && <p>{comment.comment}</p>}
+            {comment.wouldReturn ? (
+              <FaThumbsUp color="#00bcd4" title="Would Return" />
+            ) : (
+              <FaThumbsDown color="#ff4081" title="Would Not Return" />
+            )}
+          </CommentItem>
+        ))
+      ) : (
+        <p>No comments yet.</p>
+      )}
       
     </CommentsContainer>
   );
