@@ -13,6 +13,8 @@ import RecommendedRestaurants from './components/RecommendedRestaurants';
 import RestaurantMap from './components/RestaurantMap';
 import Footer from './components/Footer';
 import ModalOverlay from './components/ModalOverlay'
+import Navbar from './components/Navbar';
+
 
 const Button = styled.button`
   background: #00bcd4;
@@ -174,57 +176,35 @@ function App() {
 
   return (
     <AppContainer>
-      <AuthButtonContainer>
-        {isGuest ? (
-          <div style={{ marginBottom: '20px' }}>
-            <Button onClick={() => {
-              setShowLogin(!showLogin);
-              setShowRegister(false);
-            }}>
-              {showLogin ? 'Logging in...' : 'Login'}
-            </Button>
-            <Button onClick={() => {
-              setShowRegister(!showRegister);
-              setShowLogin(false);
-            }} style={{ marginLeft: '10px' }}>
-              {showRegister ? 'Registering...' : 'Register'}
-            </Button>
-          </div>
-        ) : (
-          <Button onClick={handleLogout} style={{ marginBottom: '20px' }}>
-            Logout
-          </Button>
-        )}
-        </AuthButtonContainer>
-        {showLogin && (<ModalOverlay onClick={() => setShowLogin(false)}><div onClick={(e) => e.stopPropagation()}><LoginForm onSuccess={() => setShowLogin(false)} /></div></ModalOverlay>)}
-        {showRegister && (<ModalOverlay onClick={() => setShowRegister(false)}><div onClick={(e) => e.stopPropagation()}><RegisterForm onSuccess={() => setShowRegister(false)} /></div></ModalOverlay>)}
-      <Header title="Foody" />
-      <Dropdown value={selectedSection} onChange={(e) => setSelectedSection(e.target.value)}>
-        <option value="visited">Visited Restaurants</option>
-        <option value="toVisit">Restaurants to Visit</option>
-        <option value="recommended">Recommended Restaurants</option>
-      </Dropdown>
+      <Header
+        title="Foody"
+        selectedSection={selectedSection}
+        setSelectedSection={setSelectedSection}
+        onShowLogin={() => {
+          setShowLogin(!showLogin);
+          setShowRegister(false);
+        }}
+        onShowRegister={() => {
+          setShowRegister(!showRegister);
+          setShowLogin(false);
+        }}
+        onLogout={handleLogout}
+      />
+      {showLogin && (<ModalOverlay onClick={() => setShowLogin(false)}><div onClick={(e) => e.stopPropagation()}><LoginForm onSuccess={() => setShowLogin(false)} /></div></ModalOverlay>)}
+      {showRegister && (<ModalOverlay onClick={() => setShowRegister(false)}><div onClick={(e) => e.stopPropagation()}><RegisterForm onSuccess={() => setShowRegister(false)} /></div></ModalOverlay>)}
       {selectedSection === 'visited' && (
         <>
           <SearchBar searchRestaurants={searchRestaurants} />
           <h2>Visited Restaurants</h2>
-          {isAuthenticated ? (
-            <RestaurantList
-              restaurants={filteredRestaurants}
-              updateRestaurant={updateRestaurant}
-              addRestaurant={addRestaurant}
-              removeRestaurant={removeRestaurant}
-            />
-          ) : (
-            <RestaurantList
-              restaurants={filteredRestaurants}
-              updateRestaurant={null}
-              addRestaurant={null}
-              removeRestaurant={null}
-            />
-          )}
+          <RestaurantList
+            restaurants={filteredRestaurants}
+            updateRestaurant={isAuthenticated ? updateRestaurant : null}
+            addRestaurant={isAuthenticated ? addRestaurant : null}
+            removeRestaurant={isAuthenticated ? removeRestaurant : null}
+          />
         </>
       )}
+
       {selectedSection === 'toVisit' && (
         <>
           <h2>Restaurants to Visit</h2>
@@ -235,17 +215,17 @@ function App() {
           />
         </>
       )}
+
       {selectedSection === 'recommended' && (
         <>
           <h2>Recommended Restaurants</h2>
           <RecommendedRestaurants recommendedRestaurants={recommendedRestaurants} />
         </>
       )}
-      <RestaurantMap
-        restaurants={[...restaurants, ...restaurantsToVisit, ...recommendedRestaurants]}
-      />
+
+      <RestaurantMap restaurants={[...restaurants, ...restaurantsToVisit, ...recommendedRestaurants]} />
       <Footer />
-      </AppContainer>
+    </AppContainer>
   );
 }
 
