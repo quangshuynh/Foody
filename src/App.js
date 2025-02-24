@@ -54,9 +54,11 @@ function App() {
   const [selectedSection, setSelectedSection] = useState('visited');
 
   useEffect(() => {
-    localStorage.setItem('visitedRestaurants', JSON.stringify(restaurants));
-    setFilteredRestaurants(restaurants);
+    const sortedRestaurants = [...restaurants].sort((a, b) => new Date(b.dateAdded) - new Date(a.dateAdded));
+    localStorage.setItem('visitedRestaurants', JSON.stringify(sortedRestaurants));
+    setFilteredRestaurants(sortedRestaurants);
   }, [restaurants]);
+  
 
   useEffect(() => {
     localStorage.setItem('restaurantsToVisit', JSON.stringify(restaurantsToVisit));
