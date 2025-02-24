@@ -3,7 +3,7 @@ import { useAuth } from './contexts/AuthContext';
 import LoginForm from './components/auth/LoginForm';
 import RegisterForm from './components/auth/RegisterForm';
 import { fetchVisitedRestaurants, addRestaurant as addRestaurantApi } from './services/restaurantService';
-import { initializeStorage } from './services/fileService';
+import { initializeJsonStorage, readJsonData, updateJsonData } from './services/jsonStorage';
 import styled from 'styled-components';
 import Header from './components/Header';
 import SearchBar from './components/SearchBar';
@@ -57,7 +57,7 @@ function App() {
   // visited restaurants list
   const [restaurants, setRestaurants] = useState([]);
   useEffect(() => {
-    initializeStorage();
+    initializeJsonStorage();
     const loadRestaurants = async () => {
       try {
         const data = await fetchVisitedRestaurants();
@@ -69,11 +69,7 @@ function App() {
     loadRestaurants();
   }, []);
 
-  const [restaurantsToVisit, setRestaurantsToVisit] = useState(() => {
-    const stored = localStorage.getItem('restaurantsToVisit');
-    return stored ? JSON.parse(stored) : [];
-  });
-
+  const [restaurantsToVisit, setRestaurantsToVisit] = useState([]);
   const [recommendedRestaurants, setRecommendedRestaurants] = useState([]);
   const [filteredRestaurants, setFilteredRestaurants] = useState(restaurants);
   const [selectedSection, setSelectedSection] = useState('visited');
@@ -85,28 +81,21 @@ function App() {
   
 
   useEffect(() => {
-    localStorage.setItem('restaurantsToVisit', JSON.stringify(restaurantsToVisit));
-  }, [restaurantsToVisit]);
+    const loadAllData = async () => {
+      try {
+        const data = readJsonData();
+        setRestaurantsToVisit(data.toVisit || []);
+        setRecommendedRestaurants(data.recommended || []);
+      } catch (err) {
+        console.error('Failed to load data:', err);
+      }
+    };
+    loadAllData();
+  }, []);
 
   useEffect(() => {
-    // Set recommended restaurants immediately instead of using setTimeout
-    setRecommendedRestaurants([
-      {
-        id: 101,
-        name: 'Kai poop',
-        address: '2 Scottsville Rd, Rochester, NY',
-        location: { lat: 43.1258, lng: -77.6424 },
-        dateAdded: new Date()
-      },
-      {
-        id: 102,
-        name: 'Carlton Gibson Hall',
-        address: 'Latimore Pl, Rochester, NY',
-        location: { lat: 43.0857, lng: -77.6672 },
-        dateAdded: new Date()
-      },
-    ]);
-  }, []);
+    updateJsonData('toVisit', restaurantsToVisit);
+  }, [restaurantsToVisit]);
 
   const addRestaurant = async (restaurant) => {
     const duplicate = restaurants.some(
