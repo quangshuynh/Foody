@@ -1,19 +1,29 @@
 {
   "users": [
     {
-      "id": 1,
+      "id": "1",
       "username": "admin",
       "password": "hashed_password_here",
       "role": "user",
       "createdAt": "2024-02-23T12:00:00.000Z"
+    },
+    {
+      "id": "2e1a",
+      "username": "forkei",
+      "password": "poopypants",
+      "role": "user",
+      "createdAt": "2025-02-24T01:01:48.725Z"
     }
   ],
   "visited": [
     {
-      "id": 1,
+      "id": "1",
       "name": "Dogtown",
       "address": "691 Monroe Ave, Rochester, NY",
-      "location": { "lat": 43.1438, "lng": -77.5923 },
+      "location": {
+        "lat": 43.1438,
+        "lng": -77.5923
+      },
       "dateAdded": "2024-02-23T12:00:00.000Z",
       "ratings": [
         {
@@ -22,11 +32,29 @@
           "wouldReturn": true,
           "comment": "Great place!",
           "date": "2024-02-23T12:00:00.000Z"
+        },
+        {
+          "userId": "2e1a",
+          "username": "forkei",
+          "rating": 1,
+          "wouldReturn": false,
+          "date": "2025-02-24T01:04:18.348Z"
         }
       ],
-      "averageRating": 5
+      "averageRating": 3
+    },
+    {
+      "id": "c196",
+      "name": "Cringe Palace",
+      "address": "London",
+      "location": {
+        "lat": 51.5074456,
+        "lng": -0.1277653
+      },
+      "rating": 0,
+      "goAgain": false,
+      "dateAdded": "2025-02-24T01:05:59.793Z"
     }
   ],
   "toVisit": []
 }
-  
