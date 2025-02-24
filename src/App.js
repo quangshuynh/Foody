@@ -79,24 +79,23 @@ function App() {
   }, [restaurantsToVisit]);
 
   useEffect(() => {
-    setTimeout(() => {
-      setRecommendedRestaurants([
-        {
-          id: 101,
-          name: 'Kai poop',
-          address: '2 Scottsville Rd, Rochester, NY',
-          location: { lat: 43.1258, lng: -77.6424 },
-          dateAdded: new Date()
-        },
-        {
-          id: 102,
-          name: 'Carlton Gibson Hall',
-          address: 'Latimore Pl, Rochester, NY',
-          location: { lat: 43.0857, lng: -77.6672 },
-          dateAdded: new Date()
-        },
-      ]);
-    }, 1000);
+    // Set recommended restaurants immediately instead of using setTimeout
+    setRecommendedRestaurants([
+      {
+        id: 101,
+        name: 'Kai poop',
+        address: '2 Scottsville Rd, Rochester, NY',
+        location: { lat: 43.1258, lng: -77.6424 },
+        dateAdded: new Date()
+      },
+      {
+        id: 102,
+        name: 'Carlton Gibson Hall',
+        address: 'Latimore Pl, Rochester, NY',
+        location: { lat: 43.0857, lng: -77.6672 },
+        dateAdded: new Date()
+      },
+    ]);
   }, []);
 
   const addRestaurant = async (restaurant) => {
