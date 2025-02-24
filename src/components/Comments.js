@@ -87,33 +87,6 @@ function Comments({ comments, onAddComment, onUpdateComment }) {
         </CommentItem>
       ))}
       
-      {isAuthenticated && (
-        <CommentForm onSubmit={handleSubmit}>
-          <TextArea
-            value={newComment}
-            onChange={(e) => setNewComment(e.target.value)}
-            placeholder="Add your comment..."
-          />
-          <div>
-            Rating:
-            {[1, 2, 3, 4, 5].map((star) => (
-              <FaStar
-                key={star}
-                style={{ cursor: 'pointer', marginRight: '5px' }}
-                color={star <= rating ? '#ffd700' : '#4a4a4a'}
-                onClick={() => setRating(star)}
-              />
-            ))}
-          </div>
-          <div>
-            <Button type="button" onClick={() => setWouldReturn(!wouldReturn)}>
-              {wouldReturn ? <FaThumbsUp /> : <FaThumbsDown />}
-              {wouldReturn ? ' Would Return' : ' Would Not Return'}
-            </Button>
-          </div>
-          <Button type="submit">Add Comment</Button>
-        </CommentForm>
-      )}
     </CommentsContainer>
   );
 }

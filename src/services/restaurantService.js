@@ -1,28 +1,22 @@
-const API_URL = 'http://localhost:3001';
+import { readJSONFile, writeJSONFile } from './fileService';
+
+const STORAGE_KEY = 'visitedRestaurants';
 
 export const fetchVisitedRestaurants = async () => {
-  const response = await fetch(`${API_URL}/visited`);
-  if (!response.ok) throw new Error('Failed to fetch restaurants');
-  return response.json();
+  const data = localStorage.getItem(STORAGE_KEY);
+  return data ? JSON.parse(data) : [];
 };
 
 export const updateRestaurant = async (restaurant) => {
   try {
-    const response = await fetch(`${API_URL}/visited/${restaurant.id}`, {
-      method: 'PUT',
-      headers: { 
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${localStorage.getItem('token')}`
-      },
-      body: JSON.stringify(restaurant)
-    });
-    
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.message || 'Failed to update restaurant');
+    const restaurants = await fetchVisitedRestaurants();
+    const index = restaurants.findIndex(r => r.id === restaurant.id);
+    if (index !== -1) {
+      restaurants[index] = restaurant;
+      await writeJSONFile(STORAGE_KEY, restaurants);
+      return restaurant;
     }
-    
-    return response.json();
+    throw new Error('Restaurant not found');
   } catch (error) {
     console.error('Update restaurant error:', error);
     throw error;
@@ -30,25 +24,21 @@ export const updateRestaurant = async (restaurant) => {
 };
 
 export const addRestaurant = async (restaurant) => {
-  const response = await fetch(`${API_URL}/visited`, {
-    method: 'POST',
-    headers: { 
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${localStorage.getItem('token')}`
-    },
-    body: JSON.stringify(restaurant)
-  });
-  if (!response.ok) throw new Error('Failed to add restaurant');
-  return response.json();
+  const restaurants = await fetchVisitedRestaurants();
+  const newRestaurant = {
+    ...restaurant,
+    id: Date.now().toString(),
+    ratings: [],
+    averageRating: 0
+  };
+  restaurants.push(newRestaurant);
+  await writeJSONFile(STORAGE_KEY, restaurants);
+  return newRestaurant;
 };
 
 export const deleteRestaurant = async (id) => {
-  const response = await fetch(`${API_URL}/visited/${id}`, {
-    method: 'DELETE',
-    headers: {
-      'Authorization': `Bearer ${localStorage.getItem('token')}`
-    }
-  });
-  if (!response.ok) throw new Error('Failed to delete restaurant');
+  const restaurants = await fetchVisitedRestaurants();
+  const filtered = restaurants.filter(r => r.id !== id);
+  await writeJSONFile(STORAGE_KEY, filtered);
   return true;
 };

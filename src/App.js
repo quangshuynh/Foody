@@ -213,12 +213,21 @@ function App() {
         <>
           <SearchBar searchRestaurants={searchRestaurants} />
           <h2>Visited Restaurants</h2>
-          <RestaurantList
-            restaurants={filteredRestaurants}
-            updateRestaurant={updateRestaurant}
-            addRestaurant={addRestaurant}
-            removeRestaurant={removeRestaurant}
-          />
+          {isAuthenticated ? (
+            <RestaurantList
+              restaurants={filteredRestaurants}
+              updateRestaurant={updateRestaurant}
+              addRestaurant={addRestaurant}
+              removeRestaurant={removeRestaurant}
+            />
+          ) : (
+            <RestaurantList
+              restaurants={filteredRestaurants}
+              updateRestaurant={null}
+              addRestaurant={null}
+              removeRestaurant={null}
+            />
+          )}
         </>
       )}
       {selectedSection === 'toVisit' && (
