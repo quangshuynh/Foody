@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import Rating from './Rating';
-import { FaTrash, FaEdit } from 'react-icons/fa';
+import Comments from './Comments';
+import { FaTrash, FaEdit, FaStar, FaComment } from 'react-icons/fa';
+import { getCurrentUser } from '../services/authService';
 
 const ItemContainer = styled.div`
   background: #2a2a2a;

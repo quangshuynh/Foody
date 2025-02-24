@@ -1,14 +1,29 @@
 {
+  "users": [
+    {
+      "id": 1,
+      "username": "admin",
+      "password": "hashed_password_here",
+      "role": "user"
+    }
+  ],
   "visited": [
     {
       "id": 1,
       "name": "Dogtown",
       "address": "691 Monroe Ave, Rochester, NY",
       "location": { "lat": 43.1438, "lng": -77.5923 },
-      "rating": 5,
-      "goAgain": true,
       "dateAdded": "2024-02-23T12:00:00.000Z",
-      "comments": []
+      "ratings": [
+        {
+          "userId": 1,
+          "rating": 5,
+          "wouldReturn": true,
+          "comment": "Great place!",
+          "date": "2024-02-23T12:00:00.000Z"
+        }
+      ],
+      "averageRating": 5
     }
   ],
   "toVisit": []

@@ -1,64 +1,27 @@
-import React, { useState } from 'react';
+import React from 'react';
 import styled from 'styled-components';
+import { FaStar } from 'react-icons/fa';
 
-const RatingContainer = styled.div`
-  margin: 10px 0;
+const StarsContainer = styled.div`
+  display: inline-flex;
+  align-items: center;
 `;
 
-const RatingButton = styled.button`
-  background: #00bcd4;
-  border: none;
-  color: #fff;
-  padding: 8px 12px;
-  border-radius: 5px;
-  cursor: pointer;
-  margin: 0 5px;
-  &:hover {
-    background: #00a1b5;
-  }
+const StarIcon = styled(FaStar)`
+  color: ${props => props.filled ? '#ffd700' : '#4a4a4a'};
+  margin: 0 2px;
 `;
 
-const RatingDisplay = styled.span`
-  margin-right: 10px;
-  color: #f5f5f5;
-`;
-
-function Rating({ rating, onRatingChange }) {
-  const [isEditing, setIsEditing] = useState(false);
-  const [tempRating, setTempRating] = useState(rating);
-
-  const handleRatingClick = (value) => {
-    setTempRating(value);
-  };
-
-  const handleSave = () => {
-    onRatingChange(tempRating);
-    setIsEditing(false);
-  };
-
-  if (isEditing) {
-    return (
-      <RatingContainer>
-        {[1, 2, 3, 4, 5].map((value) => (
-          <RatingButton
-            key={value}
-            onClick={() => handleRatingClick(value)}
-            style={{ background: tempRating === value ? '#00a1b5' : '#00bcd4' }}
-          >
-            {value}
-          </RatingButton>
-        ))}
-        <RatingButton onClick={handleSave}>Save</RatingButton>
-        <RatingButton onClick={() => setIsEditing(false)}>Cancel</RatingButton>
-      </RatingContainer>
-    );
-  }
-
+function Rating({ rating }) {
   return (
-    <RatingContainer>
-      <RatingDisplay>Rating: {rating}/5</RatingDisplay>
-      <RatingButton onClick={() => setIsEditing(true)}>Change Rating</RatingButton>
-    </RatingContainer>
+    <StarsContainer>
+      {[1, 2, 3, 4, 5].map((star) => (
+        <StarIcon 
+          key={star} 
+          filled={star <= rating} 
+        />
+      ))}
+    </StarsContainer>
   );
 }
 
