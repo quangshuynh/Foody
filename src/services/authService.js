@@ -1,9 +1,16 @@
 import { readFromStorage, writeToStorage } from './fileService';
-import bcrypt from 'bcryptjs';
 
 const TOKEN_KEY = 'auth_token';
 const USERS_KEY = 'users';
-const SALT_ROUNDS = 10;
+
+// Simple hash function for demo purposes
+const hashPassword = async (password) => {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(password);
+  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+};
 
 export const register = async (username, password) => {
   const users = readFromStorage(USERS_KEY) || [];
@@ -12,7 +19,7 @@ export const register = async (username, password) => {
     throw new Error('Username already exists');
   }
 
-  const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
+  const hashedPassword = await hashPassword(password);
   const newUser = {
     id: Date.now().toString(),
     username,
@@ -34,7 +41,7 @@ export const register = async (username, password) => {
 export const login = async (username, password) => {
   const users = readFromStorage(USERS_KEY) || [];
   const user = users.find(u => u.username === username);
-  if (!user || !(await bcrypt.compare(password, user.password))) {
+  if (!user || !(await hashPassword(password) === user.password)) {
     throw new Error('Invalid credentials');
   }
 
