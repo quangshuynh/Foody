@@ -44,6 +44,14 @@ const Dropdown = styled.select`
   color: #f5f5f5;
 `;
 
+const AuthButtonContainer = styled.div`
+  position: absolute;
+  top: 27px;
+  right: 27px;
+  display: flex;
+  gap: 10px;
+`;
+
 function App() {
   // visited restaurants list
   const [restaurants, setRestaurants] = useState([]);
@@ -174,6 +182,7 @@ function App() {
 
   return (
     <AppContainer>
+      <AuthButtonContainer>
         {isGuest ? (
           <div style={{ marginBottom: '20px' }}>
             <Button onClick={() => {
@@ -194,6 +203,7 @@ function App() {
             Logout
           </Button>
         )}
+        </AuthButtonContainer>
         {showLogin && <LoginForm onSuccess={() => setShowLogin(false)} />}
         {showRegister && <RegisterForm onSuccess={() => setShowRegister(false)} />}
       <Header title="Foody" />
