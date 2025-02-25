@@ -1,44 +1,48 @@
-import { loadData, saveData } from '../utils/dbOperations';
+const API_URL = 'http://localhost:3001/api';
 
-// In-memory data store
-let store = null;
-
-// Initialize store with data
-export const initializeStore = () => {
-  if (!store) {
-    store = loadData();
+// Get data from API
+export const getData = async (key) => {
+  try {
+    const response = await fetch(`${API_URL}/data/${key}`);
+    if (!response.ok) throw new Error(`Failed to get ${key} data`);
+    return await response.json();
+  } catch (error) {
+    console.error(`Error getting ${key} data:`, error);
+    return [];
   }
-  return store;
 };
 
-// Get data from store
-export const getData = (key) => {
-  if (!store) {
-    store = loadData();
+// Update data via API
+export const updateData = async (key, data) => {
+  try {
+    const token = localStorage.getItem('auth_token');
+    if (!token) throw new Error('Authentication required');
+    
+    const response = await fetch(`${API_URL}/data/${key}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': token
+      },
+      body: JSON.stringify({ value: data })
+    });
+    
+    if (!response.ok) throw new Error(`Failed to update ${key} data`);
+    return true;
+  } catch (error) {
+    console.error(`Error updating ${key} data:`, error);
+    return false;
   }
-  return store[key];
-};
-
-// Update data in store
-export const updateData = (key, data) => {
-  if (!store) {
-    store = loadData();
-  }
-  store[key] = data;
-  saveData(store);
-  return true;
-};
-
-// Clear store
-export const clearStore = () => {
-  store = null;
-  localStorage.removeItem('dbData');
 };
 
 // Get full store state
-export const getFullStore = () => {
-  if (!store) {
-    store = loadData();
+export const getFullStore = async () => {
+  try {
+    const response = await fetch(`${API_URL}/data`);
+    if (!response.ok) throw new Error('Failed to get store data');
+    return await response.json();
+  } catch (error) {
+    console.error('Error getting store data:', error);
+    return {};
   }
-  return store;
 };

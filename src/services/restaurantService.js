@@ -1,26 +1,34 @@
-import { readFromStorage, writeToStorage } from './fileService';
+import { getAuthToken } from './authService';
 
-const STORAGE_KEY = 'visitedRestaurants';
+const API_URL = 'http://localhost:3001/api';
 
 export const fetchVisitedRestaurants = async () => {
-  return readFromStorage(STORAGE_KEY) || [];
+  try {
+    const response = await fetch(`${API_URL}/restaurants`);
+    if (!response.ok) throw new Error('Failed to fetch restaurants');
+    return await response.json();
+  } catch (error) {
+    console.error('Fetch restaurants error:', error);
+    return [];
+  }
 };
 
 export const updateRestaurant = async (restaurant) => {
   try {
-    const restaurants = await fetchVisitedRestaurants();
-    const index = restaurants.findIndex(r => r.id === restaurant.id);
-    if (index !== -1) {
-      const updatedRestaurant = {
-        ...restaurant,
-        ratings: restaurant.ratings || [],
-        averageRating: restaurant.averageRating || 0
-      };
-      restaurants[index] = updatedRestaurant;
-      await writeToStorage(STORAGE_KEY, restaurants);
-      return updatedRestaurant;
-    }
-    throw new Error('Restaurant not found');
+    const token = getAuthToken();
+    if (!token) throw new Error('Authentication required');
+
+    const response = await fetch(`${API_URL}/restaurants/${restaurant.id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': token
+      },
+      body: JSON.stringify(restaurant)
+    });
+
+    if (!response.ok) throw new Error('Failed to update restaurant');
+    return await response.json();
   } catch (error) {
     console.error('Update restaurant error:', error);
     throw error;
@@ -29,16 +37,24 @@ export const updateRestaurant = async (restaurant) => {
 
 export const addRestaurant = async (restaurant) => {
   try {
-    const restaurants = await fetchVisitedRestaurants();
-    const newRestaurant = {
-      ...restaurant,
-      id: Date.now().toString(),
-      ratings: [],
-      averageRating: 0
-    };
-    restaurants.push(newRestaurant);
-    await writeToStorage(STORAGE_KEY, restaurants);
-    return newRestaurant;
+    const token = getAuthToken();
+    if (!token) throw new Error('Authentication required');
+
+    const response = await fetch(`${API_URL}/restaurants`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': token
+      },
+      body: JSON.stringify(restaurant)
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'Failed to add restaurant');
+    }
+    
+    return await response.json();
   } catch (error) {
     console.error('Add restaurant error:', error);
     throw error;
@@ -46,8 +62,21 @@ export const addRestaurant = async (restaurant) => {
 };
 
 export const deleteRestaurant = async (id) => {
-  const restaurants = await fetchVisitedRestaurants();
-  const filtered = restaurants.filter(r => r.id !== id);
-  await writeToStorage(STORAGE_KEY, filtered);
-  return true;
+  try {
+    const token = getAuthToken();
+    if (!token) throw new Error('Authentication required');
+
+    const response = await fetch(`${API_URL}/restaurants/${id}`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': token
+      }
+    });
+
+    if (!response.ok) throw new Error('Failed to delete restaurant');
+    return true;
+  } catch (error) {
+    console.error('Delete restaurant error:', error);
+    throw error;
+  }
 };

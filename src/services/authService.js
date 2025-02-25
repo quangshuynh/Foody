@@ -1,60 +1,56 @@
-import { readFromStorage, writeToStorage } from './fileService';
-
+const API_URL = 'http://localhost:3001/api';
 const TOKEN_KEY = 'auth_token';
-const USERS_KEY = 'users';
-
-// Simple hash function for demo purposes
-const hashPassword = async (password) => {
-  const encoder = new TextEncoder();
-  const data = encoder.encode(password);
-  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-  const hashArray = Array.from(new Uint8Array(hashBuffer));
-  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-};
 
 export const register = async (username, password) => {
-  const users = readFromStorage(USERS_KEY) || [];
-  await writeToStorage(USERS_KEY, users);
+  try {
+    const response = await fetch(`${API_URL}/auth/register`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ username, password })
+    });
 
-  if (users.find(u => u.username === username)) {
-    throw new Error('Username already exists');
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'Registration failed');
+    }
+
+    const data = await response.json();
+    localStorage.setItem('user', JSON.stringify(data.user));
+    localStorage.setItem(TOKEN_KEY, data.token);
+
+    return data;
+  } catch (error) {
+    console.error('Registration error:', error);
+    throw error;
   }
-
-  const hashedPassword = await hashPassword(password);
-  const newUser = {
-    id: Date.now().toString(),
-    username,
-    password: hashedPassword,
-    role: "user",
-    createdAt: new Date().toISOString()
-  };
-
-  users.push(newUser);
-  localStorage.setItem(USERS_KEY, JSON.stringify(users));
-
-  const token = 'dummy-token-' + Date.now();
-  localStorage.setItem('user', JSON.stringify(newUser));
-  localStorage.setItem(TOKEN_KEY, token);
-
-  return { user: newUser, token };
 };
 
 export const login = async (username, password) => {
-  const users = readFromStorage(USERS_KEY) || [];
-  const user = users.find(u => u.username === username);
-  if (!user || !(await hashPassword(password) === user.password)) {
-    throw new Error('Invalid credentials');
+  try {
+    const response = await fetch(`${API_URL}/auth/login`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ username, password })
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'Login failed');
+    }
+
+    const data = await response.json();
+    localStorage.setItem('user', JSON.stringify(data.user));
+    localStorage.setItem(TOKEN_KEY, data.token);
+
+    return data;
+  } catch (error) {
+    console.error('Login error:', error);
+    throw error;
   }
-
-  if (!user) {
-    throw new Error('Invalid credentials');
-  }
-
-  const token = 'dummy-token-' + Date.now();
-  localStorage.setItem('user', JSON.stringify(user));
-  localStorage.setItem(TOKEN_KEY, token);
-
-  return { user, token };
 };
 
 export const logout = () => {
@@ -68,5 +64,9 @@ export const getCurrentUser = () => {
 };
 
 export const isAuthenticated = () => {
-  return getCurrentUser() !== null;
+  return getCurrentUser() !== null && localStorage.getItem(TOKEN_KEY) !== null;
+};
+
+export const getAuthToken = () => {
+  return localStorage.getItem(TOKEN_KEY);
 };
