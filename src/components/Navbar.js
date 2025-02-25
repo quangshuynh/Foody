@@ -24,6 +24,15 @@ const NavContainer = styled.nav`
   }
 `;
 
+const Logo = styled.div`
+  font-family: 'eracake', sans-serif;
+  font-size: 1.8rem;
+  color: #00bcd4;
+  cursor: pointer;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+  margin-right: 20px;
+`;
+
 const NavItems = styled.div`
   display: flex;
   align-items: center;
