@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import Rating from './Rating';
 import Comments from './Comments';
-import { FaTrash, FaEdit, FaStar, FaComment, FaMapMarkerAlt} from 'react-icons/fa';
+import { FaTrash, FaEdit, FaStar, FaComment, FaMapMarkerAlt } from 'react-icons/fa';
 import { FiCopy } from 'react-icons/fi';
 import RatingModal from './RatingModal';
 import { useAuth } from '../contexts/AuthContext';
@@ -64,6 +64,14 @@ const DateText = styled.p`
   font-size: 0.8rem;
   color: #aaa;
 `;
+
+function capitalizeWords(str) {
+  if (!str) return '';
+  return str
+    .split(' ')
+    .map(word => (word.length > 0 ? word.charAt(0).toUpperCase() + word.slice(1) : word))
+    .join(' ');
+}
 
 function RestaurantItem({ restaurant, updateRestaurant, removeRestaurant }) {
   const [isEditing, setIsEditing] = useState(false);
@@ -255,11 +263,13 @@ function RestaurantItem({ restaurant, updateRestaurant, removeRestaurant }) {
               alignItems: 'center',
               justifyContent: 'center'
             }}>
-              <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(restaurant.address)}`} 
+              <a 
+                href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(restaurant.address)}`} 
                 target="_blank" 
                 rel="noopener noreferrer"
-                style={{ color: '#b4c2fa', textDecoration: 'none', fontWeight: 'bold' }}>
-                {restaurant.address}
+                style={{ color: '#b4c2fa', textDecoration: 'none', fontWeight: 'bold' }}
+              >
+                {capitalizeWords(restaurant.address)}
               </a>
               <FiCopy 
                 onClick={() => {

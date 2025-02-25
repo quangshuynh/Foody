@@ -46,32 +46,21 @@
       "averageRating": 0
     },
     {
-      "name": "Dogtown",
-      "address": "691 Monroe Ave",
+      "name": "dogtown",
+      "address": "691 monroe ave",
       "location": {
         "lat": 43.1438431,
         "lng": -77.5897493
       },
       "rating": 0,
       "goAgain": false,
-      "dateAdded": "2025-02-25T05:45:53.522Z",
-      "id": "1740462353527",
+      "dateAdded": "2025-02-25T19:55:57.966Z",
+      "id": "1740513357969",
       "ratings": [],
       "averageRating": 0
     }
   ],
-  "toVisit": [
-    {
-      "name": "test",
-      "address": "46 hazel bark run",
-      "location": {
-        "lat": 43.1668389,
-        "lng": -77.718208
-      },
-      "id": 1740512550583,
-      "dateAdded": "2025-02-25T19:42:30.583Z"
-    }
-  ],
+  "toVisit": [],
   "recommended": [
     {
       "id": "101",

@@ -70,6 +70,15 @@ const MapLegend = styled.div`
   }
 `;
 
+// Helper function to capitalize the first letter of each word in the address
+function capitalizeWords(str) {
+  if (!str) return '';
+  return str
+    .split(' ')
+    .map(word => (word.length > 0 ? word.charAt(0).toUpperCase() + word.slice(1) : word))
+    .join(' ');
+}
+
 // Component to handle map view changes
 function MapController({ selectedLocation, focusId }) {
   const map = useLeafletMap();
@@ -131,7 +140,7 @@ function RestaurantMap({ restaurants }) {
               <Popup>
                 <strong>{restaurant.name}</strong>
                 <br />
-                {restaurant.address}
+                {capitalizeWords(restaurant.address)}
                 <div style={{ marginTop: '5px' }}>
                   {restaurant.averageRating
                     ? `Rating: ${restaurant.averageRating} / 5`
@@ -142,7 +151,6 @@ function RestaurantMap({ restaurants }) {
           ) : null
         )}
 
-        
         {/* To Visit Restaurants */}
         {toVisitRestaurants.map((restaurant) => (
           restaurant.location && restaurant.location.lat && restaurant.location.lng ? (
@@ -154,7 +162,7 @@ function RestaurantMap({ restaurants }) {
               <Popup>
                 <strong>{restaurant.name}</strong>
                 <br />
-                {restaurant.address}
+                {capitalizeWords(restaurant.address)}
                 <div style={{ marginTop: '5px', color: '#ff4081' }}>
                   On your "To Visit" list
                 </div>
@@ -174,7 +182,7 @@ function RestaurantMap({ restaurants }) {
               <Popup>
                 <strong>{restaurant.name}</strong>
                 <br />
-                {restaurant.address}
+                {capitalizeWords(restaurant.address)}
                 <div style={{ marginTop: '5px', color: '#ffc107' }}>
                   Recommended
                 </div>
