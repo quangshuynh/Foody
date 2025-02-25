@@ -238,19 +238,9 @@ function RestaurantItem({ restaurant, updateRestaurant, removeRestaurant }) {
               color: '#f5f5f5', 
               fontSize: '1.7rem',
               letterSpacing: '1px',
-              marginBottom: '2px',
-              display: 'inline-flex',
-              alignItems: 'center'
+              marginBottom: '2px'
             }}>
               {restaurant.name}
-              <FaClipboard 
-                onClick={() => {
-                  navigator.clipboard.writeText(restaurant.address);
-                  alert('Address copied to clipboard!');
-                }}
-                title="Copy address to clipboard"
-                style={{ color: '#00bcd4', cursor: 'pointer', marginLeft: '10px', fontSize: '1rem' }}
-              />
             </h3>
           </div>
           {restaurant.address && (
@@ -259,7 +249,10 @@ function RestaurantItem({ restaurant, updateRestaurant, removeRestaurant }) {
               fontSize: '1.1rem', 
               color: '#fff',
               marginTop: '0',
-              textAlign: 'center'
+              textAlign: 'center',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
             }}>
               <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(restaurant.address)}`} 
                 target="_blank" 
@@ -267,6 +260,14 @@ function RestaurantItem({ restaurant, updateRestaurant, removeRestaurant }) {
                 style={{ color: '#b4c2fa', textDecoration: 'none', fontWeight: 'bold' }}>
                 {restaurant.address}
               </a>
+              <FaClipboard 
+                onClick={() => {
+                  navigator.clipboard.writeText(restaurant.address);
+                  alert('Address copied to clipboard!');
+                }}
+                title="Copy address to clipboard"
+                style={{ color: '#00bcd4', cursor: 'pointer', marginLeft: '10px', fontSize: '1rem' }}
+              />
             </p>
           )}
           <DateText>Added on: {new Date(restaurant.dateAdded).toLocaleString()}</DateText>
