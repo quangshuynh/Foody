@@ -78,7 +78,7 @@ function AddRestaurant({ addRestaurant }) {
 
   return (
     <FormContainer>
-      <h2>Add a Restaurant</h2>
+      <h3>Add a Restaurant</h3>
       {error && <p style={{ color: '#ff4081' }}>{error}</p>}
       <form onSubmit={handleSubmit}>
         <Input 

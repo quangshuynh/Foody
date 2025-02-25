@@ -176,14 +176,14 @@ function App() {
           </ModalOverlay>
         )}
 
-      <Header
+      {/* <Header
         title="Foody"
         selectedSection={selectedSection}
         setSelectedSection={setSelectedSection}
         onShowLogin={() => { setShowLogin(true); setShowRegister(false); }}
         onShowRegister={() => { setShowRegister(true); setShowLogin(false); }}
         onLogout={handleLogout}
-      />
+      /> */}
 
         {selectedSection === 'visited' && (
           <>
