@@ -1,6 +1,10 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 
+const Title = styled.h3`
+  font-family: 'Circular-Bold', sans-serif;
+`;
+
 const FormContainer = styled.div`
   background: #2a2a2a;
   padding: 20px;
@@ -75,7 +79,7 @@ function AddToVisit({ addToVisit }) {
 
   return (
     <FormContainer>
-      <h3>Add a Restaurant to Visit</h3>
+      <Title>Add a Restaurant to Visit</Title>
       {error && <p style={{ color: '#ff4081' }}>{error}</p>}
       <form onSubmit={handleSubmit}>
         <Input 
