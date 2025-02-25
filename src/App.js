@@ -133,7 +133,7 @@ function App() {
     setRestaurantsToVisit(updatedToVisit);
   };
 
-  const { isAuthenticated, setUser } = useAuth();
+  const { isAuthenticated, setUser, user } = useAuth();
   const [showLogin, setShowLogin] = useState(false);
   const [showRegister, setShowRegister] = useState(false);
 
@@ -149,11 +149,11 @@ function App() {
         selectedSection={selectedSection}
         setSelectedSection={setSelectedSection}
         onShowLogin={() => {
-          setShowLogin(!showLogin);
+          setShowLogin(true);
           setShowRegister(false);
         }}
         onShowRegister={() => {
-          setShowRegister(!showRegister);
+          setShowRegister(true);
           setShowLogin(false);
         }}
         onLogout={handleLogout}

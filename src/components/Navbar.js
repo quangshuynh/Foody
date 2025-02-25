@@ -3,21 +3,24 @@ import styled from 'styled-components';
 import { useAuth } from '../contexts/AuthContext'; 
 
 const NavContainer = styled.nav`
+  background-color: #1a1a1a;
   position: fixed;
   top: 0;
   left: 0;
-  width: 100%;
-  z-index: 1000; 
+  right: 0;
+  z-index: 1000;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: rgba(38, 38, 38, 0.95);
-  padding: 15px 20px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  padding: 0 20px;
+  height: 60px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
   
   @media (max-width: 600px) {
     flex-direction: column;
     align-items: flex-start;
+    height: auto;
+    padding: 10px 20px;
   }
 `;
 
@@ -47,32 +50,29 @@ const NavItem = styled.button`
 
 const AuthButtons = styled.div`
   display: flex;
-  align-items: center;
-  margin-right: 40px; 
+  gap: 10px;
   
   @media (max-width: 600px) {
-    margin-right: 0;
     margin-top: 10px;
   }
 `;
 
 const AuthButton = styled.button`
-  background: #00bcd4;
-  border: none;
-  color: white;
-  padding: 8px 12px;
-  border-radius: 5px;
+  background: ${props => props.$primary ? '#00bcd4' : 'transparent'};
+  color: #f5f5f5;
+  border: ${props => props.$primary ? 'none' : '1px solid #00bcd4'};
+  padding: 6px 12px;
+  border-radius: 4px;
   cursor: pointer;
-  margin-left: 10px;
-  transition: background 0.3s ease;
-
+  font-size: 0.9rem;
+  
   &:hover {
-    background: #00a1b5;
+    background: ${props => props.$primary ? '#00a1b5' : 'rgba(0, 188, 212, 0.1)'};
   }
 `;
 
 const Navbar = ({ selectedSection, setSelectedSection, onShowLogin, onShowRegister, onLogout }) => {
-  const { isGuest } = useAuth();
+  const { isAuthenticated } = useAuth();
 
   return (
     <NavContainer>
@@ -97,10 +97,10 @@ const Navbar = ({ selectedSection, setSelectedSection, onShowLogin, onShowRegist
         </NavItem>
       </NavItems>
       <AuthButtons>
-        {isGuest ? (
+        {!isAuthenticated ? (
           <>
             <AuthButton onClick={onShowLogin}>Login</AuthButton>
-            <AuthButton onClick={onShowRegister}>Register</AuthButton>
+            <AuthButton $primary onClick={onShowRegister}>Register</AuthButton>
           </>
         ) : (
           <AuthButton onClick={onLogout}>Logout</AuthButton>
