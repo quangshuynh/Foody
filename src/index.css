@@ -52,6 +52,55 @@ code {
   font-style: normal;
 }
 
+@font-face {
+  font-family: 'bakery';
+  src: url('../public/fonts/bakery-home-free-trial.regular.ttf');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'rushdriver';
+  src: url('../public/fonts/RushDriver-Italic.otf');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'saucetomato';
+  src: url('../public/fonts/sauce-tomato.regular.otf');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'donutsmatcha';
+  src: url('../public/fonts/donuts-matcha.regular.otf');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'circular-bold';
+  src: url('../public/fonts/CircularSpotifyText-Bold.otf');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'playfair';
+  src: url('../public/fonts/playfair-display.regular.ttf');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'aligarh';
+  src: url('../public/fonts/aligarh-arabic-free-personal-use.regular.otf');
+  font-weight: normal;
+  font-style: normal;
+}
+
 h1, h2 {
   font-family: 'eracake', 'Roboto', sans-serif;
   letter-spacing: 1px;

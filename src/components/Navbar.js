@@ -26,7 +26,7 @@ const NavContainer = styled.nav`
 
 const Logo = styled.div`
   font-family: 'eracake', sans-serif;
-  font-size: 1.8rem;
+  font-size: 2.5rem;
   color: #00bcd4;
   cursor: pointer;
   text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
@@ -56,7 +56,7 @@ const NavItem = styled.button`
   transition: all 0.3s ease;
   font-weight: ${(props) => props.$active ? '500' : 'normal'};
   box-shadow: ${(props) => props.$active ? '0 2px 4px rgba(0, 0, 0, 0.3)' : 'none'};
-  font-family: 'eracake', 'Roboto', sans-serif;
+  font-family: 'donutsmatcha', sans-serif;
   letter-spacing: 1px;
 
   &:hover {
@@ -83,7 +83,7 @@ const AuthButton = styled.button`
   border-radius: 4px;
   cursor: pointer;
   font-size: 0.9rem;
-  font-family: 'eracake', 'Roboto', sans-serif;
+  font-family: 'saucetomato', sans-serif;
   letter-spacing: 1px;
   font-weight: 400;
   transition: all 0.2s ease;

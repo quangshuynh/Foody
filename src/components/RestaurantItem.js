@@ -233,13 +233,22 @@ function RestaurantItem({ restaurant, updateRestaurant, removeRestaurant }) {
       ) : (
         <>
           <h3 style={{ 
-            fontFamily: "'eracake', 'Roboto', sans-serif", 
+            fontFamily: "'aligarh', sans-serif", 
             color: '#f5f5f5', 
-            fontSize: '1.6rem',
+            fontSize: '1.7rem',
             letterSpacing: '1px',
             marginBottom: '8px'
           }}>{restaurant.name}</h3>
-          {restaurant.address && <p>{restaurant.address}</p>}
+            {restaurant.address && (
+            <p style={{ fontFamily: "'playfair', sans-serif", fontSize: '1.1rem', color: '#fff' }}>
+              <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(restaurant.address)}`} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                style={{ color: '#b4c2fa', textDecoration: 'none', fontWeight: 'bold' }}>
+                {restaurant.address}
+              </a>
+            </p>
+          )}
           <DateText>Added on: {new Date(restaurant.dateAdded).toLocaleString()}</DateText>
           <Rating rating={restaurant.averageRating} />
           {showComments && (

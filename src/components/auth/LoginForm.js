@@ -95,7 +95,7 @@ function LoginForm({ onSuccess }) {
   return (
     <FormContainer>
       <CloseButton onClick={onSuccess} aria-label="Close">×</CloseButton>
-      <h2 style={{ marginBottom: '10px' }}>Login</h2>
+      <h2 style={{ fontFamily: 'rushdriver, sans-serif', marginBottom: '10px' }}>Login</h2>
       <form onSubmit={handleSubmit}>
         <Input
           type="text"
