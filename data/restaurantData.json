@@ -60,7 +60,18 @@
       "averageRating": 0
     }
   ],
-  "toVisit": [],
+  "toVisit": [
+    {
+      "name": "test",
+      "address": "46 hazel bark run",
+      "location": {
+        "lat": 43.1668389,
+        "lng": -77.718208
+      },
+      "id": 1740512550583,
+      "dateAdded": "2025-02-25T19:42:30.583Z"
+    }
+  ],
   "recommended": [
     {
       "id": "101",
