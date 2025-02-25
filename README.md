@@ -74,12 +74,12 @@ With Foody, you can:
 
 1. Clone the repository:
    ```
-   git clone https://github.com/yourusername/foody.git
+   git clone https://github.com/quangshuynh/Foody.git
    ```
 
 2. Install dependencies:
    ```
-   cd foody
+   cd Foody
    npm install
    ```
 
@@ -102,7 +102,6 @@ With Foody, you can:
 - **Dark Mode Map:** Custom styled map that matches the app's theme
 - **Responsive Design:** Works great on mobile devices too
 - **Guest Mode:** Use the app without creating an account
-- **Easter Egg:** Try selecting "💩" in the display limit dropdown!
 
 ## 🍇 Contributing
 
@@ -110,7 +109,7 @@ Pull requests are welcome! For major changes, please open an issue first to disc
 
 ## 🥓 License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+This project is licensed under the MIT License - see the MIT_LICENSE file for details.
 
 ## 🍪 Acknowledgments
 
