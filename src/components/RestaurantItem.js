@@ -73,7 +73,7 @@ function RestaurantItem({ restaurant, updateRestaurant, removeRestaurant }) {
   const [showComments, setShowComments] = useState(false);
   const [showRatingModal, setShowRatingModal] = useState(false);
   const { user, isAuthenticated } = useAuth();
-  const { setSelectedLocation } = useMap();
+  const { focusLocation } = useMap();
 
   const handleRatingSubmit = async (rating, wouldReturn, comment = '') => {
     if (!user) {
@@ -175,7 +175,7 @@ function RestaurantItem({ restaurant, updateRestaurant, removeRestaurant }) {
     <ItemContainer>
       <IconContainer>
         <FaMapMarkerAlt 
-          onClick={() => setSelectedLocation(restaurant.location)} 
+          onClick={() => focusLocation(restaurant.location)} 
           title="Show on Map"
           style={{ color: '#ff4081' }}
         />

@@ -19,7 +19,7 @@ const MapWrapper = styled.div`
 `;
 
 // Component to handle map view changes
-function MapController({ selectedLocation }) {
+function MapController({ selectedLocation, focusId }) {
   const map = useLeafletMap();
   
   useEffect(() => {
@@ -30,14 +30,14 @@ function MapController({ selectedLocation }) {
         { animate: true, duration: 1.5 }
       );
     }
-  }, [selectedLocation, map]);
+  }, [selectedLocation, focusId, map]);
   
   return null;
 }
 
 function RestaurantMap({ restaurants }) {
   const position = [43.1566, -77.6088]; // center on Rochester, NY
-  const { selectedLocation } = useMap();
+  const { selectedLocation, focusId } = useMap();
   const mapRef = useRef(null);
 
   return (
@@ -48,7 +48,7 @@ function RestaurantMap({ restaurants }) {
         style={{ height: '100%', width: '100%' }}
         ref={mapRef}
       >
-        <MapController selectedLocation={selectedLocation} />
+        <MapController selectedLocation={selectedLocation} focusId={focusId} />
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           attribution="&copy; OpenStreetMap contributors"
