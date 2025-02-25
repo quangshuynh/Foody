@@ -70,7 +70,7 @@ With Foody, you can:
 - **Context API:** For state management throughout the app
 - **Custom Hooks:** For reusable functionality
 
-## 🥞 Installation & Setup
+## 🥞 Installation & Setup (for contributing)
 
 1. Clone the repository:
    ```
