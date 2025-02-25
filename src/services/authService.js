@@ -1,4 +1,9 @@
-const API_URL = 'http://localhost:3002/api';
+let API_URL = 'http://localhost:3002/api';
+
+// Update API URL if needed
+export const updateApiUrl = (newUrl) => {
+  API_URL = newUrl;
+};
 const TOKEN_KEY = 'auth_token';
 
 export const register = async (username, password) => {

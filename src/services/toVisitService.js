@@ -1,6 +1,11 @@
 import { getAuthToken } from './authService';
 
-const API_URL = 'http://localhost:3002/api';
+let API_URL = 'http://localhost:3002/api';
+
+// Update API URL if needed
+export const updateApiUrl = (newUrl) => {
+  API_URL = newUrl;
+};
 
 export const fetchRestaurantsToVisit = async () => {
   try {

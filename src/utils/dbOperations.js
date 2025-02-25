@@ -1,4 +1,9 @@
-const API_URL = 'http://localhost:3002/api';
+let API_URL = 'http://localhost:3002/api';
+
+// Update API URL if needed
+export const updateApiUrl = (newUrl) => {
+  API_URL = newUrl;
+};
 
 // Default data structure - now just for reference, actual defaults are on server
 const defaultData = {

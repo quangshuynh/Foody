@@ -1,4 +1,9 @@
-const API_URL = 'http://localhost:3001/api';
+let API_URL = 'http://localhost:3002/api';
+
+// Update API URL if needed
+export const updateApiUrl = (newUrl) => {
+  API_URL = newUrl;
+};
 
 // Get data from API
 export const getData = async (key) => {

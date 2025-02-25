@@ -1,27 +1,24 @@
-const API_URL = 'http://localhost:3002/api';
+import { getApiUrl, findAndUpdateApiUrl } from './apiConfig';
 
 // Try to start the server if needed
 const ensureServerRunning = async () => {
   try {
     // Check if server is running
-    const response = await fetch(`${API_URL}/data`, { 
+    const response = await fetch(`${getApiUrl()}/data`, { 
       method: 'HEAD',
       signal: AbortSignal.timeout(1000) 
     }).catch(() => null);
     
     if (response && response.ok) return;
     
-    // If not running, try to import the server starter
-    console.log('Server not responding, attempting to start...');
-    try {
-      const { startServerIfNeeded } = await import('../utils/startServer.js');
-      const port = await startServerIfNeeded();
-      if (port && port !== 3001) {
-        console.log(`Server started on port ${port}, please refresh the page`);
-        alert(`Server started on port ${port}, please refresh the page`);
-      }
-    } catch (err) {
-      console.error('Failed to start server:', err);
+    // If not running, try to find the server on another port
+    console.log('Server not responding, checking other ports...');
+    const found = await findAndUpdateApiUrl();
+    
+    if (!found) {
+      console.error('Server is not running. Please start the server manually with:');
+      console.error('npm run server');
+      alert('Server is not running. Please start the server manually with: npm run server');
     }
   } catch (err) {
     console.error('Error checking server status:', err);
@@ -31,7 +28,7 @@ const ensureServerRunning = async () => {
 export const initializeStorage = async () => {
   await ensureServerRunning();
   try {
-    const response = await fetch(`${API_URL}/data/users`);
+    const response = await fetch(`${getApiUrl()}/data/users`);
     if (!response.ok) throw new Error('Failed to initialize storage');
     return await response.json();
   } catch (error) {
@@ -42,7 +39,7 @@ export const initializeStorage = async () => {
 
 export const readFromStorage = async (key) => {
   try {
-    const response = await fetch(`${API_URL}/data/${key}`);
+    const response = await fetch(`${getApiUrl()}/data/${key}`);
     if (!response.ok) throw new Error(`Failed to read ${key} from storage`);
     return await response.json();
   } catch (error) {
@@ -56,7 +53,7 @@ export const writeToStorage = async (key, data) => {
     const token = localStorage.getItem('auth_token');
     if (!token) throw new Error('Authentication required');
     
-    const response = await fetch(`${API_URL}/data/${key}`, {
+    const response = await fetch(`${getApiUrl()}/data/${key}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',

@@ -1,5 +1,11 @@
-const API_URL = 'http://localhost:3002/api';
 import { getAuthToken } from './authService';
+
+let API_URL = 'http://localhost:3002/api';
+
+// Update API URL if needed
+export const updateApiUrl = (newUrl) => {
+  API_URL = newUrl;
+};
 
 export const initializeJsonStorage = async () => {
   try {
