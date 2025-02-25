@@ -197,8 +197,8 @@ function App() {
             <h2>Restaurants to Visit</h2>
             <RestaurantsToVisit
               restaurantsToVisit={restaurantsToVisit}
-              addToVisit={addToVisit}
-              removeToVisit={removeToVisit}
+              addToVisit={isAuthenticated ? addToVisit : null}
+              removeToVisit={isAuthenticated ? removeToVisit : null}
             />
           </>
         )}
