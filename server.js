@@ -5,11 +5,11 @@ const crypto = require('crypto');
 const http = require('http');
 
 const app = express();
-let port = process.env.PORT || 3001;
+let port = process.env.PORT || 3002;
 
 // Data file paths
-const AUTH_DATA_FILE = path.join(__dirname, '../../data/authData.json');
-const RESTAURANT_DATA_FILE = path.join(__dirname, '../../data/restaurantData.json');
+const AUTH_DATA_FILE = path.join(__dirname, './data/authData.json');
+const RESTAURANT_DATA_FILE = path.join(__dirname, './data/restaurantData.json');
 
 // Default data structures
 const defaultAuthData = {
