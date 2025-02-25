@@ -186,7 +186,7 @@ function App() {
             <RestaurantList
               restaurants={filteredRestaurants}
               updateRestaurant={isAuthenticated ? updateRestaurant : null}
-              addRestaurant={isAuthenticated ? addRestaurant : null}
+              addRestaurant={null} 
               removeRestaurant={isAuthenticated ? removeRestaurant : null}
             />
           </>

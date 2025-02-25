@@ -214,7 +214,13 @@ function RestaurantItem({ restaurant, updateRestaurant, removeRestaurant }) {
         </>
       ) : (
         <>
-          <h3>{restaurant.name}</h3>
+          <h3 style={{ 
+            fontFamily: "'eracake', 'Roboto', sans-serif", 
+            color: '#f5f5f5', 
+            fontSize: '1.6rem',
+            letterSpacing: '1px',
+            marginBottom: '8px'
+          }}>{restaurant.name}</h3>
           {restaurant.address && <p>{restaurant.address}</p>}
           <DateText>Added on: {new Date(restaurant.dateAdded).toLocaleString()}</DateText>
           <Rating rating={restaurant.averageRating} />
