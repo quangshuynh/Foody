@@ -232,29 +232,34 @@ function RestaurantItem({ restaurant, updateRestaurant, removeRestaurant }) {
         </>
       ) : (
         <>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <h3 style={{ 
               fontFamily: "'aligarh', sans-serif", 
               color: '#f5f5f5', 
               fontSize: '1.7rem',
               letterSpacing: '1px',
-              marginBottom: '2px'
-            }}>{restaurant.name}</h3>
-            <FaClipboard 
-              onClick={() => {
-                navigator.clipboard.writeText(restaurant.address);
-                alert('Address copied to clipboard!');
-              }}
-              title="Copy address to clipboard"
-              style={{ color: '#00bcd4', cursor: 'pointer', marginLeft: '10px' }}
-            />
+              marginBottom: '2px',
+              display: 'inline-flex',
+              alignItems: 'center'
+            }}>
+              {restaurant.name}
+              <FaClipboard 
+                onClick={() => {
+                  navigator.clipboard.writeText(restaurant.address);
+                  alert('Address copied to clipboard!');
+                }}
+                title="Copy address to clipboard"
+                style={{ color: '#00bcd4', cursor: 'pointer', marginLeft: '10px', fontSize: '1rem' }}
+              />
+            </h3>
           </div>
           {restaurant.address && (
             <p style={{ 
               fontFamily: "'playfair', sans-serif", 
               fontSize: '1.1rem', 
               color: '#fff',
-              marginTop: '0'
+              marginTop: '0',
+              textAlign: 'center'
             }}>
               <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(restaurant.address)}`} 
                 target="_blank" 
