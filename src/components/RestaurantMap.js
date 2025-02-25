@@ -1,8 +1,9 @@
-import React from 'react';
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import React, { useEffect, useRef } from 'react';
+import { MapContainer, TileLayer, Marker, Popup, useMap as useLeafletMap } from 'react-leaflet';
 import styled from 'styled-components';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
+import { useMap } from '../contexts/MapContext';
 
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
@@ -17,23 +18,54 @@ const MapWrapper = styled.div`
   margin: 20px 0;
 `;
 
+// Component to handle map view changes
+function MapController({ selectedLocation }) {
+  const map = useLeafletMap();
+  
+  useEffect(() => {
+    if (selectedLocation) {
+      map.flyTo(
+        [selectedLocation.lat, selectedLocation.lng], 
+        16, 
+        { animate: true, duration: 1.5 }
+      );
+    }
+  }, [selectedLocation, map]);
+  
+  return null;
+}
+
 function RestaurantMap({ restaurants }) {
   const position = [43.1566, -77.6088]; // center on Rochester, NY
+  const { selectedLocation } = useMap();
+  const mapRef = useRef(null);
+
   return (
     <MapWrapper>
-      <MapContainer center={position} zoom={13} style={{ height: '100%', width: '100%' }}>
+      <MapContainer 
+        center={position} 
+        zoom={13} 
+        style={{ height: '100%', width: '100%' }}
+        ref={mapRef}
+      >
+        <MapController selectedLocation={selectedLocation} />
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           attribution="&copy; OpenStreetMap contributors"
         />
         {restaurants.map((restaurant) => (
-          <Marker key={restaurant.id} position={[restaurant.location.lat, restaurant.location.lng]}>
-            <Popup>
-              <strong>{restaurant.name}</strong>
-              <br />
-              {restaurant.address}
-            </Popup>
-          </Marker>
+          restaurant.location && restaurant.location.lat && restaurant.location.lng ? (
+            <Marker 
+              key={restaurant.id} 
+              position={[restaurant.location.lat, restaurant.location.lng]}
+            >
+              <Popup>
+                <strong>{restaurant.name}</strong>
+                <br />
+                {restaurant.address}
+              </Popup>
+            </Marker>
+          ) : null
         ))}
       </MapContainer>
     </MapWrapper>

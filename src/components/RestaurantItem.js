@@ -2,9 +2,10 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import Rating from './Rating';
 import Comments from './Comments';
-import { FaTrash, FaEdit, FaStar, FaComment } from 'react-icons/fa';
+import { FaTrash, FaEdit, FaStar, FaComment, FaMapMarkerAlt } from 'react-icons/fa';
 import RatingModal from './RatingModal';
 import { useAuth } from '../contexts/AuthContext';
+import { useMap } from '../contexts/MapContext';
 import { updateRestaurant as updateRestaurantApi } from '../services/restaurantService';
 
 const ItemContainer = styled.div`
@@ -72,6 +73,7 @@ function RestaurantItem({ restaurant, updateRestaurant, removeRestaurant }) {
   const [showComments, setShowComments] = useState(false);
   const [showRatingModal, setShowRatingModal] = useState(false);
   const { user, isAuthenticated } = useAuth();
+  const { setSelectedLocation } = useMap();
 
   const handleRatingSubmit = async (rating, wouldReturn, comment = '') => {
     if (!user) {
@@ -172,6 +174,11 @@ function RestaurantItem({ restaurant, updateRestaurant, removeRestaurant }) {
   return (
     <ItemContainer>
       <IconContainer>
+        <FaMapMarkerAlt 
+          onClick={() => setSelectedLocation(restaurant.location)} 
+          title="Show on Map"
+          style={{ color: '#ff4081' }}
+        />
         {isAuthenticated && (
           <>
             <FaEdit onClick={handleEdit} title="Edit" />

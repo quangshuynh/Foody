@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from './contexts/AuthContext';
+import { MapProvider } from './contexts/MapContext';
 import LoginForm from './components/auth/LoginForm';
 import RegisterForm from './components/auth/RegisterForm';
 import { fetchVisitedRestaurants, addRestaurant as addRestaurantApi } from './services/restaurantService';
@@ -144,7 +145,7 @@ function App() {
   };
 
   return (
-    <>
+    <MapProvider>
       <Navbar
         selectedSection={selectedSection}
         setSelectedSection={setSelectedSection}
@@ -210,7 +211,7 @@ function App() {
         <RestaurantMap restaurants={[...restaurants, ...restaurantsToVisit, ...recommendedRestaurants]} />
         <Footer />
       </AppContainer>
-    </>
+    </MapProvider>
   );
 }
 
