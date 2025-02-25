@@ -178,8 +178,8 @@ function App() {
 
         {selectedSection === 'visited' && (
           <>
-            <SearchBar searchRestaurants={searchRestaurants} />
             <h2>Visited Restaurants</h2>
+            <SearchBar searchRestaurants={searchRestaurants} />
             {isAuthenticated && (
               <AddRestaurant addRestaurant={addRestaurant} />
             )}
