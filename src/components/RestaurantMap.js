@@ -121,10 +121,10 @@ function RestaurantMap({ restaurants }) {
         />
         
         {/* Visited Restaurants */}
-        {visitedRestaurants.map((restaurant) => (
+        {visitedRestaurants.map((restaurant) =>
           restaurant.location && restaurant.location.lat && restaurant.location.lng ? (
-            <Marker 
-              key={restaurant.id} 
+            <Marker
+              key={restaurant.id}
               position={[restaurant.location.lat, restaurant.location.lng]}
               icon={visitedIcon}
             >
@@ -132,15 +132,16 @@ function RestaurantMap({ restaurants }) {
                 <strong>{restaurant.name}</strong>
                 <br />
                 {restaurant.address}
-                {restaurant.averageRating && (
-                  <div style={{ marginTop: '5px' }}>
-                    Rating: {restaurant.averageRating} / 5
-                  </div>
-                )}
+                <div style={{ marginTop: '5px' }}>
+                  {restaurant.averageRating
+                    ? `Rating: ${restaurant.averageRating} / 5`
+                    : 'No ratings available'}
+                </div>
               </Popup>
             </Marker>
           ) : null
-        ))}
+        )}
+
         
         {/* To Visit Restaurants */}
         {toVisitRestaurants.map((restaurant) => (
