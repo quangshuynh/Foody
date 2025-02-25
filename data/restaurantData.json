@@ -65,7 +65,7 @@
     {
       "id": "101",
       "name": "Kai poop",
-      "address": "2 Scottsville Rd, Rochester, NY",
+      "address": "2 Scottsville Rd",
       "location": {
         "lat": 43.1258,
         "lng": -77.6424
@@ -75,7 +75,7 @@
     {
       "id": "102",
       "name": "Carlton Gibson Hall",
-      "address": "Latimore Pl, Rochester, NY",
+      "address": "Latimore Pl",
       "location": {
         "lat": 43.0857,
         "lng": -77.6672
