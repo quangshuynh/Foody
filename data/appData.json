@@ -20,6 +20,13 @@
       "password": "e30c2ea7a76f83b7c1a975ddc24286b675e714ebbbc72ccd5f0401730231ab57",
       "role": "user",
       "createdAt": "2025-02-25T01:39:52.765Z"
+    },
+    {
+      "id": "1740465778629",
+      "username": "quang",
+      "password": "12e90b8e74f20fc0a7274cff9fcbae14592db12292757f1ea0d7503d30799fd2",
+      "role": "user",
+      "createdAt": "2025-02-25T06:42:58.629Z"
     }
   ],
   "visited": [],

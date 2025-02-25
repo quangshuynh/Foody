@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import Rating from './Rating';
 import Comments from './Comments';
-import { FaTrash, FaEdit, FaStar, FaComment, FaMapMarkerAlt, FaClipboard } from 'react-icons/fa';
+import { FaTrash, FaEdit, FaStar, FaComment, FaMapMarkerAlt} from 'react-icons/fa';
+import { FiCopy } from 'react-icons/fi';
 import RatingModal from './RatingModal';
 import { useAuth } from '../contexts/AuthContext';
 import { useMap } from '../contexts/MapContext';
@@ -214,13 +215,13 @@ function RestaurantItem({ restaurant, updateRestaurant, removeRestaurant }) {
             type="text"
             value={editName}
             onChange={(e) => setEditName(e.target.value)}
-            placeholder="Restaurant Name"
+            placeholder="Restaurant Name (e.g., Dogtown)" 
           />
           <Input
             type="text"
             value={editAddress}
             onChange={(e) => setEditAddress(e.target.value)}
-            placeholder="Street Address (e.g., 123 Main St, Rochester, NY)"
+            placeholder="Street Address (e.g., 691 Monroe Ave)" 
           />
           {editError && <p style={{ color: '#ff4081' }}>{editError}</p>}
           <Button onClick={handleEditSave} disabled={editLoading}>
@@ -260,7 +261,7 @@ function RestaurantItem({ restaurant, updateRestaurant, removeRestaurant }) {
                 style={{ color: '#b4c2fa', textDecoration: 'none', fontWeight: 'bold' }}>
                 {restaurant.address}
               </a>
-              <FaClipboard 
+              <FiCopy 
                 onClick={() => {
                   navigator.clipboard.writeText(restaurant.address);
                   alert('Address copied to clipboard!');
