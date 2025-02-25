@@ -56,6 +56,8 @@ const NavItem = styled.button`
   transition: all 0.3s ease;
   font-weight: ${(props) => props.$active ? '500' : 'normal'};
   box-shadow: ${(props) => props.$active ? '0 2px 4px rgba(0, 0, 0, 0.3)' : 'none'};
+  font-family: 'eracake', 'Roboto', sans-serif;
+  letter-spacing: 1px;
 
   &:hover {
     color: #00bcd4;
@@ -81,9 +83,15 @@ const AuthButton = styled.button`
   border-radius: 4px;
   cursor: pointer;
   font-size: 0.9rem;
+  font-family: 'Roboto', sans-serif;
+  letter-spacing: 0.5px;
+  font-weight: 500;
+  transition: all 0.2s ease;
   
   &:hover {
     background: ${props => props.$primary ? '#00a1b5' : 'rgba(0, 188, 212, 0.1)'};
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
   }
 `;
 

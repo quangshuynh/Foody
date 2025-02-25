@@ -74,6 +74,17 @@ function RestaurantItem({ restaurant, updateRestaurant, removeRestaurant }) {
   const [showRatingModal, setShowRatingModal] = useState(false);
   const { user, isAuthenticated } = useAuth();
   const { focusLocation } = useMap();
+  
+  const handleMapFocus = (location) => {
+    focusLocation(location);
+    // Scroll to map
+    const mapElement = document.getElementById('restaurant-map');
+    if (mapElement) {
+      setTimeout(() => {
+        mapElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 100);
+    }
+  };
 
   const handleRatingSubmit = async (rating, wouldReturn, comment = '') => {
     if (!user) {
@@ -175,7 +186,7 @@ function RestaurantItem({ restaurant, updateRestaurant, removeRestaurant }) {
     <ItemContainer>
       <IconContainer>
         <FaMapMarkerAlt 
-          onClick={() => focusLocation(restaurant.location)} 
+          onClick={() => handleMapFocus(restaurant.location)} 
           title="Show on Map"
           style={{ color: '#ff4081' }}
         />

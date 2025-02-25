@@ -14,11 +14,12 @@ L.Icon.Default.mergeOptions({
 
 const MapWrapper = styled.div`
   width: 90%;
-  height: 400px;
+  height: 500px;
   margin: 20px auto;
   border-radius: 8px;
   overflow: hidden;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  scroll-margin-top: 80px;
 `;
 
 // Component to handle map view changes
@@ -32,6 +33,14 @@ function MapController({ selectedLocation, focusId }) {
         16, 
         { animate: true, duration: 1.5 }
       );
+      
+      // Center the map on the screen
+      map.once('moveend', () => {
+        map.panInside([selectedLocation.lat, selectedLocation.lng], {
+          padding: [50, 50],
+          animate: true
+        });
+      });
     }
   }, [selectedLocation, focusId, map]);
   
@@ -42,9 +51,10 @@ function RestaurantMap({ restaurants }) {
   const position = [43.1566, -77.6088]; // center on Rochester, NY
   const { selectedLocation, focusId } = useMap();
   const mapRef = useRef(null);
+  const wrapperRef = useRef(null);
 
   return (
-    <MapWrapper>
+    <MapWrapper ref={wrapperRef} id="restaurant-map">
       <MapContainer 
         center={position} 
         zoom={13} 
