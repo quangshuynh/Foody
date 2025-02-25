@@ -70,6 +70,20 @@
       "id": "1740457707001",
       "ratings": [],
       "averageRating": 0
+    },
+    {
+      "name": "Dogtown",
+      "address": "691 Monroe Ave",
+      "location": {
+        "lat": 43.1438431,
+        "lng": -77.5897493
+      },
+      "rating": 0,
+      "goAgain": false,
+      "dateAdded": "2025-02-25T05:45:53.522Z",
+      "id": "1740462353527",
+      "ratings": [],
+      "averageRating": 0
     }
   ]
 }
