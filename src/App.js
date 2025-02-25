@@ -5,7 +5,6 @@ import RegisterForm from './components/auth/RegisterForm';
 import { fetchVisitedRestaurants, addRestaurant as addRestaurantApi } from './services/restaurantService';
 import { initializeJsonStorage, readJsonData, updateJsonData } from './services/jsonStorage';
 import styled from 'styled-components';
-import Header from './components/Header';
 import SearchBar from './components/SearchBar';
 import RestaurantList from './components/RestaurantList';
 import RestaurantsToVisit from './components/RestaurantsToVisit';
@@ -176,14 +175,6 @@ function App() {
           </ModalOverlay>
         )}
 
-      {/* <Header
-        title="Foody"
-        selectedSection={selectedSection}
-        setSelectedSection={setSelectedSection}
-        onShowLogin={() => { setShowLogin(true); setShowRegister(false); }}
-        onShowRegister={() => { setShowRegister(true); setShowLogin(false); }}
-        onLogout={handleLogout}
-      /> */}
 
         {selectedSection === 'visited' && (
           <>

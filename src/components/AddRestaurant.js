@@ -9,6 +9,7 @@ const FormContainer = styled.div`
   width: 80%;
   max-width: 600px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
+  border: 1px solid #333;
 `;
 
 const Input = styled.input`

@@ -16,7 +16,7 @@ const NavContainer = styled.nav`
   height: 60px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
   
-  @media (max-width: 600px) {
+  @media (max-width: 768px) {
     flex-direction: column;
     align-items: flex-start;
     height: auto;
@@ -72,10 +72,11 @@ const AuthButton = styled.button`
 `;
 
 const Navbar = ({ selectedSection, setSelectedSection, onShowLogin, onShowRegister, onLogout }) => {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
 
   return (
     <NavContainer>
+      <Logo>Foody</Logo>
       <NavItems>
         <NavItem
           $active={selectedSection === 'visited'}

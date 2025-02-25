@@ -100,7 +100,7 @@ function RegisterForm({ onSuccess }) {
   return (
     <FormContainer>
       <CloseButton onClick={onSuccess} aria-label="Close">×</CloseButton>
-      <h2>Register</h2>
+      <h2 style={{ marginBottom: '10px' }}>Register</h2>
       <form onSubmit={handleSubmit}>
         <Input
           type="text"
