@@ -36,24 +36,31 @@ const Logo = styled.div`
 const NavItems = styled.div`
   display: flex;
   align-items: center;
+  background: rgba(26, 26, 26, 0.8);
+  padding: 5px;
+  border-radius: 8px;
+  margin-left: 10px;
 `;
 
 const NavItem = styled.button`
-  background: transparent;
+  background: ${(props) => props.$active ? 'rgba(0, 188, 212, 0.2)' : 'transparent'};
   border: none;
-  color: #f5f5f5;
+  color: ${(props) => props.$active ? '#00bcd4' : '#f5f5f5'};
   font-size: 1.1rem;
   margin: 0 10px;
   cursor: pointer;
   padding: 10px 15px;
+  border-radius: 5px;
   border-bottom: ${(props) =>
     props.$active ? '3px solid #00bcd4' : '3px solid transparent'};
-  transition: color 0.3s ease, transform 0.3s ease, border-bottom 0.3s ease;
+  transition: all 0.3s ease;
+  font-weight: ${(props) => props.$active ? '500' : 'normal'};
+  box-shadow: ${(props) => props.$active ? '0 2px 4px rgba(0, 0, 0, 0.3)' : 'none'};
 
   &:hover {
     color: #00bcd4;
     transform: translateY(-2px);
-    border-bottom: 3px solid #00bcd4;
+    background: rgba(0, 188, 212, 0.1);
   }
 `;
 

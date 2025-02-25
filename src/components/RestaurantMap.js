@@ -13,9 +13,12 @@ L.Icon.Default.mergeOptions({
 });
 
 const MapWrapper = styled.div`
-  width: 100%;
+  width: 90%;
   height: 400px;
-  margin: 20px 0;
+  margin: 20px auto;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
 `;
 
 // Component to handle map view changes
