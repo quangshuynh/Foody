@@ -7,18 +7,22 @@ const http = require('http');
 const app = express();
 let port = process.env.PORT || 3001;
 
-// Data file path
-const DATA_FILE = path.join(__dirname, '../../data/appData.json');
+// Data file paths
+const AUTH_DATA_FILE = path.join(__dirname, '../../data/authData.json');
+const RESTAURANT_DATA_FILE = path.join(__dirname, '../../data/restaurantData.json');
 
-// Default data structure
-const defaultData = {
+// Default data structures
+const defaultAuthData = {
   users: [{
     id: "1",
     username: "admin",
     password: "8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918", // admin
     role: "user",
     createdAt: new Date().toISOString()
-  }],
+  }]
+};
+
+const defaultRestaurantData = {
   visitedRestaurants: [],
   toVisit: [],
   recommended: [
@@ -39,37 +43,67 @@ const defaultData = {
   ]
 };
 
-// Ensure data directory and file exist with proper structure
+// Ensure data directory and files exist with proper structure
 const initializeData = () => {
-  const dir = path.dirname(DATA_FILE);
+  const dir = path.dirname(AUTH_DATA_FILE);
   if (!fs.existsSync(dir)) {
     fs.mkdirSync(dir, { recursive: true });
   }
   
-  let data = defaultData;
-  if (fs.existsSync(DATA_FILE)) {
+  // Initialize auth data
+  let authData = defaultAuthData;
+  if (fs.existsSync(AUTH_DATA_FILE)) {
     try {
-      data = fs.readJsonSync(DATA_FILE);
+      authData = fs.readJsonSync(AUTH_DATA_FILE);
       
-      // Ensure all required arrays exist
-      if (!data.users) data.users = defaultData.users;
-      if (!data.visitedRestaurants) data.visitedRestaurants = [];
-      if (!data.toVisit) data.toVisit = [];
-      if (!data.recommended) data.recommended = defaultData.recommended;
+      // Ensure users array exists
+      if (!authData.users) authData.users = defaultAuthData.users;
       
       // Write back the validated data
-      fs.writeJsonSync(DATA_FILE, data, { spaces: 2 });
+      fs.writeJsonSync(AUTH_DATA_FILE, authData, { spaces: 2 });
     } catch (error) {
-      console.error('Error reading data file, creating new one:', error);
-      fs.writeJsonSync(DATA_FILE, defaultData, { spaces: 2 });
+      console.error('Error reading auth data file, creating new one:', error);
+      fs.writeJsonSync(AUTH_DATA_FILE, defaultAuthData, { spaces: 2 });
     }
   } else {
-    fs.writeJsonSync(DATA_FILE, defaultData, { spaces: 2 });
+    fs.writeJsonSync(AUTH_DATA_FILE, defaultAuthData, { spaces: 2 });
+  }
+  
+  // Initialize restaurant data
+  let restaurantData = defaultRestaurantData;
+  if (fs.existsSync(RESTAURANT_DATA_FILE)) {
+    try {
+      restaurantData = fs.readJsonSync(RESTAURANT_DATA_FILE);
+      
+      // Ensure all required arrays exist
+      if (!restaurantData.visitedRestaurants) restaurantData.visitedRestaurants = [];
+      if (!restaurantData.toVisit) restaurantData.toVisit = [];
+      if (!restaurantData.recommended) restaurantData.recommended = defaultRestaurantData.recommended;
+      
+      // Write back the validated data
+      fs.writeJsonSync(RESTAURANT_DATA_FILE, restaurantData, { spaces: 2 });
+    } catch (error) {
+      console.error('Error reading restaurant data file, creating new one:', error);
+      fs.writeJsonSync(RESTAURANT_DATA_FILE, defaultRestaurantData, { spaces: 2 });
+    }
+  } else {
+    fs.writeJsonSync(RESTAURANT_DATA_FILE, defaultRestaurantData, { spaces: 2 });
   }
 };
 
 // Initialize data storage
 initializeData();
+
+// Helper functions to save data
+const saveAuthData = (users) => {
+  const authData = { users };
+  fs.writeJsonSync(AUTH_DATA_FILE, authData, { spaces: 2 });
+};
+
+const saveRestaurantData = (visitedRestaurants, toVisit, recommended) => {
+  const restaurantData = { visitedRestaurants, toVisit, recommended };
+  fs.writeJsonSync(RESTAURANT_DATA_FILE, restaurantData, { spaces: 2 });
+};
 
 app.use(express.json());
 
@@ -178,11 +212,11 @@ app.post('/api/auth/register', (req, res) => {
   try {
     const { username, password } = req.body;
     
-    // Read existing data
-    const data = fs.readJsonSync(DATA_FILE);
+    // Read existing auth data
+    const authData = fs.readJsonSync(AUTH_DATA_FILE);
     
     // Check if username already exists
-    if (data.users.some(u => u.username === username)) {
+    if (authData.users.some(u => u.username === username)) {
       return res.status(400).json({ error: 'Username already exists' });
     }
     
@@ -196,10 +230,10 @@ app.post('/api/auth/register', (req, res) => {
     };
     
     // Add user to data
-    data.users.push(newUser);
+    authData.users.push(newUser);
     
     // Write back to file
-    fs.writeJsonSync(DATA_FILE, data, { spaces: 2 });
+    fs.writeJsonSync(AUTH_DATA_FILE, authData, { spaces: 2 });
     
     // Return user without password and with token
     const { password: _, ...userWithoutPassword } = newUser;
@@ -217,11 +251,11 @@ app.post('/api/auth/login', (req, res) => {
   try {
     const { username, password } = req.body;
     
-    // Read existing data
-    const data = fs.readJsonSync(DATA_FILE);
+    // Read existing auth data
+    const authData = fs.readJsonSync(AUTH_DATA_FILE);
     
     // Find user
-    const user = data.users.find(u => u.username === username);
+    const user = authData.users.find(u => u.username === username);
     
     // Check if user exists and password is correct
     if (!user || user.password !== hashPassword(password)) {
@@ -242,14 +276,14 @@ app.post('/api/auth/login', (req, res) => {
 // Restaurant endpoints
 app.get('/api/restaurants', (req, res) => {
   try {
-    const data = fs.readJsonSync(DATA_FILE);
+    const restaurantData = fs.readJsonSync(RESTAURANT_DATA_FILE);
     // Ensure visitedRestaurants exists
-    if (!data.visitedRestaurants) {
-      data.visitedRestaurants = [];
+    if (!restaurantData.visitedRestaurants) {
+      restaurantData.visitedRestaurants = [];
       // Save the updated data
-      fs.writeJsonSync(DATA_FILE, data, { spaces: 2 });
+      fs.writeJsonSync(RESTAURANT_DATA_FILE, restaurantData, { spaces: 2 });
     }
-    res.json(data.visitedRestaurants);
+    res.json(restaurantData.visitedRestaurants);
   } catch (error) {
     console.error('Error fetching restaurants:', error);
     res.status(500).json({ error: 'Failed to fetch restaurants' });
@@ -259,15 +293,15 @@ app.get('/api/restaurants', (req, res) => {
 app.post('/api/restaurants', authenticateUser, (req, res) => {
   try {
     const restaurant = req.body;
-    const data = fs.readJsonSync(DATA_FILE);
+    const restaurantData = fs.readJsonSync(RESTAURANT_DATA_FILE);
     
     // Ensure visitedRestaurants exists
-    if (!data.visitedRestaurants) {
-      data.visitedRestaurants = [];
+    if (!restaurantData.visitedRestaurants) {
+      restaurantData.visitedRestaurants = [];
     }
     
     // Check for duplicates
-    const duplicate = data.visitedRestaurants.some(
+    const duplicate = restaurantData.visitedRestaurants.some(
       r => r.name.toLowerCase() === restaurant.name.toLowerCase() ||
            r.address.toLowerCase() === restaurant.address.toLowerCase()
     );
@@ -283,8 +317,8 @@ app.post('/api/restaurants', authenticateUser, (req, res) => {
       averageRating: 0
     };
     
-    data.visitedRestaurants.push(newRestaurant);
-    fs.writeJsonSync(DATA_FILE, data, { spaces: 2 });
+    restaurantData.visitedRestaurants.push(newRestaurant);
+    fs.writeJsonSync(RESTAURANT_DATA_FILE, restaurantData, { spaces: 2 });
     
     res.json(newRestaurant);
   } catch (error) {
@@ -297,27 +331,27 @@ app.put('/api/restaurants/:id', authenticateUser, (req, res) => {
   try {
     const { id } = req.params;
     const updatedRestaurant = req.body;
-    const data = fs.readJsonSync(DATA_FILE);
+    const restaurantData = fs.readJsonSync(RESTAURANT_DATA_FILE);
     
     // Ensure visitedRestaurants exists
-    if (!data.visitedRestaurants) {
-      data.visitedRestaurants = [];
+    if (!restaurantData.visitedRestaurants) {
+      restaurantData.visitedRestaurants = [];
     }
     
-    const index = data.visitedRestaurants.findIndex(r => r.id === id);
+    const index = restaurantData.visitedRestaurants.findIndex(r => r.id === id);
     if (index === -1) {
       return res.status(404).json({ error: 'Restaurant not found' });
     }
     
-    data.visitedRestaurants[index] = {
+    restaurantData.visitedRestaurants[index] = {
       ...updatedRestaurant,
       id,
-      ratings: updatedRestaurant.ratings || data.visitedRestaurants[index].ratings || [],
-      averageRating: updatedRestaurant.averageRating || data.visitedRestaurants[index].averageRating || 0
+      ratings: updatedRestaurant.ratings || restaurantData.visitedRestaurants[index].ratings || [],
+      averageRating: updatedRestaurant.averageRating || restaurantData.visitedRestaurants[index].averageRating || 0
     };
     
-    fs.writeJsonSync(DATA_FILE, data, { spaces: 2 });
-    res.json(data.visitedRestaurants[index]);
+    fs.writeJsonSync(RESTAURANT_DATA_FILE, restaurantData, { spaces: 2 });
+    res.json(restaurantData.visitedRestaurants[index]);
   } catch (error) {
     console.error('Error updating restaurant:', error);
     res.status(500).json({ error: 'Failed to update restaurant' });
@@ -327,16 +361,16 @@ app.put('/api/restaurants/:id', authenticateUser, (req, res) => {
 app.delete('/api/restaurants/:id', authenticateUser, (req, res) => {
   try {
     const { id } = req.params;
-    const data = fs.readJsonSync(DATA_FILE);
+    const restaurantData = fs.readJsonSync(RESTAURANT_DATA_FILE);
     
     // Ensure visitedRestaurants exists
-    if (!data.visitedRestaurants) {
-      data.visitedRestaurants = [];
+    if (!restaurantData.visitedRestaurants) {
+      restaurantData.visitedRestaurants = [];
     } else {
-      data.visitedRestaurants = data.visitedRestaurants.filter(r => r.id !== id);
+      restaurantData.visitedRestaurants = restaurantData.visitedRestaurants.filter(r => r.id !== id);
     }
     
-    fs.writeJsonSync(DATA_FILE, data, { spaces: 2 });
+    fs.writeJsonSync(RESTAURANT_DATA_FILE, restaurantData, { spaces: 2 });
     res.json({ success: true });
   } catch (error) {
     console.error('Error deleting restaurant:', error);
@@ -347,14 +381,14 @@ app.delete('/api/restaurants/:id', authenticateUser, (req, res) => {
 // To-visit restaurants endpoints
 app.get('/api/tovisit', (req, res) => {
   try {
-    const data = fs.readJsonSync(DATA_FILE);
+    const restaurantData = fs.readJsonSync(RESTAURANT_DATA_FILE);
     // Ensure toVisit exists
-    if (!data.toVisit) {
-      data.toVisit = [];
+    if (!restaurantData.toVisit) {
+      restaurantData.toVisit = [];
       // Save the updated data
-      fs.writeJsonSync(DATA_FILE, data, { spaces: 2 });
+      fs.writeJsonSync(RESTAURANT_DATA_FILE, restaurantData, { spaces: 2 });
     }
-    res.json(data.toVisit);
+    res.json(restaurantData.toVisit);
   } catch (error) {
     console.error('Error fetching to-visit restaurants:', error);
     res.status(500).json({ error: 'Failed to fetch to-visit restaurants' });
@@ -364,15 +398,15 @@ app.get('/api/tovisit', (req, res) => {
 app.post('/api/tovisit', authenticateUser, (req, res) => {
   try {
     const restaurant = req.body;
-    const data = fs.readJsonSync(DATA_FILE);
+    const restaurantData = fs.readJsonSync(RESTAURANT_DATA_FILE);
     
     // Ensure toVisit exists
-    if (!data.toVisit) {
-      data.toVisit = [];
+    if (!restaurantData.toVisit) {
+      restaurantData.toVisit = [];
     }
     
     // Check for duplicates
-    const duplicate = data.toVisit.some(
+    const duplicate = restaurantData.toVisit.some(
       r => r.name.toLowerCase() === restaurant.name.toLowerCase() ||
            r.address.toLowerCase() === restaurant.address.toLowerCase()
     );
@@ -387,8 +421,8 @@ app.post('/api/tovisit', authenticateUser, (req, res) => {
       dateAdded: new Date().toISOString()
     };
     
-    data.toVisit.push(newRestaurant);
-    fs.writeJsonSync(DATA_FILE, data, { spaces: 2 });
+    restaurantData.toVisit.push(newRestaurant);
+    fs.writeJsonSync(RESTAURANT_DATA_FILE, restaurantData, { spaces: 2 });
     
     res.json(newRestaurant);
   } catch (error) {
@@ -400,16 +434,16 @@ app.post('/api/tovisit', authenticateUser, (req, res) => {
 app.delete('/api/tovisit/:id', authenticateUser, (req, res) => {
   try {
     const { id } = req.params;
-    const data = fs.readJsonSync(DATA_FILE);
+    const restaurantData = fs.readJsonSync(RESTAURANT_DATA_FILE);
     
     // Ensure toVisit exists
-    if (!data.toVisit) {
-      data.toVisit = [];
+    if (!restaurantData.toVisit) {
+      restaurantData.toVisit = [];
     } else {
-      data.toVisit = data.toVisit.filter(r => r.id !== id);
+      restaurantData.toVisit = restaurantData.toVisit.filter(r => r.id !== id);
     }
     
-    fs.writeJsonSync(DATA_FILE, data, { spaces: 2 });
+    fs.writeJsonSync(RESTAURANT_DATA_FILE, restaurantData, { spaces: 2 });
     res.json({ success: true });
   } catch (error) {
     console.error('Error deleting to-visit restaurant:', error);
@@ -420,14 +454,14 @@ app.delete('/api/tovisit/:id', authenticateUser, (req, res) => {
 // Recommended restaurants endpoints
 app.get('/api/recommended', (req, res) => {
   try {
-    const data = fs.readJsonSync(DATA_FILE);
+    const restaurantData = fs.readJsonSync(RESTAURANT_DATA_FILE);
     // Ensure recommended exists
-    if (!data.recommended) {
-      data.recommended = [];
+    if (!restaurantData.recommended) {
+      restaurantData.recommended = [];
       // Save the updated data
-      fs.writeJsonSync(DATA_FILE, data, { spaces: 2 });
+      fs.writeJsonSync(RESTAURANT_DATA_FILE, restaurantData, { spaces: 2 });
     }
-    res.json(data.recommended);
+    res.json(restaurantData.recommended);
   } catch (error) {
     console.error('Error fetching recommended restaurants:', error);
     res.status(500).json({ error: 'Failed to fetch recommended restaurants' });
