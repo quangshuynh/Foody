@@ -6,6 +6,43 @@ const ListContainer = styled.div`
   margin: 20px 0;
 `;
 
+function getRandomPoopAddress() {
+  const randomNumber = Math.floor(Math.random() * 99999) + 1;
+  const streetNames = ["Poop", "Doo-doo", "Poo", "Dung", "Caca"];
+  const streetSuffixes = ["Ave", "St", "Rd", "Blvd", "Way", "Lane"];
+  const randomStreetName = streetNames[Math.floor(Math.random() * streetNames.length)];
+  const randomStreetSuffix = streetSuffixes[Math.floor(Math.random() * streetSuffixes.length)];
+  return `${randomNumber} ${randomStreetName} ${randomStreetSuffix}`;
+}
+
+function getRandomPoopRestaurantName() {
+  const adjectives = [
+    "Stinky", "Smelly", "Funky", "Mushy", "Gross", "Foul",
+    "Pungent", "Odorous", "Rank", "Noxious", "Putrid",
+    "Moldy", "Slimy", "Fetid", "Stenchy", "Noisome", "Rancid",
+    "Gag-worthy", "Revolting", "Disgusting", "Sordid", "Vile", "Moist"
+  ];
+  const names = [
+    "Palace", "Tavern", "Bistro", "Cafe", "Diner", "Joint",
+    "Grill", "Eatery", "Kitchen", "Lounge", "Pit", "Bar",
+    "Stop", "Shack", "House", "Corner", "Spot", "Depot",
+    "Station", "Canteen", "Buffet"
+  ];
+  
+  const wordCount = Math.floor(Math.random() * 3) + 1;
+  let parts = [];
+  
+  for (let i = 0; i < wordCount; i++) {
+    if (Math.random() < 0.5) {
+      parts.push(adjectives[Math.floor(Math.random() * adjectives.length)]);
+    } else {
+      parts.push(names[Math.floor(Math.random() * names.length)]);
+    }
+  }
+  
+  return parts.join(" ");
+}
+
 function RestaurantList({ restaurants, updateRestaurant, removeRestaurant, isPoopMode }) {
   return (
     <ListContainer>
@@ -14,8 +51,8 @@ function RestaurantList({ restaurants, updateRestaurant, removeRestaurant, isPoo
           key={restaurant.id}
           restaurant={isPoopMode ? {
             ...restaurant,
-            name: "Poop",
-            address: "123 Poop Ave"
+            name: getRandomPoopRestaurantName(),
+            address: getRandomPoopAddress()
           } : restaurant}
           updateRestaurant={updateRestaurant}
           removeRestaurant={removeRestaurant}
