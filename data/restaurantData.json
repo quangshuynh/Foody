@@ -66,14 +66,20 @@
       "id": "101",
       "name": "Kai poop",
       "address": "2 Scottsville Rd, Rochester, NY",
-      "location": { "lat": 43.1258, "lng": -77.6424 },
+      "location": {
+        "lat": 43.1258,
+        "lng": -77.6424
+      },
       "dateAdded": "2025-02-25T01:37:06.552Z"
     },
     {
       "id": "102",
       "name": "Carlton Gibson Hall",
       "address": "Latimore Pl, Rochester, NY",
-      "location": { "lat": 43.0857, "lng": -77.6672 },
+      "location": {
+        "lat": 43.0857,
+        "lng": -77.6672
+      },
       "dateAdded": "2025-02-25T01:37:06.552Z"
     }
   ]
