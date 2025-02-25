@@ -27,28 +27,35 @@ function RestaurantList({ restaurants, updateRestaurant, removeRestaurant, isPoo
 
     restaurants.forEach(() => {
       const wordCount = Math.floor(Math.random() * 3) + 1; 
-      let parts = [];
-      for (let i = 0; i < wordCount; i++) {
-        let useAdjective = Math.random() < 0.5;
-        if (useAdjective && availableAdjectives.length === 0) {
-          useAdjective = false;
-        }
-        if (!useAdjective && availableNames.length === 0) {
-          useAdjective = true;
-        }
-        if (useAdjective) {
-          const idx = Math.floor(Math.random() * availableAdjectives.length);
-          const word = availableAdjectives[idx];
-          parts.push(word);
-          availableAdjectives.splice(idx, 1);
-        } else {
-          const idx = Math.floor(Math.random() * availableNames.length);
-          const word = availableNames[idx];
-          parts.push(word);
-          availableNames.splice(idx, 1);
-        }
+      if (wordCount === 1) {
+        const oneWordOptions = ["Poop", "Doo-doo"];
+        const randomIndex = Math.floor(Math.random() * oneWordOptions.length);
+        uniqueNames.push(oneWordOptions[randomIndex]);
+      } else if (wordCount === 2) {
+        const adjectiveIdx = Math.floor(Math.random() * availableAdjectives.length);
+        const adjective = availableAdjectives[adjectiveIdx];
+        availableAdjectives.splice(adjectiveIdx, 1);
+
+        const nameIdx = Math.floor(Math.random() * availableNames.length);
+        const name = availableNames[nameIdx];
+        availableNames.splice(nameIdx, 1);
+
+        uniqueNames.push(`${adjective} ${name}`);
+      } else if (wordCount === 3) {
+        const adjectiveIdx1 = Math.floor(Math.random() * availableAdjectives.length);
+        const adjective1 = availableAdjectives[adjectiveIdx1];
+        availableAdjectives.splice(adjectiveIdx1, 1);
+
+        const adjectiveIdx2 = Math.floor(Math.random() * availableAdjectives.length);
+        const adjective2 = availableAdjectives[adjectiveIdx2];
+        availableAdjectives.splice(adjectiveIdx2, 1);
+
+        const nameIdx = Math.floor(Math.random() * availableNames.length);
+        const name = availableNames[nameIdx];
+        availableNames.splice(nameIdx, 1);
+
+        uniqueNames.push(`${adjective1} ${adjective2} ${name}`);
       }
-      uniqueNames.push(parts.join(" "));
     });
 
     const streetNames = ["Poop", "Doo-doo", "Poo", "Dung", "Caca"];
