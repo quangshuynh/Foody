@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import Rating from './Rating';
 import Comments from './Comments';
-import { FaTrash, FaEdit, FaStar, FaComment, FaMapMarkerAlt } from 'react-icons/fa';
+import { FaTrash, FaEdit, FaStar, FaComment, FaMapMarkerAlt, FaClipboard } from 'react-icons/fa';
 import RatingModal from './RatingModal';
 import { useAuth } from '../contexts/AuthContext';
 import { useMap } from '../contexts/MapContext';
@@ -232,15 +232,30 @@ function RestaurantItem({ restaurant, updateRestaurant, removeRestaurant }) {
         </>
       ) : (
         <>
-          <h3 style={{ 
-            fontFamily: "'aligarh', sans-serif", 
-            color: '#f5f5f5', 
-            fontSize: '1.7rem',
-            letterSpacing: '1px',
-            marginBottom: '8px'
-          }}>{restaurant.name}</h3>
-            {restaurant.address && (
-            <p style={{ fontFamily: "'playfair', sans-serif", fontSize: '1.1rem', color: '#fff' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <h3 style={{ 
+              fontFamily: "'aligarh', sans-serif", 
+              color: '#f5f5f5', 
+              fontSize: '1.7rem',
+              letterSpacing: '1px',
+              marginBottom: '2px'
+            }}>{restaurant.name}</h3>
+            <FaClipboard 
+              onClick={() => {
+                navigator.clipboard.writeText(restaurant.address);
+                alert('Address copied to clipboard!');
+              }}
+              title="Copy address to clipboard"
+              style={{ color: '#00bcd4', cursor: 'pointer', marginLeft: '10px' }}
+            />
+          </div>
+          {restaurant.address && (
+            <p style={{ 
+              fontFamily: "'playfair', sans-serif", 
+              fontSize: '1.1rem', 
+              color: '#fff',
+              marginTop: '0'
+            }}>
               <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(restaurant.address)}`} 
                 target="_blank" 
                 rel="noopener noreferrer"
