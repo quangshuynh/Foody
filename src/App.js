@@ -199,29 +199,8 @@ function App() {
         {selectedSection === 'visited' && (
           <>
             <h2>Visited Restaurants</h2>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '80%', margin: '0 auto' }}>
+            <div style={{ width: '80%', margin: '0 auto' }}>
               <SearchBar searchRestaurants={searchRestaurants} />
-              <div style={{ marginLeft: '20px' }}>
-                <label style={{ marginRight: '10px', color: '#f5f5f5' }}>Show: </label>
-                <select 
-                  onChange={handleDisplayLimitChange} 
-                  value={isPoopMode ? "poop" : displayLimit}
-                  style={{
-                    padding: '8px',
-                    borderRadius: '4px',
-                    background: '#2a2a2a',
-                    color: '#f5f5f5',
-                    border: '1px solid #00bcd4'
-                  }}
-                >
-                  <option value="5">5 restaurants</option>
-                  <option value="10">10 restaurants</option>
-                  <option value="15">15 restaurants</option>
-                  <option value="20">20 restaurants</option>
-                  <option value="50">50 restaurants</option>
-                  <option value="poop">💩</option>
-                </select>
-              </div>
             </div>
             {isAuthenticated && (
               <AddRestaurant addRestaurant={addRestaurant} />
@@ -232,6 +211,28 @@ function App() {
               removeRestaurant={isAuthenticated ? removeRestaurant : null}
               isPoopMode={isPoopMode}
             />
+            
+            <div style={{ width: '80%', margin: '10px auto', textAlign: 'left' }}>
+              <select 
+                onChange={handleDisplayLimitChange} 
+                value={isPoopMode ? "poop" : displayLimit}
+                style={{
+                  padding: '8px',
+                  borderRadius: '4px',
+                  background: '#2a2a2a',
+                  color: '#f5f5f5',
+                  border: '1px solid #00bcd4',
+                  cursor: 'pointer'
+                }}
+              >
+                <option value="5">5</option>
+                <option value="10">10</option>
+                <option value="15">15</option>
+                <option value="20">20</option>
+                <option value="50">50</option>
+                <option value="poop">💩</option>
+              </select>
+            </div>
           </>
         )}
         {selectedSection === 'toVisit' && (
