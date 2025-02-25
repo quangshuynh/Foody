@@ -1,6 +1,35 @@
 const API_URL = 'http://localhost:3001/api';
 
+// Try to start the server if needed
+const ensureServerRunning = async () => {
+  try {
+    // Check if server is running
+    const response = await fetch(`${API_URL}/data`, { 
+      method: 'HEAD',
+      signal: AbortSignal.timeout(1000) 
+    }).catch(() => null);
+    
+    if (response && response.ok) return;
+    
+    // If not running, try to import the server starter
+    console.log('Server not responding, attempting to start...');
+    try {
+      const { startServerIfNeeded } = await import('../utils/startServer.js');
+      const port = await startServerIfNeeded();
+      if (port && port !== 3001) {
+        console.log(`Server started on port ${port}, please refresh the page`);
+        alert(`Server started on port ${port}, please refresh the page`);
+      }
+    } catch (err) {
+      console.error('Failed to start server:', err);
+    }
+  } catch (err) {
+    console.error('Error checking server status:', err);
+  }
+};
+
 export const initializeStorage = async () => {
+  await ensureServerRunning();
   try {
     const response = await fetch(`${API_URL}/data/users`);
     if (!response.ok) throw new Error('Failed to initialize storage');

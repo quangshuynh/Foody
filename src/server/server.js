@@ -2,9 +2,10 @@ const express = require('express');
 const path = require('path');
 const fs = require('fs-extra');
 const crypto = require('crypto');
+const http = require('http');
 
 const app = express();
-const port = process.env.PORT || 3001;
+let port = process.env.PORT || 3001;
 
 // Data file path
 const DATA_FILE = path.join(__dirname, '../../data/appData.json');
@@ -56,7 +57,13 @@ app.use(express.json());
 
 // CORS middleware
 app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', 'http://localhost:3000');
+  const origin = req.headers.origin;
+  // Allow requests from localhost on any port
+  if (origin && origin.match(/^https?:\/\/localhost(:\d+)?$/)) {
+    res.header('Access-Control-Allow-Origin', origin);
+  } else {
+    res.header('Access-Control-Allow-Origin', 'http://localhost:3000');
+  }
   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
   res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   next();
@@ -371,6 +378,65 @@ if (process.env.NODE_ENV === 'production') {
   });
 }
 
-app.listen(port, () => {
-  console.log(`Server running on port ${port}`);
-});
+// Create HTTP server
+const server = http.createServer(app);
+
+// Function to find an available port
+const startServer = (initialPort) => {
+  port = initialPort;
+  
+  server.on('error', (err) => {
+    if (err.code === 'EADDRINUSE') {
+      console.log(`Port ${port} is already in use, trying ${port + 1}...`);
+      port += 1;
+      setTimeout(() => {
+        server.close();
+        server.listen(port);
+      }, 1000);
+    } else {
+      console.error('Server error:', err);
+    }
+  });
+  
+  server.on('listening', () => {
+    console.log(`Server running on port ${port}`);
+    
+    // Update API_URL in client files if port changed
+    if (port !== 3001) {
+      updateClientApiUrl(port);
+    }
+  });
+  
+  server.listen(port);
+};
+
+// Function to update API_URL in client files if port changed
+const updateClientApiUrl = (newPort) => {
+  const clientFiles = [
+    path.join(__dirname, '../services/fileService.js'),
+    path.join(__dirname, '../services/authService.js'),
+    path.join(__dirname, '../services/restaurantService.js'),
+    path.join(__dirname, '../services/jsonStorage.js'),
+    path.join(__dirname, '../services/toVisitService.js'),
+    path.join(__dirname, '../services/recommendedService.js'),
+    path.join(__dirname, '../utils/dbOperations.js')
+  ];
+  
+  clientFiles.forEach(filePath => {
+    if (fs.existsSync(filePath)) {
+      try {
+        let content = fs.readFileSync(filePath, 'utf8');
+        content = content.replace(
+          /const API_URL = ['"]http:\/\/localhost:3001\/api['"]/g,
+          `const API_URL = 'http://localhost:${newPort}/api'`
+        );
+        fs.writeFileSync(filePath, content, 'utf8');
+      } catch (error) {
+        console.error(`Error updating API_URL in ${filePath}:`, error);
+      }
+    }
+  });
+};
+
+// Start the server
+startServer(port);
