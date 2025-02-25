@@ -96,7 +96,7 @@ const AuthButton = styled.button`
 `;
 
 const Navbar = ({ selectedSection, setSelectedSection, onShowLogin, onShowRegister, onLogout }) => {
-  const { isAuthenticated, user } = useAuth();
+  const { isAuthenticated } = useAuth();
 
   return (
     <NavContainer>
