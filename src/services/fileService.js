@@ -1,4 +1,4 @@
-const API_URL = 'http://localhost:3001/api';
+const API_URL = 'http://localhost:3002/api';
 
 // Try to start the server if needed
 const ensureServerRunning = async () => {

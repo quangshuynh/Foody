@@ -1,4 +1,4 @@
-const API_URL = 'http://localhost:3001/api';
+const API_URL = 'http://localhost:3002/api';
 const TOKEN_KEY = 'auth_token';
 
 export const register = async (username, password) => {
