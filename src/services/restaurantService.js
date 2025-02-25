@@ -66,7 +66,7 @@ export const addRestaurant = async (restaurant) => {
   }
 };
 
-export const deleteRestaurant = async (id) => {
+export const removeRestaurant = async (id) => {
   try {
     const token = getAuthToken();
     if (!token) throw new Error('Authentication required');

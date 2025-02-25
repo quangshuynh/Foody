@@ -3,7 +3,7 @@ import { useAuth } from './contexts/AuthContext';
 import { MapProvider } from './contexts/MapContext';
 import LoginForm from './components/auth/LoginForm';
 import RegisterForm from './components/auth/RegisterForm';
-import { fetchVisitedRestaurants, addRestaurant as addRestaurantApi } from './services/restaurantService';
+import { fetchVisitedRestaurants, addRestaurant as addRestaurantApi, removeRestaurant as removeRestaurantApi } from './services/restaurantService';
 import { initializeJsonStorage, readJsonData, updateJsonData } from './services/jsonStorage';
 import styled from 'styled-components';
 import SearchBar from './components/SearchBar';
@@ -46,6 +46,8 @@ function App() {
   const [recommendedRestaurants, setRecommendedRestaurants] = useState([]);
   const [filteredRestaurants, setFilteredRestaurants] = useState(restaurants);
   const [selectedSection, setSelectedSection] = useState('visited');
+  const [displayLimit, setDisplayLimit] = useState(5);
+  const [isPoopMode, setIsPoopMode] = useState(false);
 
   useEffect(() => {
     const sortedRestaurants = [...restaurants].sort((a, b) => new Date(b.dateAdded) - new Date(a.dateAdded));
@@ -98,10 +100,27 @@ function App() {
     setFilteredRestaurants(updatedRestaurants);
   };
 
-  const removeRestaurant = (id) => {
-    const updatedRestaurants = restaurants.filter((rest) => rest.id !== id);
-    setRestaurants(updatedRestaurants);
-    setFilteredRestaurants(updatedRestaurants);
+  const removeRestaurant = async (id) => {
+    try {
+      await removeRestaurantApi(id);
+      const updatedRestaurants = restaurants.filter((rest) => rest.id !== id);
+      setRestaurants(updatedRestaurants);
+      setFilteredRestaurants(updatedRestaurants);
+    } catch (err) {
+      console.error('Failed to remove restaurant:', err);
+      alert('Failed to remove restaurant. Please try again.');
+    }
+  };
+
+  const handleDisplayLimitChange = (e) => {
+    const value = e.target.value;
+    if (value === "poop") {
+      setIsPoopMode(true);
+      setDisplayLimit(5);
+    } else {
+      setIsPoopMode(false);
+      setDisplayLimit(Number(value));
+    }
   };
 
   const searchRestaurants = (query) => {
