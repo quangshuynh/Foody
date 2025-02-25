@@ -1,0 +1,80 @@
+{
+  "visitedRestaurants": [
+    {
+      "name": "Love City",
+      "address": "Paris",
+      "location": {
+        "lat": 48.8588897,
+        "lng": 2.3200410217200766
+      },
+      "rating": 0,
+      "goAgain": false,
+      "dateAdded": "2025-02-25T01:37:06.552Z",
+      "id": "1740447426557",
+      "ratings": [
+        {
+          "userId": "1740446646356",
+          "username": "forkei",
+          "rating": 2,
+          "wouldReturn": false,
+          "comment": "I farted here.",
+          "date": "2025-02-25T01:37:26.966Z"
+        },
+        {
+          "userId": "1740447592765",
+          "username": "forkei2",
+          "rating": 5,
+          "wouldReturn": true,
+          "comment": "Someone else farted here. But other than that, all good.",
+          "date": "2025-02-25T01:40:32.132Z"
+        }
+      ],
+      "averageRating": 3.5
+    },
+    {
+      "name": "Where the Queen tho?",
+      "address": "London",
+      "location": {
+        "lat": 51.5074456,
+        "lng": -0.1277653
+      },
+      "rating": 0,
+      "goAgain": false,
+      "dateAdded": "2025-02-25T04:28:26.997Z",
+      "id": "1740457707001",
+      "ratings": [],
+      "averageRating": 0
+    },
+    {
+      "name": "Dogtown",
+      "address": "691 Monroe Ave",
+      "location": {
+        "lat": 43.1438431,
+        "lng": -77.5897493
+      },
+      "rating": 0,
+      "goAgain": false,
+      "dateAdded": "2025-02-25T05:45:53.522Z",
+      "id": "1740462353527",
+      "ratings": [],
+      "averageRating": 0
+    }
+  ],
+  "toVisit": [],
+  "recommended": [
+    {
+      "id": "101",
+      "name": "Kai poop",
+      "address": "2 Scottsville Rd, Rochester, NY",
+      "location": { "lat": 43.1258, "lng": -77.6424 },
+      "dateAdded": "2025-02-25T01:37:06.552Z"
+    },
+    {
+      "id": "102",
+      "name": "Carlton Gibson Hall",
+      "address": "Latimore Pl, Rochester, NY",
+      "location": { "lat": 43.0857, "lng": -77.6672 },
+      "dateAdded": "2025-02-25T01:37:06.552Z"
+    }
+  ]
+}

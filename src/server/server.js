@@ -145,16 +145,12 @@ const authenticateUser = (req, res, next) => {
 // Get all data
 app.get('/api/data', (req, res) => {
   try {
-    const data = fs.readJsonSync(DATA_FILE);
-    // Don't send passwords to client
-    const safeData = { ...data };
-    if (safeData.users) {
-      safeData.users = safeData.users.map(user => {
-        const { password, ...userWithoutPassword } = user;
-        return userWithoutPassword;
-      });
-    }
-    res.json(safeData);
+    const restaurantData = fs.readJsonSync(RESTAURANT_DATA_FILE);
+    res.json({
+      visitedRestaurants: restaurantData.visitedRestaurants || [],
+      toVisit: restaurantData.toVisit || [],
+      recommended: restaurantData.recommended || []
+    });
   } catch (error) {
     res.status(500).json({ error: 'Failed to read data' });
   }
@@ -164,17 +160,15 @@ app.get('/api/data', (req, res) => {
 app.get('/api/data/:key', (req, res) => {
   try {
     const { key } = req.params;
-    const data = fs.readJsonSync(DATA_FILE);
     
     if (key === 'users') {
-      // Don't send passwords to client
-      const safeUsers = data.users.map(user => {
-        const { password, ...userWithoutPassword } = user;
-        return userWithoutPassword;
-      });
-      res.json(safeUsers);
+      // Only return user count for security
+      const authData = fs.readJsonSync(AUTH_DATA_FILE);
+      const userCount = authData.users ? authData.users.length : 0;
+      res.json({ userCount });
     } else {
-      res.json(data[key] || []);
+      const restaurantData = fs.readJsonSync(RESTAURANT_DATA_FILE);
+      res.json(restaurantData[key] || []);
     }
   } catch (error) {
     res.status(500).json({ error: 'Failed to read data' });
@@ -187,19 +181,23 @@ app.put('/api/data/:key', authenticateUser, (req, res) => {
     const { key } = req.params;
     const { value } = req.body;
     
-    // Read existing data
-    let data = {};
-    if (fs.existsSync(DATA_FILE)) {
-      data = fs.readJsonSync(DATA_FILE);
+    if (key === 'users') {
+      return res.status(403).json({ error: 'Cannot update users through this endpoint' });
+    }
+    
+    // Read existing restaurant data
+    let restaurantData = {};
+    if (fs.existsSync(RESTAURANT_DATA_FILE)) {
+      restaurantData = fs.readJsonSync(RESTAURANT_DATA_FILE);
     } else {
-      data = defaultData;
+      restaurantData = defaultRestaurantData;
     }
     
     // Update data
-    data[key] = value;
+    restaurantData[key] = value;
     
     // Write back to file
-    fs.writeJsonSync(DATA_FILE, data, { spaces: 2 });
+    fs.writeJsonSync(RESTAURANT_DATA_FILE, restaurantData, { spaces: 2 });
     res.json({ success: true });
   } catch (error) {
     console.error('Error updating data:', error);
