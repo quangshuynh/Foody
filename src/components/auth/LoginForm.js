@@ -11,7 +11,9 @@ const FormContainer = styled.div`
   border-radius: 8px;
   display: flex;
   flex-direction: column;
-  align-items: center; 
+  align-items: center;
+  position: relative;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
 `;
 
 const Input = styled.input`
@@ -22,6 +24,7 @@ const Input = styled.input`
   border: 1px solid #00bcd4;
   border-radius: 5px;
   color: #f5f5f5;
+  font-size: 1rem;
 `;
 
 const Button = styled.button`
@@ -33,8 +36,32 @@ const Button = styled.button`
   color: white;
   cursor: pointer;
   margin-top: 10px;
+  font-size: 1rem;
+  transition: background 0.2s;
   &:hover {
     background: #00a1b5;
+  }
+`;
+
+const CloseButton = styled.button`
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: transparent;
+  border: none;
+  color: #f5f5f5;
+  font-size: 1.2rem;
+  cursor: pointer;
+  &:hover {
+    color: #ff4081;
+  }
+`;
+
+const ContinueAsGuestButton = styled(Button)`
+  background: #424242;
+  margin-top: 15px;
+  &:hover {
+    background: #616161;
   }
 `;
 
@@ -43,7 +70,6 @@ const ErrorMessage = styled.p`
   margin: 10px 0;
   text-align: center;
 `;
-
 
 function LoginForm({ onSuccess }) {
   const [username, setUsername] = useState('');
@@ -62,8 +88,13 @@ function LoginForm({ onSuccess }) {
     }
   };
 
+  const handleContinueAsGuest = () => {
+    if (onSuccess) onSuccess();
+  };
+
   return (
     <FormContainer>
+      <CloseButton onClick={onSuccess} aria-label="Close">×</CloseButton>
       <h2>Login</h2>
       <form onSubmit={handleSubmit}>
         <Input
@@ -81,6 +112,9 @@ function LoginForm({ onSuccess }) {
         {error && <ErrorMessage>{error}</ErrorMessage>}
         <Button type="submit">Login</Button>
       </form>
+      <ContinueAsGuestButton type="button" onClick={handleContinueAsGuest}>
+        Continue as Guest
+      </ContinueAsGuestButton>
     </FormContainer>
   );
 }

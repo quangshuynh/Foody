@@ -35,7 +35,7 @@ const NavItem = styled.button`
   cursor: pointer;
   padding: 10px 15px;
   border-bottom: ${(props) =>
-    props.active ? '3px solid #00bcd4' : '3px solid transparent'};
+    props.$active ? '3px solid #00bcd4' : '3px solid transparent'};
   transition: color 0.3s ease, transform 0.3s ease, border-bottom 0.3s ease;
 
   &:hover {
@@ -78,19 +78,19 @@ const Navbar = ({ selectedSection, setSelectedSection, onShowLogin, onShowRegist
     <NavContainer>
       <NavItems>
         <NavItem
-          active={selectedSection === 'visited'}
+          $active={selectedSection === 'visited'}
           onClick={() => setSelectedSection('visited')}
         >
           Visited
         </NavItem>
         <NavItem
-          active={selectedSection === 'toVisit'}
+          $active={selectedSection === 'toVisit'}
           onClick={() => setSelectedSection('toVisit')}
         >
           To Visit
         </NavItem>
         <NavItem
-          active={selectedSection === 'recommended'}
+          $active={selectedSection === 'recommended'}
           onClick={() => setSelectedSection('recommended')}
         >
           Recommended

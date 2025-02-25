@@ -188,6 +188,9 @@ function App() {
           <>
             <SearchBar searchRestaurants={searchRestaurants} />
             <h2>Visited Restaurants</h2>
+            {isAuthenticated && (
+              <AddRestaurant addRestaurant={addRestaurant} />
+            )}
             <RestaurantList
               restaurants={filteredRestaurants}
               updateRestaurant={isAuthenticated ? updateRestaurant : null}
