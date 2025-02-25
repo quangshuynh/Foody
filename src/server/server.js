@@ -39,13 +39,31 @@ const defaultData = {
   ]
 };
 
-// Ensure data directory and file exist
+// Ensure data directory and file exist with proper structure
 const initializeData = () => {
   const dir = path.dirname(DATA_FILE);
   if (!fs.existsSync(dir)) {
     fs.mkdirSync(dir, { recursive: true });
   }
-  if (!fs.existsSync(DATA_FILE)) {
+  
+  let data = defaultData;
+  if (fs.existsSync(DATA_FILE)) {
+    try {
+      data = fs.readJsonSync(DATA_FILE);
+      
+      // Ensure all required arrays exist
+      if (!data.users) data.users = defaultData.users;
+      if (!data.visitedRestaurants) data.visitedRestaurants = [];
+      if (!data.toVisit) data.toVisit = [];
+      if (!data.recommended) data.recommended = defaultData.recommended;
+      
+      // Write back the validated data
+      fs.writeJsonSync(DATA_FILE, data, { spaces: 2 });
+    } catch (error) {
+      console.error('Error reading data file, creating new one:', error);
+      fs.writeJsonSync(DATA_FILE, defaultData, { spaces: 2 });
+    }
+  } else {
     fs.writeJsonSync(DATA_FILE, defaultData, { spaces: 2 });
   }
 };
@@ -225,8 +243,15 @@ app.post('/api/auth/login', (req, res) => {
 app.get('/api/restaurants', (req, res) => {
   try {
     const data = fs.readJsonSync(DATA_FILE);
-    res.json(data.visitedRestaurants || []);
+    // Ensure visitedRestaurants exists
+    if (!data.visitedRestaurants) {
+      data.visitedRestaurants = [];
+      // Save the updated data
+      fs.writeJsonSync(DATA_FILE, data, { spaces: 2 });
+    }
+    res.json(data.visitedRestaurants);
   } catch (error) {
+    console.error('Error fetching restaurants:', error);
     res.status(500).json({ error: 'Failed to fetch restaurants' });
   }
 });
@@ -235,6 +260,11 @@ app.post('/api/restaurants', authenticateUser, (req, res) => {
   try {
     const restaurant = req.body;
     const data = fs.readJsonSync(DATA_FILE);
+    
+    // Ensure visitedRestaurants exists
+    if (!data.visitedRestaurants) {
+      data.visitedRestaurants = [];
+    }
     
     // Check for duplicates
     const duplicate = data.visitedRestaurants.some(
@@ -269,6 +299,11 @@ app.put('/api/restaurants/:id', authenticateUser, (req, res) => {
     const updatedRestaurant = req.body;
     const data = fs.readJsonSync(DATA_FILE);
     
+    // Ensure visitedRestaurants exists
+    if (!data.visitedRestaurants) {
+      data.visitedRestaurants = [];
+    }
+    
     const index = data.visitedRestaurants.findIndex(r => r.id === id);
     if (index === -1) {
       return res.status(404).json({ error: 'Restaurant not found' });
@@ -294,9 +329,14 @@ app.delete('/api/restaurants/:id', authenticateUser, (req, res) => {
     const { id } = req.params;
     const data = fs.readJsonSync(DATA_FILE);
     
-    data.visitedRestaurants = data.visitedRestaurants.filter(r => r.id !== id);
-    fs.writeJsonSync(DATA_FILE, data, { spaces: 2 });
+    // Ensure visitedRestaurants exists
+    if (!data.visitedRestaurants) {
+      data.visitedRestaurants = [];
+    } else {
+      data.visitedRestaurants = data.visitedRestaurants.filter(r => r.id !== id);
+    }
     
+    fs.writeJsonSync(DATA_FILE, data, { spaces: 2 });
     res.json({ success: true });
   } catch (error) {
     console.error('Error deleting restaurant:', error);
@@ -308,8 +348,15 @@ app.delete('/api/restaurants/:id', authenticateUser, (req, res) => {
 app.get('/api/tovisit', (req, res) => {
   try {
     const data = fs.readJsonSync(DATA_FILE);
-    res.json(data.toVisit || []);
+    // Ensure toVisit exists
+    if (!data.toVisit) {
+      data.toVisit = [];
+      // Save the updated data
+      fs.writeJsonSync(DATA_FILE, data, { spaces: 2 });
+    }
+    res.json(data.toVisit);
   } catch (error) {
+    console.error('Error fetching to-visit restaurants:', error);
     res.status(500).json({ error: 'Failed to fetch to-visit restaurants' });
   }
 });
@@ -318,6 +365,11 @@ app.post('/api/tovisit', authenticateUser, (req, res) => {
   try {
     const restaurant = req.body;
     const data = fs.readJsonSync(DATA_FILE);
+    
+    // Ensure toVisit exists
+    if (!data.toVisit) {
+      data.toVisit = [];
+    }
     
     // Check for duplicates
     const duplicate = data.toVisit.some(
@@ -350,9 +402,14 @@ app.delete('/api/tovisit/:id', authenticateUser, (req, res) => {
     const { id } = req.params;
     const data = fs.readJsonSync(DATA_FILE);
     
-    data.toVisit = data.toVisit.filter(r => r.id !== id);
-    fs.writeJsonSync(DATA_FILE, data, { spaces: 2 });
+    // Ensure toVisit exists
+    if (!data.toVisit) {
+      data.toVisit = [];
+    } else {
+      data.toVisit = data.toVisit.filter(r => r.id !== id);
+    }
     
+    fs.writeJsonSync(DATA_FILE, data, { spaces: 2 });
     res.json({ success: true });
   } catch (error) {
     console.error('Error deleting to-visit restaurant:', error);
@@ -364,8 +421,15 @@ app.delete('/api/tovisit/:id', authenticateUser, (req, res) => {
 app.get('/api/recommended', (req, res) => {
   try {
     const data = fs.readJsonSync(DATA_FILE);
-    res.json(data.recommended || []);
+    // Ensure recommended exists
+    if (!data.recommended) {
+      data.recommended = [];
+      // Save the updated data
+      fs.writeJsonSync(DATA_FILE, data, { spaces: 2 });
+    }
+    res.json(data.recommended);
   } catch (error) {
+    console.error('Error fetching recommended restaurants:', error);
     res.status(500).json({ error: 'Failed to fetch recommended restaurants' });
   }
 });
