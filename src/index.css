@@ -11,8 +11,8 @@ body {
 
 /* Custom scrollbar styling */
 ::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
+  width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
@@ -21,12 +21,23 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #00bcd4;
+  background: rgba(0, 188, 212, 0.5);
   border-radius: 5px;
+  transition: background 0.3s ease;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #00a1b5;
+  background: #00bcd4;
+  width: 10px;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 188, 212, 0.5) #2a2a2a;
+}
+
+*:hover {
+  scrollbar-color: #00bcd4 #2a2a2a;
 }
 
 code {

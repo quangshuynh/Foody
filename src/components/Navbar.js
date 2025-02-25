@@ -83,9 +83,9 @@ const AuthButton = styled.button`
   border-radius: 4px;
   cursor: pointer;
   font-size: 0.9rem;
-  font-family: 'Roboto', sans-serif;
-  letter-spacing: 0.5px;
-  font-weight: 500;
+  font-family: 'eracake', 'Roboto', sans-serif;
+  letter-spacing: 1px;
+  font-weight: 400;
   transition: all 0.2s ease;
   
   &:hover {
