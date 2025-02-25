@@ -12,8 +12,9 @@ import RestaurantsToVisit from './components/RestaurantsToVisit';
 import RecommendedRestaurants from './components/RecommendedRestaurants';
 import RestaurantMap from './components/RestaurantMap';
 import Footer from './components/Footer';
-import ModalOverlay from './components/ModalOverlay'
+import ModalOverlay from './components/ModalOverlay';
 import Navbar from './components/Navbar';
+import AddRestaurant from './components/AddRestaurant';
 
 const AppContainer = styled.div`
   font-family: 'Roboto', sans-serif;
@@ -133,7 +134,7 @@ function App() {
     setRestaurantsToVisit(updatedToVisit);
   };
 
-  const { isAuthenticated, setUser, user } = useAuth();
+  const { isAuthenticated, setUser } = useAuth();
   const [showLogin, setShowLogin] = useState(false);
   const [showRegister, setShowRegister] = useState(false);
 
