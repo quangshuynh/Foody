@@ -60,3 +60,7 @@ out/
 .DS_Store
 Thumbs.db
 .vercel
+
+# firebase
+.firebase
+firebase.json
