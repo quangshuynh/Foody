@@ -7,10 +7,21 @@ export const updateApiUrl = (newUrl) => {
   API_URL = newUrl;
 };
 
-export const initializeJsonStorage = async () => {
+// Constants for localStorage keys
+const STORAGE_KEYS = {
+  TO_VISIT: 'foody_to_visit',
+  RECOMMENDED: 'foody_recommended'
+};
+
+// Initialize storage with default values if empty
+export const initializeJsonStorage = () => {
   try {
-    const response = await fetch(`${API_URL}/data`);
-    if (!response.ok) throw new Error('Failed to initialize storage');
+    if (!localStorage.getItem(STORAGE_KEYS.TO_VISIT)) {
+      localStorage.setItem(STORAGE_KEYS.TO_VISIT, JSON.stringify([]));
+    }
+    if (!localStorage.getItem(STORAGE_KEYS.RECOMMENDED)) {
+      localStorage.setItem(STORAGE_KEYS.RECOMMENDED, JSON.stringify([]));
+    }
     return true;
   } catch (error) {
     console.error('Error initializing storage:', error);
@@ -18,11 +29,13 @@ export const initializeJsonStorage = async () => {
   }
 };
 
-export const readJsonData = async () => {
+// Read data from localStorage
+export const readJsonData = () => {
   try {
-    const response = await fetch(`${API_URL}/data`);
-    if (!response.ok) throw new Error('Failed to read data');
-    return await response.json();
+    return {
+      toVisit: JSON.parse(localStorage.getItem(STORAGE_KEYS.TO_VISIT) || '[]'),
+      recommended: JSON.parse(localStorage.getItem(STORAGE_KEYS.RECOMMENDED) || '[]')
+    };
   } catch (error) {
     console.error('Error reading data:', error);
     return {
@@ -32,25 +45,15 @@ export const readJsonData = async () => {
   }
 };
 
-export const writeJsonData = async (data) => {
+// Write data to localStorage
+export const writeJsonData = (data) => {
   try {
-    const token = getAuthToken();
-    if (!token) throw new Error('Authentication required');
-    
-    // Update each key separately
-    for (const key of Object.keys(data)) {
-      const response = await fetch(`${API_URL}/data/${key}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': token
-        },
-        body: JSON.stringify({ value: data[key] })
-      });
-      
-      if (!response.ok) throw new Error(`Failed to write ${key} data`);
+    if (data.toVisit !== undefined) {
+      localStorage.setItem(STORAGE_KEYS.TO_VISIT, JSON.stringify(data.toVisit));
     }
-    
+    if (data.recommended !== undefined) {
+      localStorage.setItem(STORAGE_KEYS.RECOMMENDED, JSON.stringify(data.recommended));
+    }
     return true;
   } catch (error) {
     console.error('Error writing data:', error);
@@ -58,24 +61,63 @@ export const writeJsonData = async (data) => {
   }
 };
 
-export const updateJsonData = async (key, value) => {
+// Update specific key in localStorage
+export const updateJsonData = (key, value) => {
   try {
-    const token = getAuthToken();
-    if (!token) throw new Error('Authentication required');
+    const storageKey = STORAGE_KEYS[key.toUpperCase()];
+    if (!storageKey) throw new Error(`Invalid key: ${key}`);
     
-    const response = await fetch(`${API_URL}/data/${key}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': token
-      },
-      body: JSON.stringify({ value })
-    });
-    
-    if (!response.ok) throw new Error(`Failed to update ${key} data`);
+    localStorage.setItem(storageKey, JSON.stringify(value));
     return true;
   } catch (error) {
     console.error(`Error updating ${key} data:`, error);
     return false;
   }
+};
+
+// Export data to JSON file
+export const exportToJsonFile = (filename = 'foody_data.json') => {
+  try {
+    const data = readJsonData();
+    const jsonString = JSON.stringify(data, null, 2);
+    const blob = new Blob([jsonString], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    
+    return true;
+  } catch (error) {
+    console.error('Error exporting data:', error);
+    return false;
+  }
+};
+
+// Import data from JSON file
+export const importFromJsonFile = (file) => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    
+    reader.onload = (event) => {
+      try {
+        const data = JSON.parse(event.target.result);
+        if (data.toVisit || data.recommended) {
+          writeJsonData(data);
+          resolve(true);
+        } else {
+          reject(new Error('Invalid data format'));
+        }
+      } catch (error) {
+        reject(error);
+      }
+    };
+    
+    reader.onerror = () => reject(new Error('Error reading file'));
+    reader.readAsText(file);
+  });
 };
