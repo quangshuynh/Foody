@@ -1,6 +1,6 @@
 {
   "name": "foody",
-  "homepage": ".",
+  "homepage": "http://quangshuynh.github.io/Foody",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -31,7 +31,7 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "predeploy": "npm run build",
-    "deploy": "vercel --prod"
+    "deploy": "gh-pages -d build"
   },
   "eslintConfig": {
     "extends": [
