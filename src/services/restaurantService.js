@@ -1,8 +1,6 @@
 import { db, auth } from '../firebaseConfig'; // Import Firestore DB and Auth
 import {
   collection,
-  query,
-  where,
   getDocs,
   addDoc,
   updateDoc,

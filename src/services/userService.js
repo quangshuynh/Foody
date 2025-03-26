@@ -1,8 +1,7 @@
-import { db, auth } from '../firebaseConfig';
-import { doc, setDoc, getDoc, collection, query, where, getDocs, writeBatch } from 'firebase/firestore';
+import { db } from '../firebaseConfig';
+import { doc, getDoc, collection, query, where, getDocs, writeBatch } from 'firebase/firestore';
 
 const usersCollectionRef = collection(db, 'users');
-const usernamesCollectionRef = collection(db, 'usernames');
 
 /**
  * Checks if a username already exists.
