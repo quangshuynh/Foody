@@ -2,40 +2,73 @@
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
-  signOut
+  signOut,
+  deleteUser // Import deleteUser for potential rollback
 } from "firebase/auth";
-import { auth } from '../firebaseConfig'; // Import the initialized auth service
+import { auth } from '../firebaseConfig';
+import { createUserProfile } from './userService'; // Import profile creation
 
 // Note: We are removing the old API-based functions and helpers.
 // Firebase handles authentication state persistence automatically.
 
 /**
- * Registers a new user with email and password.
+ * Registers a new user with username, email, and password, and creates their profile.
+ * @param {string} username - The chosen username.
  * @param {string} email - The user's email.
  * @param {string} password - The user's password.
  * @returns {Promise<User>} Firebase User object.
  */
-export const register = async (email, password) => {
-  if (!email || !password) {
-    throw new Error("Email and password are required for registration.");
+export const register = async (username, email, password) => {
+  if (!username || !email || !password) {
+    throw new Error("Username, email, and password are required for registration.");
   }
+  let userCredential; // Define userCredential outside try block to access in catch
   try {
-    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-    // You might want to store additional user profile info in Firestore/Realtime Database here
-    console.log("User registered successfully:", userCredential.user.uid);
-    return userCredential.user;
-  } catch (error) {
-    console.error('Registration error:', error.code, error.message);
+    // 1. Create the Firebase Auth user
+    userCredential = await createUserWithEmailAndPassword(auth, email, password);
+    const user = userCredential.user;
+    console.log("Firebase Auth user created successfully:", user.uid);
+
+    // 2. Create the user profile document in Firestore
+    try {
+      await createUserProfile(user.uid, username, email);
+      console.log("User profile created successfully for:", user.uid);
+      return user; // Return the user object on full success
+    } catch (profileError) {
+      console.error("Failed to create user profile after auth creation:", profileError);
+      // Attempt to roll back Auth user creation if profile fails
+      if (user) {
+        try {
+          await deleteUser(user);
+          console.log("Rolled back Firebase Auth user creation for:", user.uid);
+        } catch (deleteError) {
+          console.error("Failed to roll back Firebase Auth user creation:", deleteError);
+          // This leaves an orphaned Auth user - might need manual cleanup
+          throw new Error("Registration failed: Could not create profile, and failed to clean up user account. Please contact support.");
+        }
+      }
+      // Throw the original profile error or a combined error
+      throw new Error(`Registration failed: ${profileError.message || 'Could not create user profile.'}`);
+    }
+
+  } catch (authError) {
+    console.error('Registration error:', authError.code, authError.message);
     // Provide more specific error messages
+    // Handle Auth specific errors
     let friendlyMessage = 'Registration failed. Please try again.';
-    if (error.code === 'auth/email-already-in-use') {
+    if (authError.code === 'auth/email-already-in-use') {
       friendlyMessage = 'This email address is already in use.';
-    } else if (error.code === 'auth/invalid-email') {
+    } else if (authError.code === 'auth/invalid-email') {
       friendlyMessage = 'Please enter a valid email address.';
-    } else if (error.code === 'auth/weak-password') {
+    } else if (authError.code === 'auth/weak-password') {
       friendlyMessage = 'Password is too weak. Please choose a stronger password.';
     }
-    throw new Error(friendlyMessage); // Re-throw a user-friendly error
+    // If it wasn't a profile error re-thrown from the inner catch block
+    if (!friendlyMessage.startsWith('Registration failed:')) {
+        throw new Error(friendlyMessage);
+    } else {
+        throw authError; // Re-throw the specific profile error from the inner catch
+    }
   }
 };
 
