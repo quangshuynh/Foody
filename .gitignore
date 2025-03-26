@@ -67,3 +67,4 @@ firebase.json
 .firebase
 ./firebase/
 /src/firebase.js
+/src/firebaseConfig.js
