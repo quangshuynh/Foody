@@ -15,15 +15,27 @@ const CommentItem = styled.div`
   border-bottom: 1px solid #444;
 `;
 
+// Removed unused props: onAddComment, onUpdateComment
+function Comments({ comments }) {
+  // Helper to format Firestore Timestamp or ISO string date
+  const formatDate = (dateInput) => {
+    if (!dateInput) return 'Unknown date';
+    // Check if it's a Firestore Timestamp
+    if (dateInput.toDate) {
+      return dateInput.toDate().toLocaleString();
+    }
+    // Otherwise, assume it's an ISO string or Date object
+    return new Date(dateInput).toLocaleString();
+  };
 
-function Comments({ comments, onAddComment, onUpdateComment }) {
   return (
     <CommentsContainer>
       <h4>Comments</h4>
       {comments && comments.length > 0 ? (
         comments.map((comment, index) => (
           <CommentItem key={index}>
-            <strong>{comment.username}</strong> - {new Date(comment.date).toLocaleString()}
+            {/* Display userEmail or fallback to userId */}
+            <strong>{comment.userEmail || `User (${comment.userId?.substring(0, 6)}...)`}</strong> - {formatDate(comment.date)}
             <div>
               {[1, 2, 3, 4, 5].map((star) => (
                 <FaStar key={star} color={star <= comment.rating ? '#ffd700' : '#4a4a4a'} />
