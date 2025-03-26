@@ -17,8 +17,9 @@ import RecommendedRestaurants from './components/RecommendedRestaurants';
 import RestaurantMap from './components/RestaurantMap';
 import Footer from './components/Footer';
 import ModalOverlay from './components/ModalOverlay';
-import Navbar from './components/Navbar';
-import AddRestaurant from './components/AddRestaurant';
+import Navbar from './components/Navbar'; // Keep this
+import AddRestaurant from './components/AddRestaurant'; // Keep this
+import UsernamePromptModal from './components/auth/UsernamePromptModal'; // Import the new modal
 
 const AppContainer = styled.div`
   font-family: 'Roboto', sans-serif;
@@ -31,7 +32,8 @@ const AppContainer = styled.div`
 `;
 
 function App() {
-  const { user, loading: authLoading } = useAuth(); // Get user and auth loading state
+  // Get user, profile status flags from context
+  const { user, authLoading, profileLoading, profileMissing } = useAuth();
 
   // State for different restaurant lists
   const [restaurants, setRestaurants] = useState([]); // Visited
@@ -227,9 +229,14 @@ function App() {
     }
   };
 
-  // Render loading indicator while checking auth state
-  if (authLoading) {
-    return <AppContainer>Loading...</AppContainer>; // Or a proper spinner component
+  // Render loading indicator while checking auth state OR profile state after login
+  if (authLoading || (user && profileLoading)) {
+    return <AppContainer>Loading...</AppContainer>; // Show loading until profile is checked
+  }
+
+  // Show username prompt if user is logged in but profile is missing
+  if (user && profileMissing) {
+    return <UsernamePromptModal />;
   }
 
   return (
