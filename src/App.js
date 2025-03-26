@@ -1,14 +1,12 @@
-import React, { useState, useEffect } from 'react'; // Ensure React is imported only once
+import React, { useState, useEffect } from 'react'; 
 import { useAuth } from './contexts/AuthContext';
 import { MapProvider } from './contexts/MapContext';
 import LoginForm from './components/auth/LoginForm';
 import RegisterForm from './components/auth/RegisterForm';
-// Updated imports for Firestore services
 import { fetchVisitedRestaurants, addRestaurant as addRestaurantApi, updateRestaurant as updateRestaurantApi, removeRestaurant as removeRestaurantApi } from './services/restaurantService';
 import { fetchToVisitRestaurants, addToVisit as addToVisitApi, removeToVisit as removeToVisitApi } from './services/toVisitService';
 import { fetchRecommendedRestaurants } from './services/recommendedService';
-import { logout } from './services/authService'; // <-- Add missing logout import
-// Removed jsonStorage imports
+import { logout } from './services/authService'; 
 import styled from 'styled-components';
 import SearchBar from './components/SearchBar';
 import RestaurantList from './components/RestaurantList';
@@ -17,9 +15,8 @@ import RecommendedRestaurants from './components/RecommendedRestaurants';
 import RestaurantMap from './components/RestaurantMap';
 import Footer from './components/Footer';
 import ModalOverlay from './components/ModalOverlay';
-import Navbar from './components/Navbar'; // Keep this
-import AddRestaurant from './components/AddRestaurant'; // Keep this
-import UsernamePromptModal from './components/auth/UsernamePromptModal'; // Import the new modal
+import Navbar from './components/Navbar';
+import AddRestaurant from './components/AddRestaurant'; 
 
 const AppContainer = styled.div`
   font-family: 'Roboto', sans-serif;
@@ -32,15 +29,12 @@ const AppContainer = styled.div`
 `;
 
 function App() {
-  // Get user, profile status flags from context
-  const { user, authLoading, profileLoading, profileMissing } = useAuth();
+  const { user, authLoading, profileLoading } = useAuth();
 
-  // State for different restaurant lists
-  const [restaurants, setRestaurants] = useState([]); // Visited
+  const [restaurants, setRestaurants] = useState([]); 
   const [restaurantsToVisit, setRestaurantsToVisit] = useState([]);
   const [recommendedRestaurants, setRecommendedRestaurants] = useState([]);
 
-  // State for UI
   const [filteredRestaurants, setFilteredRestaurants] = useState(restaurants);
   const [selectedSection, setSelectedSection] = useState('visited');
   const [displayLimit, setDisplayLimit] = useState(5);
@@ -232,11 +226,6 @@ function App() {
   // Render loading indicator while checking auth state OR profile state after login
   if (authLoading || (user && profileLoading)) {
     return <AppContainer>Loading...</AppContainer>; // Show loading until profile is checked
-  }
-
-  // Show username prompt if user is logged in but profile is missing
-  if (user && profileMissing) {
-    return <UsernamePromptModal />;
   }
 
   return (

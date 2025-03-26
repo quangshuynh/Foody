@@ -65,7 +65,6 @@ function Comments({ comments }) {
   return (
     <CommentsContainer>
       <h4>Comments</h4>
-      <h4>Comments</h4>
       {loadingUsernames && <p>Loading usernames...</p>}
       {comments && comments.length > 0 ? (
         comments.map((comment, index) => {

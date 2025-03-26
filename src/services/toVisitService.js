@@ -8,7 +8,7 @@ import {
   addDoc,
   deleteDoc,
   doc,
-  serverTimestamp
+  Timestamp
 } from 'firebase/firestore';
 import { logAuditEvent } from './auditLogService'; // Import audit log service
 
@@ -48,7 +48,7 @@ export const addToVisit = async (restaurant) => {
     const newToVisitData = {
       ...restaurant, // Include name, address, location etc.
       userId: user.uid,
-      dateAdded: serverTimestamp()
+      dateAdded: Timestamp.fromDate(new Date())
     };
     // Remove any temporary 'id' if it exists from the input
     delete newToVisitData.id;
