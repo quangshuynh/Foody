@@ -7,12 +7,8 @@
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.2.0",
     "@testing-library/user-event": "^13.5.0",
-    "bcryptjs": "^2.4.3",
-    "concurrently": "^8.2.2",
-    "express": "^4.18.2",
+    // Removed: bcryptjs, concurrently, express, fs-extra, jsonwebtoken
     "firebase": "^11.5.0",
-    "fs-extra": "^11.3.0",
-    "jsonwebtoken": "^9.0.2",
     "leaflet": "^1.9.4",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
@@ -24,9 +20,9 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "start": "concurrently \"npm run server\" \"npm run client\"",
-    "server": "node server.js",
-    "client": "react-scripts start",
+    "start": "react-scripts start", // Changed start script
+    // Removed: "server" script
+    "client": "react-scripts start", // Keep client for clarity or remove if start is enough
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",

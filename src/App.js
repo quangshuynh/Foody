@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from 'react';
-import React, { useState, useEffect } from 'react'; // Ensure React is imported
+import React, { useState, useEffect } from 'react'; // Ensure React is imported only once
 import { useAuth } from './contexts/AuthContext';
 import { MapProvider } from './contexts/MapContext';
 import LoginForm from './components/auth/LoginForm';
