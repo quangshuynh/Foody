@@ -65,3 +65,4 @@ Thumbs.db
 .firebaserc
 firebase.json
 .firebase
+./firebase/
