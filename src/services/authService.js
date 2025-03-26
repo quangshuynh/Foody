@@ -1,77 +1,84 @@
-let API_URL = 'http://localhost:3002/api';
+// src/services/authService.js - Firebase Version
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  signOut
+} from "firebase/auth";
+import { auth } from '../firebaseConfig'; // Import the initialized auth service
 
-// Update API URL if needed
-export const updateApiUrl = (newUrl) => {
-  API_URL = newUrl;
-};
-const TOKEN_KEY = 'auth_token';
+// Note: We are removing the old API-based functions and helpers.
+// Firebase handles authentication state persistence automatically.
 
-export const register = async (username, password) => {
+/**
+ * Registers a new user with email and password.
+ * @param {string} email - The user's email.
+ * @param {string} password - The user's password.
+ * @returns {Promise<User>} Firebase User object.
+ */
+export const register = async (email, password) => {
+  if (!email || !password) {
+    throw new Error("Email and password are required for registration.");
+  }
   try {
-    const response = await fetch(`${API_URL}/auth/register`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ username, password })
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.error || 'Registration failed');
-    }
-
-    const data = await response.json();
-    localStorage.setItem('user', JSON.stringify(data.user));
-    localStorage.setItem(TOKEN_KEY, data.token);
-
-    return data;
+    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+    // You might want to store additional user profile info in Firestore/Realtime Database here
+    console.log("User registered successfully:", userCredential.user.uid);
+    return userCredential.user;
   } catch (error) {
-    console.error('Registration error:', error);
-    throw error;
+    console.error('Registration error:', error.code, error.message);
+    // Provide more specific error messages
+    let friendlyMessage = 'Registration failed. Please try again.';
+    if (error.code === 'auth/email-already-in-use') {
+      friendlyMessage = 'This email address is already in use.';
+    } else if (error.code === 'auth/invalid-email') {
+      friendlyMessage = 'Please enter a valid email address.';
+    } else if (error.code === 'auth/weak-password') {
+      friendlyMessage = 'Password is too weak. Please choose a stronger password.';
+    }
+    throw new Error(friendlyMessage); // Re-throw a user-friendly error
   }
 };
 
-export const login = async (username, password) => {
+/**
+ * Logs in a user with email and password.
+ * @param {string} email - The user's email.
+ * @param {string} password - The user's password.
+ * @returns {Promise<User>} Firebase User object.
+ */
+export const login = async (email, password) => {
+  if (!email || !password) {
+    throw new Error("Email and password are required for login.");
+  }
   try {
-    const response = await fetch(`${API_URL}/auth/login`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ username, password })
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.error || 'Login failed');
-    }
-
-    const data = await response.json();
-    localStorage.setItem('user', JSON.stringify(data.user));
-    localStorage.setItem(TOKEN_KEY, data.token);
-
-    return data;
+    const userCredential = await signInWithEmailAndPassword(auth, email, password);
+    console.log("User logged in successfully:", userCredential.user.uid);
+    return userCredential.user;
   } catch (error) {
-    console.error('Login error:', error);
-    throw error;
+    console.error('Login error:', error.code, error.message);
+    // Provide more specific error messages
+    let friendlyMessage = 'Login failed. Please check your credentials.';
+    if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
+      friendlyMessage = 'Invalid email or password.';
+    } else if (error.code === 'auth/invalid-email') {
+      friendlyMessage = 'Please enter a valid email address.';
+    }
+    throw new Error(friendlyMessage); // Re-throw a user-friendly error
   }
 };
 
-export const logout = () => {
-  localStorage.removeItem('user');
-  localStorage.removeItem(TOKEN_KEY);
+/**
+ * Logs out the current user.
+ * @returns {Promise<void>}
+ */
+export const logout = async () => {
+  try {
+    await signOut(auth);
+    console.log("User logged out successfully.");
+  } catch (error) {
+    console.error('Logout error:', error);
+    throw new Error('Logout failed. Please try again.'); // Re-throw a user-friendly error
+  }
 };
 
-export const getCurrentUser = () => {
-  const user = localStorage.getItem('user');
-  return user ? JSON.parse(user) : null;
-};
-
-export const isAuthenticated = () => {
-  return getCurrentUser() !== null && localStorage.getItem(TOKEN_KEY) !== null;
-};
-
-export const getAuthToken = () => {
-  return localStorage.getItem(TOKEN_KEY);
-};
+// No need for getCurrentUser, isAuthenticated, getAuthToken, updateApiUrl
+// Firebase's onAuthStateChanged handles state, and auth headers are managed differently if needed (e.g., for Cloud Functions).
