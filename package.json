@@ -20,7 +20,6 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    // Removed: "server" script
     "client": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
