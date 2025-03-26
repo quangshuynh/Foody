@@ -198,8 +198,7 @@ function App() {
   const [showLogin, setShowLogin] = useState(false);
   const [showRegister, setShowRegister] = useState(false);
 
-  // Import the logout function from your *Firebase* authService
-  import { logout } from './services/authService';
+  // The logout function is imported at the top level, remove the misplaced import below
 
   const handleLogout = async () => {
     try {
