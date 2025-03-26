@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, useMap as useLeafletMap } from 'react-leaflet';
 import styled from 'styled-components';
 import 'leaflet/dist/leaflet.css';
-import './MapDarkMode.css';
+import '../styles/MapDarkMode.css';
 import L from 'leaflet';
 import { useMap } from '../contexts/MapContext';
 
