@@ -10,6 +10,7 @@ import {
   doc,
   serverTimestamp
 } from 'firebase/firestore';
+import { logAuditEvent } from './auditLogService'; // Import audit log service
 
 // Collection reference
 const restaurantsCollectionRef = collection(db, 'visitedRestaurants');
