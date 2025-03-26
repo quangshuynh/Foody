@@ -155,16 +155,16 @@ function App() {
   };
 
   // Remove setUser from useAuth() destructuring if it's no longer provided by AuthContext
-  const { isAuthenticated } = useAuth(); 
+  const { isAuthenticated } = useAuth();
   const [showLogin, setShowLogin] = useState(false);
   const [showRegister, setShowRegister] = useState(false);
 
-  // Import the logout function from your updated authService
-  import { logout as firebaseLogout } from './services/authService'; 
+  // Import the logout function from your *Firebase* authService
+  import { logout } from './services/authService';
 
   const handleLogout = async () => {
     try {
-      await firebaseLogout();
+      await logout();
       // No need to manually set user to null or remove items from localStorage.
       // The onAuthStateChanged listener in AuthContext handles the state update.
       console.log("User logged out successfully.");
