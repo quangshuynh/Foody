@@ -7,10 +7,9 @@ import { FiCopy } from 'react-icons/fi';
 import RatingModal from './RatingModal';
 import { useAuth } from '../contexts/AuthContext';
 import { useMap } from '../contexts/MapContext';
-// Import Firestore functions and db config
 import { db } from '../firebaseConfig';
 import { doc, updateDoc, arrayUnion, arrayRemove, getDoc, Timestamp } from 'firebase/firestore';
-import { logAuditEvent } from '../services/auditLogService'; // Import audit log service
+import { logAuditEvent } from '../services/auditLogService'; 
 
 const ItemContainer = styled.div`
   background: #2a2a2a;
@@ -254,11 +253,12 @@ function RestaurantItem({ restaurant, updateRestaurant, removeRestaurant }) {
           <>
             <FaEdit onClick={handleEdit} title="Edit" />
             <FaStar onClick={() => setShowRatingModal(true)} title="Rate" />
-            <FaComment onClick={() => setShowComments(!showComments)} title="Comments" />
             <FaTrash onClick={handleRemove} title="Remove" />
           </>
         )}
+        <FaComment onClick={() => setShowComments(!showComments)} title="Comments" />
       </IconContainer>
+
 
       {showRatingModal && (
         <RatingModal
