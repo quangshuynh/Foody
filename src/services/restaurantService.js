@@ -39,6 +39,8 @@ export const fetchVisitedRestaurants = async () => {
     console.error('Fetch restaurants error:', error);
     return [];
   }
+}; // <-- Added missing closing brace
+
 // Update an existing restaurant document in Firestore
 export const updateRestaurant = async (restaurant) => {
   const user = auth.currentUser;
@@ -66,6 +68,8 @@ export const updateRestaurant = async (restaurant) => {
     console.error('Update restaurant error:', error);
     throw error;
   }
+}; // <-- Added missing closing brace
+
 // Add a new restaurant document to Firestore
 export const addRestaurant = async (restaurant) => {
   const user = auth.currentUser;
@@ -88,6 +92,8 @@ export const addRestaurant = async (restaurant) => {
     console.error('Add restaurant error:', error);
     throw error;
   }
+}; // <-- Added missing closing brace
+
 // Delete a restaurant document from Firestore
 export const removeRestaurant = async (id) => {
   const user = auth.currentUser;
