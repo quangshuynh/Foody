@@ -7,7 +7,10 @@ import { FiCopy } from 'react-icons/fi';
 import RatingModal from './RatingModal';
 import { useAuth } from '../contexts/AuthContext';
 import { useMap } from '../contexts/MapContext';
-import { updateRestaurant as updateRestaurantApi } from '../services/restaurantService';
+// Import Firestore functions and db config
+import { db } from '../firebaseConfig';
+import { doc, updateDoc, arrayUnion, arrayRemove, getDoc, Timestamp } from 'firebase/firestore';
+import { logAuditEvent } from '../services/auditLogService'; // Import audit log service
 
 const ItemContainer = styled.div`
   background: #2a2a2a;
@@ -97,45 +100,87 @@ function RestaurantItem({ restaurant, updateRestaurant, removeRestaurant }) {
 
   const handleRatingSubmit = async (rating, wouldReturn, comment = '') => {
     if (!user) {
-      alert('Please log in to rate this restaurant');
+      alert('Please log in to rate this restaurant.');
       return;
     }
 
-    const newRating = {
-      userId: user.id,
-      username: user.username,
-      rating,
-      wouldReturn,
-      comment,
-      date: new Date().toISOString()
-    };
-
-    const ratings = restaurant.ratings || [];
-    const existingRatingIndex = ratings.findIndex(r => r.userId === user.id);
-    let updatedRatings;
-    
-    if (existingRatingIndex !== -1) {
-      updatedRatings = [...ratings];
-      updatedRatings[existingRatingIndex] = newRating;
-    } else {
-      updatedRatings = [...ratings, newRating];
-    }
-
-    const averageRating = updatedRatings.reduce((acc, r) => acc + r.rating, 0) / updatedRatings.length;
-
-    const updatedRestaurant = {
-      ...restaurant,
-      ratings: updatedRatings,
-      averageRating: Math.round(averageRating * 10) / 10
-    };
+    const restaurantDocRef = doc(db, 'visitedRestaurants', restaurant.id);
 
     try {
-      await updateRestaurantApi(updatedRestaurant);
-      updateRestaurant(updatedRestaurant);
+      // Fetch the current document to get the latest ratings array
+      const docSnap = await getDoc(restaurantDocRef);
+      if (!docSnap.exists()) {
+        throw new Error("Restaurant document not found.");
+      }
+      const currentData = docSnap.data();
+      const currentRatings = currentData.ratings || [];
+
+      // Find existing rating by the current user
+      const existingRating = currentRatings.find(r => r.userId === user.uid);
+
+      const newRatingData = {
+        userId: user.uid, // Use uid
+        userEmail: user.email, // Store email (or displayName if available)
+        rating,
+        wouldReturn,
+        comment: comment.trim(), // Trim comment
+        date: Timestamp.fromDate(new Date()) // Use Firestore Timestamp
+      };
+
+      let ratingsUpdate = [];
+      let averageRating = 0;
+
+      if (existingRating) {
+        // Atomically remove the old rating and add the new one
+        await updateDoc(restaurantDocRef, {
+          ratings: arrayRemove(existingRating)
+        });
+        await updateDoc(restaurantDocRef, {
+          ratings: arrayUnion(newRatingData)
+        });
+        // Recalculate based on the new state (fetch again or calculate locally)
+        const updatedDocSnap = await getDoc(restaurantDocRef); // Fetch again to be safe
+        ratingsUpdate = updatedDocSnap.data().ratings || [];
+      } else {
+        // Atomically add the new rating
+        await updateDoc(restaurantDocRef, {
+          ratings: arrayUnion(newRatingData)
+        });
+        ratingsUpdate = [...currentRatings, newRatingData]; // Optimistic local update
+      }
+
+      // Calculate new average rating
+      if (ratingsUpdate.length > 0) {
+        averageRating = ratingsUpdate.reduce((acc, r) => acc + r.rating, 0) / ratingsUpdate.length;
+      }
+
+      // Update the average rating in Firestore
+      await updateDoc(restaurantDocRef, {
+        averageRating: Math.round(averageRating * 10) / 10
+      });
+
+      // Update local state via the prop from App.js
+      updateRestaurant({
+        ...restaurant,
+        ratings: ratingsUpdate.map(r => ({ // Convert Timestamps back for local state if needed
+          ...r,
+          date: r.date.toDate().toISOString()
+        })),
+        averageRating: Math.round(averageRating * 10) / 10
+      });
+
+      // Log the audit event *after* successful rating update/add
+      await logAuditEvent(
+        existingRating ? 'UPDATE_RATING' : 'CREATE_RATING',
+        'visitedRestaurants',
+        restaurant.id,
+        { rating: newRatingData.rating, wouldReturn: newRatingData.wouldReturn, commentProvided: !!newRatingData.comment }
+      );
+
       setShowRatingModal(false);
     } catch (error) {
       console.error('Failed to update rating:', error);
-      alert('Failed to update rating. Please try again.');
+      alert(`Failed to update rating: ${error.message}. Please try again.`); // Keep user feedback
     }
   };
 
@@ -171,10 +216,12 @@ function RestaurantItem({ restaurant, updateRestaurant, removeRestaurant }) {
         const data = await res.json();
         if (data && data.length > 0) {
           const { lat, lon } = data[0];
+          // Call the updateRestaurant prop (which calls the service)
+          // The service handles the updateDoc call and adds timestamps
           updateRestaurant({
-            ...restaurant,
-            name: editName,
-            address: editAddress,
+            ...restaurant, // Pass existing data
+            name: editName.trim(), // Trim name
+            address: editAddress.trim(), // Trim address
             location: { lat: parseFloat(lat), lng: parseFloat(lon) },
           });
           setIsEditing(false);
@@ -182,7 +229,11 @@ function RestaurantItem({ restaurant, updateRestaurant, removeRestaurant }) {
           setEditError('Address not found. Please enter a valid address.');
         }
       } else {
-        updateRestaurant({ ...restaurant, name: editName });
+        // Only name changed, update that
+        updateRestaurant({
+          ...restaurant, // Pass existing data
+          name: editName.trim() // Trim name
+        });
         setIsEditing(false);
       }
     } catch (err) {
@@ -213,7 +264,8 @@ function RestaurantItem({ restaurant, updateRestaurant, removeRestaurant }) {
         <RatingModal
           onSubmit={handleRatingSubmit}
           onClose={() => setShowRatingModal(false)}
-          currentRating={(restaurant.ratings || []).find(r => r?.userId === user?.id)?.rating || 0}
+          // Use user.uid to find the current user's rating
+          currentRating={(restaurant.ratings || []).find(r => r?.userId === user?.uid)?.rating || 0}
         />
       )}
 
@@ -285,9 +337,13 @@ function RestaurantItem({ restaurant, updateRestaurant, removeRestaurant }) {
           <Rating rating={restaurant.averageRating} />
           {showComments && (
             <Comments
-              comments={(restaurant.ratings || []).filter(r => r?.comment)}
-              onAddComment={(comment) => handleRatingSubmit(comment.rating, comment.wouldReturn, comment.comment)}
-              restaurantId={restaurant.id}
+              // Filter for ratings that have a non-empty comment
+              comments={(restaurant.ratings || [])
+                .filter(r => r?.comment)
+                // Sort comments by date, newest first
+                .sort((a, b) => new Date(b.date) - new Date(a.date))
+              }
+              // Removed unused props: onAddComment, restaurantId
             />
           )}
         </>

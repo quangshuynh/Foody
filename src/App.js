@@ -1,11 +1,14 @@
-import React, { useState, useEffect } from 'react';
-import React, { useState, useEffect } from 'react'; // Ensure React is imported
+import React, { useState, useEffect } from 'react'; // Ensure React is imported only once
 import { useAuth } from './contexts/AuthContext';
 import { MapProvider } from './contexts/MapContext';
 import LoginForm from './components/auth/LoginForm';
 import RegisterForm from './components/auth/RegisterForm';
-import { fetchVisitedRestaurants, addRestaurant as addRestaurantApi, removeRestaurant as removeRestaurantApi } from './services/restaurantService';
-import { initializeJsonStorage, readJsonData, updateJsonData } from './services/jsonStorage';
+// Updated imports for Firestore services
+import { fetchVisitedRestaurants, addRestaurant as addRestaurantApi, updateRestaurant as updateRestaurantApi, removeRestaurant as removeRestaurantApi } from './services/restaurantService';
+import { fetchToVisitRestaurants, addToVisit as addToVisitApi, removeToVisit as removeToVisitApi } from './services/toVisitService';
+import { fetchRecommendedRestaurants } from './services/recommendedService';
+import { logout } from './services/authService'; // <-- Add missing logout import
+// Removed jsonStorage imports
 import styled from 'styled-components';
 import SearchBar from './components/SearchBar';
 import RestaurantList from './components/RestaurantList';
@@ -14,8 +17,9 @@ import RecommendedRestaurants from './components/RecommendedRestaurants';
 import RestaurantMap from './components/RestaurantMap';
 import Footer from './components/Footer';
 import ModalOverlay from './components/ModalOverlay';
-import Navbar from './components/Navbar';
-import AddRestaurant from './components/AddRestaurant';
+import Navbar from './components/Navbar'; // Keep this
+import AddRestaurant from './components/AddRestaurant'; // Keep this
+import UsernamePromptModal from './components/auth/UsernamePromptModal'; // Import the new modal
 
 const AppContainer = styled.div`
   font-family: 'Roboto', sans-serif;
@@ -28,52 +32,61 @@ const AppContainer = styled.div`
 `;
 
 function App() {
-  // visited restaurants list
-  const [restaurants, setRestaurants] = useState([]);
-  useEffect(() => {
-    initializeJsonStorage().catch(console.error);
-    const loadRestaurants = async () => {
-      try {
-        const data = await fetchVisitedRestaurants();
-        setRestaurants(data);
-      } catch (err) {
-        console.error('Failed to load restaurants:', err);
-      }
-    };
-    loadRestaurants();
-  }, []);
+  // Get user, profile status flags from context
+  const { user, authLoading, profileLoading, profileMissing } = useAuth();
 
+  // State for different restaurant lists
+  const [restaurants, setRestaurants] = useState([]); // Visited
   const [restaurantsToVisit, setRestaurantsToVisit] = useState([]);
   const [recommendedRestaurants, setRecommendedRestaurants] = useState([]);
+
+  // State for UI
   const [filteredRestaurants, setFilteredRestaurants] = useState(restaurants);
   const [selectedSection, setSelectedSection] = useState('visited');
   const [displayLimit, setDisplayLimit] = useState(5);
   const [isPoopMode, setIsPoopMode] = useState(false);
 
+  // Fetch data on initial load and when auth state might change (though reads are now public)
   useEffect(() => {
-    const sortedRestaurants = [...restaurants].sort((a, b) => new Date(b.dateAdded) - new Date(a.dateAdded));
-    setFilteredRestaurants(sortedRestaurants);
-  }, [restaurants]);
-  
-
-  useEffect(() => {
-    const loadAllData = async () => {
+    const loadData = async () => {
+      // Fetch all lists regardless of login state
       try {
-        const data = await readJsonData();
-        setRestaurantsToVisit(data.toVisit || []);
-        setRecommendedRestaurants(data.recommended || []);
+        const [visitedData, toVisitData, recommendedData] = await Promise.all([
+          fetchVisitedRestaurants(),
+          fetchToVisitRestaurants(),
+          fetchRecommendedRestaurants() // Keep fetching recommended
+        ]);
+        setRestaurants(visitedData);
+        setRestaurantsToVisit(toVisitData);
+        setRecommendedRestaurants(recommendedData);
       } catch (err) {
-        console.error('Failed to load data:', err);
+        console.error('Failed to load restaurant data:', err);
+        // Optionally show an error message to the user
       }
+
+      // Note: We no longer clear lists on logout, as guests can see them.
+      // The UI controls for editing/adding are handled by `isAuthenticated`.
     };
-    loadAllData();
-  }, []);
 
+    // Only load data once auth state is determined (to avoid potential flashes)
+    if (!authLoading) {
+      loadData();
+    }
+  }, [authLoading]); // Re-run only when auth loading state changes
+
+  // Update filteredRestaurants whenever the main 'restaurants' list changes
   useEffect(() => {
-    updateJsonData('toVisit', restaurantsToVisit);
-  }, [restaurantsToVisit]);
+    // No need to sort here if fetchVisitedRestaurants already sorts
+    setFilteredRestaurants(restaurants);
+  }, [restaurants]);
 
+  // Add a new VISITED restaurant (uses restaurantService)
   const addRestaurant = async (restaurant) => {
+    // Check authentication before allowing add
+    if (!isAuthenticated) {
+      alert("Please log in to add a restaurant.");
+      return;
+    }
     const duplicate = restaurants.some(
       (r) =>
         r.name.toLowerCase() === restaurant.name.toLowerCase() ||
@@ -84,32 +97,49 @@ function App() {
       return;
     }
     try {
-      const newRestaurant = { ...restaurant, dateAdded: new Date().toISOString() };
-      const savedRestaurant = await addRestaurantApi(newRestaurant);
-      setRestaurants(prev => [...prev, savedRestaurant]);
+      // No need to add dateAdded here, Firestore service handles it
+      const savedRestaurant = await addRestaurantApi(restaurant);
+      // Prepend the new restaurant to the list for immediate UI update
+      setRestaurants(prev => [savedRestaurant, ...prev]);
     } catch (err) {
-      console.error('Failed to add restaurant:', err);
-      alert('Failed to add restaurant. Please try again.');
+      console.error('Failed to add visited restaurant:', err);
+      alert(`Failed to add visited restaurant: ${err.message}. Please try again.`);
     }
   };
 
-  const updateRestaurant = (updatedRestaurant) => {
-    const updatedRestaurants = restaurants.map((rest) =>
-      rest.id === updatedRestaurant.id ? updatedRestaurant : rest
-    );
-    setRestaurants(updatedRestaurants);
-    setFilteredRestaurants(updatedRestaurants);
+  // Update a VISITED restaurant (uses restaurantService)
+  const updateRestaurant = async (updatedRestaurant) => {
+    // Check authentication before allowing update
+    if (!isAuthenticated) {
+      alert("Please log in to update a restaurant.");
+      return;
+    }
+    try {
+      const savedRestaurant = await updateRestaurantApi(updatedRestaurant);
+      const updatedList = restaurants.map((rest) =>
+        rest.id === savedRestaurant.id ? savedRestaurant : rest
+      );
+      setRestaurants(updatedList);
+      // No need to update filteredRestaurants separately if it depends on restaurants state
+    } catch (err) {
+      console.error('Failed to update visited restaurant:', err);
+      alert(`Failed to update visited restaurant: ${err.message}. Please try again.`);
+    }
   };
 
   const removeRestaurant = async (id) => {
+    // Check authentication before allowing remove
+    if (!isAuthenticated) {
+      alert("Please log in to remove a restaurant.");
+      return;
+    }
     try {
       await removeRestaurantApi(id);
-      const updatedRestaurants = restaurants.filter((rest) => rest.id !== id);
-      setRestaurants(updatedRestaurants);
-      setFilteredRestaurants(updatedRestaurants);
+      const updatedList = restaurants.filter((rest) => rest.id !== id);
+      setRestaurants(updatedList);
     } catch (err) {
-      console.error('Failed to remove restaurant:', err);
-      alert('Failed to remove restaurant. Please try again.');
+      console.error('Failed to remove visited restaurant:', err);
+      alert(`Failed to remove visited restaurant: ${err.message}. Please try again.`);
     }
   };
 
@@ -135,7 +165,13 @@ function App() {
     }
   };
 
-  const addToVisit = (restaurant) => {
+  // Add a restaurant to the TO VISIT list (uses toVisitService)
+  const addToVisit = async (restaurant) => {
+    // Check authentication before allowing add
+    if (!isAuthenticated) {
+      alert("Please log in to add a restaurant to visit.");
+      return;
+    }
     const duplicate = restaurantsToVisit.some(
       (r) =>
         r.name.toLowerCase() === restaurant.name.toLowerCase() ||
@@ -145,26 +181,45 @@ function App() {
       alert("This restaurant already exists in your 'to visit' list!");
       return;
     }
-    const newRestaurant = { ...restaurant, id: Date.now(), dateAdded: new Date() };
-    setRestaurantsToVisit([...restaurantsToVisit, newRestaurant]);
+    try {
+      // Pass the basic restaurant info (name, address, location)
+      const savedToVisit = await addToVisitApi(restaurant);
+      // Prepend to the list for immediate UI update
+      setRestaurantsToVisit(prev => [savedToVisit, ...prev]);
+    } catch (err) {
+      console.error('Failed to add to-visit restaurant:', err);
+      alert(`Failed to add to-visit restaurant: ${err.message}. Please try again.`);
+    }
   };
 
-  const removeToVisit = (id) => {
-    const updatedToVisit = restaurantsToVisit.filter((r) => r.id !== id);
-    setRestaurantsToVisit(updatedToVisit);
+  // Remove a restaurant from the TO VISIT list (uses toVisitService)
+  const removeToVisit = async (id) => {
+    // Check authentication before allowing remove
+    if (!isAuthenticated) {
+      alert("Please log in to remove a restaurant from the 'to visit' list.");
+      return;
+    }
+    try {
+      await removeToVisitApi(id);
+      const updatedList = restaurantsToVisit.filter((r) => r.id !== id);
+      setRestaurantsToVisit(updatedList);
+    } catch (err) {
+      console.error('Failed to remove to-visit restaurant:', err);
+      alert(`Failed to remove to-visit restaurant: ${err.message}. Please try again.`);
+    }
   };
 
-  // Remove setUser from useAuth() destructuring if it's no longer provided by AuthContext
-  const { isAuthenticated } = useAuth(); 
+  // Use user object directly for isAuthenticated check
+  // user and authLoading are already available from the useAuth() call at the top of the component
+  const isAuthenticated = !!user; // Derive from user object
   const [showLogin, setShowLogin] = useState(false);
   const [showRegister, setShowRegister] = useState(false);
 
-  // Import the logout function from your updated authService
-  import { logout as firebaseLogout } from './services/authService'; 
+  // The logout function is imported at the top level, remove the misplaced import below
 
   const handleLogout = async () => {
     try {
-      await firebaseLogout();
+      await logout();
       // No need to manually set user to null or remove items from localStorage.
       // The onAuthStateChanged listener in AuthContext handles the state update.
       console.log("User logged out successfully.");
@@ -173,6 +228,16 @@ function App() {
       alert(`Logout failed: ${error.message}`);
     }
   };
+
+  // Render loading indicator while checking auth state OR profile state after login
+  if (authLoading || (user && profileLoading)) {
+    return <AppContainer>Loading...</AppContainer>; // Show loading until profile is checked
+  }
+
+  // Show username prompt if user is logged in but profile is missing
+  if (user && profileMissing) {
+    return <UsernamePromptModal />;
+  }
 
   return (
     <MapProvider>
@@ -218,14 +283,15 @@ function App() {
             )}
             <RestaurantList
               restaurants={filteredRestaurants.slice(0, displayLimit)}
+              // Pass the async updateRestaurant function directly
               updateRestaurant={isAuthenticated ? updateRestaurant : null}
               removeRestaurant={isAuthenticated ? removeRestaurant : null}
               isPoopMode={isPoopMode}
             />
-            
+
             <div style={{ width: '80%', margin: '10px auto', textAlign: 'left' }}>
-              <select 
-                onChange={handleDisplayLimitChange} 
+              <select
+                onChange={handleDisplayLimitChange}
                 value={isPoopMode ? "poop" : displayLimit}
                 style={{
                   padding: '8px',

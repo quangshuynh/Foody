@@ -1,87 +1,119 @@
-import { getAuthToken } from './authService';
+import { db, auth } from '../firebaseConfig'; // Import Firestore DB and Auth
+import {
+  collection,
+  query,
+  where,
+  getDocs,
+  addDoc,
+  updateDoc,
+  deleteDoc,
+  doc,
+  serverTimestamp
+} from 'firebase/firestore';
+import { logAuditEvent } from './auditLogService'; // Import audit log service
 
-let API_URL = 'http://localhost:3002/api';
+// Collection reference
+const restaurantsCollectionRef = collection(db, 'visitedRestaurants');
 
-// Update API URL if needed
-export const updateApiUrl = (newUrl) => {
-  API_URL = newUrl;
-};
-
+// Fetch ALL visited restaurants (public read)
 export const fetchVisitedRestaurants = async () => {
+  // No user check needed for public read
   try {
-    const response = await fetch(`${API_URL}/restaurants`);
-    if (!response.ok) throw new Error('Failed to fetch restaurants');
-    return await response.json();
+    // Create a query against the collection (no user filter)
+    const querySnapshot = await getDocs(restaurantsCollectionRef);
+    const restaurants = querySnapshot.docs.map(doc => ({
+      id: doc.id, // Use Firestore document ID
+      ...doc.data(),
+      // Convert Firestore Timestamps to JS Date objects if needed, or handle in component
+      dateAdded: doc.data().dateAdded?.toDate ? doc.data().dateAdded.toDate().toISOString() : null
+    }));
+    // Sort by dateAdded descending (newest first)
+    restaurants.sort((a, b) => new Date(b.dateAdded) - new Date(a.dateAdded));
+    return restaurants;
   } catch (error) {
     console.error('Fetch restaurants error:', error);
     return [];
   }
-};
+}; // <-- Closing brace was missing
 
+// Update an existing restaurant document in Firestore
 export const updateRestaurant = async (restaurant) => {
+  const user = auth.currentUser;
+  if (!user) throw new Error('Authentication required');
+  if (!restaurant.id) throw new Error('Restaurant ID is required for update');
+
   try {
-    const token = getAuthToken();
-    if (!token) throw new Error('Authentication required');
+    const restaurantDocRef = doc(db, 'visitedRestaurants', restaurant.id);
+    // Prepare data for update, ensuring we don't overwrite userId and potentially dateAdded
+    // Add an updatedAt timestamp
+    const updateData = {
+      ...restaurant,
+      updatedAt: serverTimestamp()
+    };
+    // Remove id and potentially userId/dateAdded if they shouldn't be updated
+    delete updateData.id;
+    // delete updateData.userId; // Keep userId check in Firestore rules
+    // delete updateData.dateAdded;
 
-    const response = await fetch(`${API_URL}/restaurants/${restaurant.id}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': token
-      },
-      body: JSON.stringify(restaurant)
-    });
+    await updateDoc(restaurantDocRef, updateData);
+    // Log the audit event *after* successful update
+    await logAuditEvent('UPDATE', 'visitedRestaurants', restaurant.id, { updatedFields: Object.keys(updateData) });
 
-    if (!response.ok) throw new Error('Failed to update restaurant');
-    return await response.json();
+    // Return the updated restaurant data (or just success)
+    // Fetching the updated doc might be needed if serverTimestamp is crucial immediately
+    return { ...restaurant, updatedAt: new Date() }; // Return optimistic update
   } catch (error) {
     console.error('Update restaurant error:', error);
-    throw error;
+    throw error; // Re-throw error after logging failure or handling
   }
-};
+}; // <-- Closing brace was missing
 
+// Add a new restaurant document to Firestore
 export const addRestaurant = async (restaurant) => {
+  const user = auth.currentUser;
+  if (!user) throw new Error('Authentication required');
+
   try {
-    const token = getAuthToken();
-    if (!token) throw new Error('Authentication required');
+    // Add userId and dateAdded timestamp to the restaurant data
+    const newRestaurantData = {
+      ...restaurant,
+      userId: user.uid,
+      dateAdded: serverTimestamp(),
+      ratings: restaurant.ratings || [], // Ensure ratings array exists
+      averageRating: restaurant.averageRating || 0 // Ensure averageRating exists
+    };
 
-    const response = await fetch(`${API_URL}/restaurants`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': token
-      },
-      body: JSON.stringify(restaurant)
-    });
+    const docRef = await addDoc(restaurantsCollectionRef, newRestaurantData);
 
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.error || 'Failed to add restaurant');
-    }
-    
-    return await response.json();
+    // Log the audit event *after* successful add
+    await logAuditEvent('CREATE', 'visitedRestaurants', docRef.id, { name: newRestaurantData.name, address: newRestaurantData.address });
+
+    // Return the new restaurant data including the Firestore generated ID
+    return { ...newRestaurantData, id: docRef.id, dateAdded: new Date() }; // Return optimistic update
   } catch (error) {
     console.error('Add restaurant error:', error);
-    throw error;
+    throw error; // Re-throw error after logging failure or handling
   }
-};
+}; // <-- Closing brace was missing
 
+// Delete a restaurant document from Firestore
 export const removeRestaurant = async (id) => {
+  const user = auth.currentUser;
+  if (!user) throw new Error('Authentication required');
+  if (!id) throw new Error('Restaurant ID is required for deletion');
+
   try {
-    const token = getAuthToken();
-    if (!token) throw new Error('Authentication required');
+    const restaurantDocRef = doc(db, 'visitedRestaurants', id);
+    // Consider fetching the doc name/address before deleting if needed for the log details
+    await deleteDoc(restaurantDocRef);
 
-    const response = await fetch(`${API_URL}/restaurants/${id}`, {
-      method: 'DELETE',
-      headers: {
-        'Authorization': token
-      }
-    });
+    // Log the audit event *after* successful delete
+    await logAuditEvent('DELETE', 'visitedRestaurants', id);
 
-    if (!response.ok) throw new Error('Failed to delete restaurant');
-    return true;
+    // Firestore rules should ensure only the owner can delete
+    return true; // Indicate success
   } catch (error) {
     console.error('Delete restaurant error:', error);
-    throw error;
+    throw error; // Re-throw error after logging failure or handling
   }
 };

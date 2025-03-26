@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { useAuth } from '../contexts/AuthContext'; 
+import { useAuth } from '../contexts/AuthContext';
 
 const NavContainer = styled.nav`
   background-color: #1a1a1a;
@@ -95,8 +95,27 @@ const AuthButton = styled.button`
   }
 `;
 
+// New styled component for username display
+const UserInfo = styled.span`
+  color: #00bcd4; /* Use theme primary color */
+  margin-right: 15px;
+  font-size: 1.05rem; /* Slightly larger */
+  font-family: 'saucetomato', sans-serif; /* Use a different font */
+  font-weight: 500; /* Keep weight */
+  align-self: center; /* Vertically center within the flex container */
+  
+  @media (max-width: 600px) {
+    margin-right: 0;
+    margin-bottom: 5px; /* Add space below on mobile */
+    display: block; /* Make it block on mobile */
+    text-align: right; /* Align to right on mobile */
+  }
+`;
+
+
 const Navbar = ({ selectedSection, setSelectedSection, onShowLogin, onShowRegister, onLogout }) => {
-  const { isAuthenticated } = useAuth();
+  // Get userProfile along with isAuthenticated
+  const { isAuthenticated, userProfile } = useAuth();
 
   return (
     <NavContainer>
@@ -128,7 +147,11 @@ const Navbar = ({ selectedSection, setSelectedSection, onShowLogin, onShowRegist
             <AuthButton $primary onClick={onShowRegister}>Register</AuthButton>
           </>
         ) : (
-          <AuthButton onClick={onLogout}>Logout</AuthButton>
+          <>
+            {/* Display username if profile exists */}
+            {userProfile && <UserInfo>Hi, {userProfile.username}!</UserInfo>}
+            <AuthButton onClick={onLogout}>Logout</AuthButton>
+          </>
         )}
       </AuthButtons>
     </NavContainer>
