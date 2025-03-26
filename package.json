@@ -19,9 +19,9 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "start": "react-scripts start", // Changed start script
+    "start": "react-scripts start",
     // Removed: "server" script
-    "client": "react-scripts start", // Keep client for clarity or remove if start is enough
+    "client": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
