@@ -219,7 +219,7 @@ function RegisterForm({ onSuccess }) {
       {/* <ContinueAsGuestButton type="button" onClick={handleContinueAsGuest}>
         Continue as Guest
       </ContinueAsGuestButton> */}
-      </ContinueAsGuestButton>
+      {/* Removed duplicate closing tag above */}
     </FormContainer>
   );
 }
