@@ -83,14 +83,11 @@ With Foody, you can:
    npm install
    ```
 
-3. Start the development server:
+3. Put your Firebase API key in firebaseConfig.js
+
+4. Start the development server:
    ```
    npm start
-   ```
-
-4. Start the backend server:
-   ```
-   node src/server/server.js
    ```
 
 5. Open your browser and navigate to `http://localhost:3000`
