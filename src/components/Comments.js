@@ -91,20 +91,7 @@ function Comments({ comments }) {
       ) : (
         <p>No comments yet.</p>
       )}
-              ))}
-            </div>
-            {comment.comment && <p>{comment.comment}</p>}
-            {comment.wouldReturn ? (
-              <FaThumbsUp color="#00bcd4" title="Would Return" />
-            ) : (
-              <FaThumbsDown color="#ff4081" title="Would Not Return" />
-            )}
-          </CommentItem>
-        ))
-      ) : (
-        <p>No comments yet.</p>
-      )}
-      
+      {/* Removed duplicated closing block below */}
     </CommentsContainer>
   );
 }

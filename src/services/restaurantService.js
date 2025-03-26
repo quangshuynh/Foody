@@ -34,7 +34,7 @@ export const fetchVisitedRestaurants = async () => {
     console.error('Fetch restaurants error:', error);
     return [];
   }
-}; // <-- Added missing closing brace
+}; // <-- Closing brace was missing
 
 // Update an existing restaurant document in Firestore
 export const updateRestaurant = async (restaurant) => {
@@ -66,7 +66,7 @@ export const updateRestaurant = async (restaurant) => {
     console.error('Update restaurant error:', error);
     throw error; // Re-throw error after logging failure or handling
   }
-}; // <-- Added missing closing brace
+}; // <-- Closing brace was missing
 
 // Add a new restaurant document to Firestore
 export const addRestaurant = async (restaurant) => {
@@ -94,7 +94,7 @@ export const addRestaurant = async (restaurant) => {
     console.error('Add restaurant error:', error);
     throw error; // Re-throw error after logging failure or handling
   }
-}; // <-- Added missing closing brace
+}; // <-- Closing brace was missing
 
 // Delete a restaurant document from Firestore
 export const removeRestaurant = async (id) => {
