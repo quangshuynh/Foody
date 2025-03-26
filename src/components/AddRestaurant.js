@@ -62,12 +62,11 @@ function AddRestaurant({ addRestaurant }) {
       const data = await res.json();
       if (data && data.length > 0) {
         const { lat, lon } = data[0];
+        // Pass only necessary info; service adds defaults like ratings array, userId, dateAdded
         const newRestaurant = {
-          name,
-          address,
+          name: name.trim(),
+          address: address.trim(),
           location: { lat: parseFloat(lat), lng: parseFloat(lon) },
-          rating: 0,
-          goAgain: false,
         };
         addRestaurant(newRestaurant);
         setName('');

@@ -7,6 +7,7 @@ import RegisterForm from './components/auth/RegisterForm';
 import { fetchVisitedRestaurants, addRestaurant as addRestaurantApi, updateRestaurant as updateRestaurantApi, removeRestaurant as removeRestaurantApi } from './services/restaurantService';
 import { fetchToVisitRestaurants, addToVisit as addToVisitApi, removeToVisit as removeToVisitApi } from './services/toVisitService';
 import { fetchRecommendedRestaurants } from './services/recommendedService';
+import { logout } from './services/authService'; // <-- Add missing logout import
 // Removed jsonStorage imports
 import styled from 'styled-components';
 import SearchBar from './components/SearchBar';
@@ -94,7 +95,6 @@ function App() {
         r.address.toLowerCase() === restaurant.address.toLowerCase()
     );
     if (duplicate) {
-      alert("This restaurant already exists in your visited list!");
       alert("This restaurant already exists in your visited list!");
       return;
     }

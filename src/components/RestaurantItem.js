@@ -99,7 +99,6 @@ function RestaurantItem({ restaurant, updateRestaurant, removeRestaurant }) {
 
   const handleRatingSubmit = async (rating, wouldReturn, comment = '') => {
     if (!user) {
-      alert('Please log in to rate this restaurant');
       alert('Please log in to rate this restaurant.');
       return;
     }
