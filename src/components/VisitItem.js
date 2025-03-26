@@ -1,7 +1,9 @@
 import React from 'react';
 import styled from 'styled-components';
-import { FaTrash } from 'react-icons/fa';
+import { FaTrash, FaMapMarkerAlt } from 'react-icons/fa';
 import { FiCopy } from 'react-icons/fi';
+import { useAuth } from '../contexts/AuthContext';
+import { useMap } from '../contexts/MapContext';
 
 const ItemContainer = styled.div`
   background: #2a2a2a;
@@ -17,6 +19,8 @@ const IconContainer = styled.div`
   position: absolute;
   top: 15px;
   right: 15px;
+  display: flex;
+  gap: 10px;
   svg {
     cursor: pointer;
     color: #00bcd4;
@@ -41,16 +45,36 @@ function capitalizeWords(str) {
 }
 
 function VisitItem({ restaurant, removeToVisit }) {
+  const { isAuthenticated } = useAuth();
+  const { focusLocation } = useMap();
+
   const handleRemove = () => {
     if (window.confirm('Are you sure you want to remove this restaurant?')) {
       removeToVisit(restaurant.id);
     }
   };
 
+  const handleMapFocus = (location) => {
+    focusLocation(location);
+    const mapElement = document.getElementById('restaurant-map');
+    if (mapElement) {
+      setTimeout(() => {
+        mapElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 100);
+    }
+  };
+
   return (
     <ItemContainer>
       <IconContainer>
-        <FaTrash onClick={handleRemove} title="Remove" />
+        <FaMapMarkerAlt 
+          onClick={() => handleMapFocus(restaurant.location)} 
+          title="Show on Map"
+          style={{ color: '#ff4081' }}
+        />
+        {isAuthenticated && (
+          <FaTrash onClick={handleRemove} title="Remove" />
+        )}
       </IconContainer>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <h3

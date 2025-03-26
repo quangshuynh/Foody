@@ -343,7 +343,6 @@ function RestaurantItem({ restaurant, updateRestaurant, removeRestaurant }) {
                 // Sort comments by date, newest first
                 .sort((a, b) => new Date(b.date) - new Date(a.date))
               }
-              // Removed unused props: onAddComment, restaurantId
             />
           )}
         </>
