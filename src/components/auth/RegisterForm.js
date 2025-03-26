@@ -72,21 +72,23 @@ const ErrorMessage = styled.p`
 `;
 
 function RegisterForm({ onSuccess }) {
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState(''); // Changed from username to email
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
-  const { setUser } = useAuth();
+  // Removed setUser from useAuth() - AuthContext handles state via onAuthStateChanged
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError(''); // Clear previous errors
     if (password !== confirmPassword) {
       setError('Passwords do not match');
       return;
     }
     try {
-      const data = await register(username, password);
-      setUser(data.user);
+      // Call register with email and password
+      await register(email, password);
+      // No need to call setUser here, AuthContext listener will update the state
       if (onSuccess) onSuccess();
     } catch (err) {
       setError(err.message || 'Failed to register');
@@ -103,22 +105,25 @@ function RegisterForm({ onSuccess }) {
       <h2 style={{ fontFamily: 'rushdriver, sans-serif', marginBottom: '10px' }}>Register</h2>
       <form onSubmit={handleSubmit}>
         <Input
-          type="text"
-          placeholder="Username"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
+          type="email" // Changed type to email
+          placeholder="Email" // Changed placeholder
+          value={email}
+          onChange={(e) => setEmail(e.target.value)} // Changed handler
+          required // Added required attribute
         />
         <Input
           type="password"
-          placeholder="Password"
+          placeholder="Password (min. 6 characters)" // Added hint
           value={password}
           onChange={(e) => setPassword(e.target.value)}
+          required // Added required attribute
         />
         <Input
           type="password"
           placeholder="Confirm Password"
           value={confirmPassword}
           onChange={(e) => setConfirmPassword(e.target.value)}
+          required // Added required attribute
         />
         {error && <ErrorMessage>{error}</ErrorMessage>}
         <Button type="submit">Register</Button>
