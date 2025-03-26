@@ -62,9 +62,6 @@ Thumbs.db
 .vercel
 
 # firebase
-.firebaserc
-firebase.json
 .firebase
 ./firebase/
-/src/firebase.js
 /src/firebaseConfig.js
