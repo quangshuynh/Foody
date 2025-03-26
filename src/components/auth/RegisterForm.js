@@ -1,9 +1,9 @@
 import React, { useState, useCallback } from 'react';
 import styled from 'styled-components';
-// Removed useAuth import as it's not used here directly for setting user
 import { register } from '../../services/authService';
 import { checkUsernameExists } from '../../services/userService'; // Import username check
 import debounce from '../../utils/debounce'; // We'll create this utility
+import Modal from './Modal'
 
 const FormContainer = styled.div`
   width: 400px;          
@@ -61,13 +61,6 @@ const CloseButton = styled.button`
   }
 `;
 
-// const ContinueAsGuestButton = styled(Button)`
-//   background: #424242;
-//   margin-top: 15px;
-//   &:hover {
-//     background: #616161;
-//   }
-// `;
 
 const ErrorMessage = styled.p`
   color: #ff4081;
@@ -75,7 +68,7 @@ const ErrorMessage = styled.p`
   text-align: center;
 `;
 
-function RegisterForm({ onClose, onSuccess }) {
+function RegisterForm({ onSuccess }) {
   const [username, setUsername] = useState('');
   const [usernameAvailable, setUsernameAvailable] = useState(true);
   const [usernameLoading, setUsernameLoading] = useState(false);
@@ -170,65 +163,62 @@ function RegisterForm({ onClose, onSuccess }) {
     }
   };
 
-  // const handleContinueAsGuest = () => {
-  //   if (onSuccess) onSuccess();
-  // };
 
   return (
-    <FormContainer>
-      <CloseButton onClick={onClose} aria-label="Close">×</CloseButton>
-      <h2 style={{ fontFamily: 'rushdriver, sans-serif', marginBottom: '10px' }}>Register</h2>
-      <form 
-        onSubmit={handleSubmit} 
-        style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}
-      >
-        <Input
-          type="text"
-          placeholder="Username (min. 3 chars, a-z, 0-9, _, -)"
-          value={username}
-          onChange={handleUsernameChange}
-          required
-          aria-invalid={!usernameAvailable}
-          aria-describedby="username-status"
-        />
-        <div 
-          id="username-status" 
-          style={{ height: '1.2em', fontSize: '0.8em', color: usernameAvailable ? 'lightgreen' : '#ff4081' }}
+    <Modal onClose={onSuccess}>
+      <FormContainer>
+        <CloseButton onClick={onSuccess} aria-label="Close">×</CloseButton>
+        <h2 style={{ fontFamily: 'rushdriver, sans-serif', marginBottom: '10px' }}>Register</h2>
+        <form 
+          onSubmit={handleSubmit} 
+          style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}
         >
-          {usernameLoading ? 'Checking...' : (username && username.length >= 3 ? (usernameAvailable ? 'Available' : 'Username taken') : '')}
-        </div>
-        <Input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-        />
-        <Input
-          type="password"
-          placeholder="Password (min. 6 characters)"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-        />
-        <Input
-          type="password"
-          placeholder="Confirm Password"
-          value={confirmPassword}
-          onChange={(e) => setConfirmPassword(e.target.value)}
-          required
-        />
-        {error && <ErrorMessage>{error}</ErrorMessage>}
-        <Button type="submit" disabled={loading || usernameLoading || !usernameAvailable}>
-          {loading ? 'Registering...' : 'Register'}
-        </Button>
-      </form>
-      {/* Guest button might be less relevant if registration is simple */}
-      {/* <ContinueAsGuestButton type="button" onClick={handleContinueAsGuest}>
-        Continue as Guest
-      </ContinueAsGuestButton> */}
-      {/* Removed duplicate closing tag above */}
-    </FormContainer>
+          <Input
+            type="text"
+            placeholder="Username (min. 3 chars, a-z, 0-9, _, -)"
+            value={username}
+            onChange={handleUsernameChange}
+            required
+            aria-invalid={!usernameAvailable}
+            aria-describedby="username-status"
+          />
+          <div 
+            id="username-status" 
+            style={{ height: '1.2em', fontSize: '0.8em', color: usernameAvailable ? 'lightgreen' : '#ff4081' }}
+          >
+            {usernameLoading
+              ? 'Checking...'
+              : (username && username.length >= 3 ? (usernameAvailable ? 'Available' : 'Username taken') : '')
+            }
+          </div>
+          <Input
+            type="email"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
+          <Input
+            type="password"
+            placeholder="Password (min. 6 characters)"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+          <Input
+            type="password"
+            placeholder="Confirm Password"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            required
+          />
+          {error && <ErrorMessage>{error}</ErrorMessage>}
+          <Button type="submit" disabled={loading || usernameLoading || !usernameAvailable}>
+            {loading ? 'Registering...' : 'Register'}
+          </Button>
+        </form>
+      </FormContainer>
+    </Modal>
   );
 }
 

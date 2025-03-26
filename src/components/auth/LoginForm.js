@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { useAuth } from '../../contexts/AuthContext';
 import { login } from '../../services/authService';
+import Modal from './Modal'
 
 const FormContainer = styled.div`
   max-width: 400px;
@@ -75,7 +75,6 @@ function LoginForm({ onSuccess }) {
   const [email, setEmail] = useState(''); // Changed from username to email
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  // Removed setUser from useAuth() - AuthContext handles state via onAuthStateChanged
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -95,31 +94,33 @@ function LoginForm({ onSuccess }) {
   };
 
   return (
-    <FormContainer>
-      <CloseButton onClick={onSuccess} aria-label="Close">×</CloseButton>
-      <h2 style={{ fontFamily: 'rushdriver, sans-serif', marginBottom: '10px' }}>Login</h2>
-      <form onSubmit={handleSubmit}>
-        <Input
-          type="email" // Changed type to email
-          placeholder="Email" // Changed placeholder
-          value={email}
-          onChange={(e) => setEmail(e.target.value)} // Changed handler
-          required // Added required attribute
-        />
-        <Input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required // Added required attribute
-        />
-        {error && <ErrorMessage>{error}</ErrorMessage>}
-        <Button type="submit">Login</Button>
-      </form>
-      <ContinueAsGuestButton type="button" onClick={handleContinueAsGuest}>
-        Continue as Guest
-      </ContinueAsGuestButton>
-    </FormContainer>
+    <Modal onClose={onSuccess}>
+      <FormContainer>
+        <CloseButton onClick={onSuccess} aria-label="Close">×</CloseButton>
+        <h2 style={{ fontFamily: 'rushdriver, sans-serif', marginBottom: '10px' }}>Login</h2>
+        <form onSubmit={handleSubmit}>
+          <Input
+            type="email" // Changed type to email
+            placeholder="Email" // Changed placeholder
+            value={email}
+            onChange={(e) => setEmail(e.target.value)} // Changed handler
+            required // Added required attribute
+          />
+          <Input
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required // Added required attribute
+          />
+          {error && <ErrorMessage>{error}</ErrorMessage>}
+          <Button type="submit">Login</Button>
+        </form>
+        <ContinueAsGuestButton type="button" onClick={handleContinueAsGuest}>
+          Continue as Guest
+        </ContinueAsGuestButton>
+      </FormContainer>
+    </Modal>
   );
 }
 
