@@ -1,10 +1,11 @@
 import React, { useEffect, useRef } from 'react';
-import { MapContainer, TileLayer, Marker, Popup, useMap as useLeafletMap } from 'react-leaflet';
+import { MapContainer, TileLayer, Popup, useMap as useLeafletMap } from 'react-leaflet';
 import styled from 'styled-components';
 import 'leaflet/dist/leaflet.css';
 import '../styles/MapDarkMode.css';
 import L from 'leaflet';
 import { useMap } from '../contexts/MapContext';
+import RestaurantMarker from './RestaurantMarker';
 
 // Create custom icons for different types of restaurants
 const createCustomIcon = (color) => {
@@ -88,7 +89,7 @@ function MapController({ selectedLocation, focusId }) {
       map.flyTo(
         [selectedLocation.lat, selectedLocation.lng], 
         16, 
-        { animate: true, duration: 1.5 }
+        { animate: true, duration: 2, easeLinearit: 0.3 }
       );
       
       // Center the map on the screen
@@ -132,9 +133,9 @@ function RestaurantMap({ restaurants }) {
         {/* Visited Restaurants */}
         {visitedRestaurants.map((restaurant) =>
           restaurant.location && restaurant.location.lat && restaurant.location.lng ? (
-            <Marker
+            <RestaurantMarker
               key={restaurant.id}
-              position={[restaurant.location.lat, restaurant.location.lng]}
+              restaurant={restaurant}
               icon={visitedIcon}
             >
               <Popup>
@@ -147,16 +148,16 @@ function RestaurantMap({ restaurants }) {
                     : 'No ratings available'}
                 </div>
               </Popup>
-            </Marker>
+            </RestaurantMarker>
           ) : null
         )}
 
         {/* To Visit Restaurants */}
-        {toVisitRestaurants.map((restaurant) => (
+        {toVisitRestaurants.map((restaurant) =>
           restaurant.location && restaurant.location.lat && restaurant.location.lng ? (
-            <Marker 
-              key={restaurant.id} 
-              position={[restaurant.location.lat, restaurant.location.lng]}
+            <RestaurantMarker
+              key={restaurant.id}
+              restaurant={restaurant}
               icon={toVisitIcon}
             >
               <Popup>
@@ -167,16 +168,16 @@ function RestaurantMap({ restaurants }) {
                   On your "To Visit" list
                 </div>
               </Popup>
-            </Marker>
+            </RestaurantMarker>
           ) : null
-        ))}
-        
+        )}
+
         {/* Recommended Restaurants */}
-        {recommendedRestaurants.map((restaurant) => (
+        {recommendedRestaurants.map((restaurant) =>
           restaurant.location && restaurant.location.lat && restaurant.location.lng ? (
-            <Marker 
-              key={restaurant.id} 
-              position={[restaurant.location.lat, restaurant.location.lng]}
+            <RestaurantMarker
+              key={restaurant.id}
+              restaurant={restaurant}
               icon={recommendedIcon}
             >
               <Popup>
@@ -187,9 +188,9 @@ function RestaurantMap({ restaurants }) {
                   Recommended
                 </div>
               </Popup>
-            </Marker>
+            </RestaurantMarker>
           ) : null
-        ))}
+        )}
       </MapContainer>
       
       <MapLegend>
