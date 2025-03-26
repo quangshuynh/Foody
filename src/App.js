@@ -4,8 +4,11 @@ import { useAuth } from './contexts/AuthContext';
 import { MapProvider } from './contexts/MapContext';
 import LoginForm from './components/auth/LoginForm';
 import RegisterForm from './components/auth/RegisterForm';
-import { fetchVisitedRestaurants, addRestaurant as addRestaurantApi, removeRestaurant as removeRestaurantApi } from './services/restaurantService';
-import { initializeJsonStorage, readJsonData, updateJsonData } from './services/jsonStorage';
+// Updated imports for Firestore services
+import { fetchVisitedRestaurants, addRestaurant as addRestaurantApi, updateRestaurant as updateRestaurantApi, removeRestaurant as removeRestaurantApi } from './services/restaurantService';
+import { fetchToVisitRestaurants, addToVisit as addToVisitApi, removeToVisit as removeToVisitApi } from './services/toVisitService';
+import { fetchRecommendedRestaurants } from './services/recommendedService';
+// Removed jsonStorage imports
 import styled from 'styled-components';
 import SearchBar from './components/SearchBar';
 import RestaurantList from './components/RestaurantList';
@@ -28,51 +31,63 @@ const AppContainer = styled.div`
 `;
 
 function App() {
-  // visited restaurants list
-  const [restaurants, setRestaurants] = useState([]);
-  useEffect(() => {
-    initializeJsonStorage().catch(console.error);
-    const loadRestaurants = async () => {
-      try {
-        const data = await fetchVisitedRestaurants();
-        setRestaurants(data);
-      } catch (err) {
-        console.error('Failed to load restaurants:', err);
-      }
-    };
-    loadRestaurants();
-  }, []);
+  const { user, loading: authLoading } = useAuth(); // Get user and auth loading state
 
+  // State for different restaurant lists
+  const [restaurants, setRestaurants] = useState([]); // Visited
   const [restaurantsToVisit, setRestaurantsToVisit] = useState([]);
   const [recommendedRestaurants, setRecommendedRestaurants] = useState([]);
+
+  // State for UI
   const [filteredRestaurants, setFilteredRestaurants] = useState(restaurants);
   const [selectedSection, setSelectedSection] = useState('visited');
   const [displayLimit, setDisplayLimit] = useState(5);
   const [isPoopMode, setIsPoopMode] = useState(false);
 
+  // Fetch data based on user authentication state
   useEffect(() => {
-    const sortedRestaurants = [...restaurants].sort((a, b) => new Date(b.dateAdded) - new Date(a.dateAdded));
-    setFilteredRestaurants(sortedRestaurants);
-  }, [restaurants]);
-  
+    const loadData = async () => {
+      if (user) {
+        // User is logged in, fetch their visited and to-visit lists
+        try {
+          const [visitedData, toVisitData] = await Promise.all([
+            fetchVisitedRestaurants(),
+            fetchToVisitRestaurants()
+          ]);
+          setRestaurants(visitedData);
+          setRestaurantsToVisit(toVisitData);
+        } catch (err) {
+          console.error('Failed to load user-specific data:', err);
+          // Optionally show an error message to the user
+        }
+      } else {
+        // User is logged out, clear user-specific lists
+        setRestaurants([]);
+        setRestaurantsToVisit([]);
+      }
 
-  useEffect(() => {
-    const loadAllData = async () => {
+      // Fetch recommended restaurants (public data) regardless of login state
       try {
-        const data = await readJsonData();
-        setRestaurantsToVisit(data.toVisit || []);
-        setRecommendedRestaurants(data.recommended || []);
+        const recommendedData = await fetchRecommendedRestaurants();
+        setRecommendedRestaurants(recommendedData);
       } catch (err) {
-        console.error('Failed to load data:', err);
+        console.error('Failed to load recommended restaurants:', err);
       }
     };
-    loadAllData();
-  }, []);
 
+    // Only load data once auth state is determined
+    if (!authLoading) {
+      loadData();
+    }
+  }, [user, authLoading]); // Re-run when user or authLoading changes
+
+  // Update filteredRestaurants whenever the main 'restaurants' list changes
   useEffect(() => {
-    updateJsonData('toVisit', restaurantsToVisit);
-  }, [restaurantsToVisit]);
+    // No need to sort here if fetchVisitedRestaurants already sorts
+    setFilteredRestaurants(restaurants);
+  }, [restaurants]);
 
+  // Add a new VISITED restaurant (uses restaurantService)
   const addRestaurant = async (restaurant) => {
     const duplicate = restaurants.some(
       (r) =>
@@ -81,35 +96,43 @@ function App() {
     );
     if (duplicate) {
       alert("This restaurant already exists in your visited list!");
+      alert("This restaurant already exists in your visited list!");
       return;
     }
     try {
-      const newRestaurant = { ...restaurant, dateAdded: new Date().toISOString() };
-      const savedRestaurant = await addRestaurantApi(newRestaurant);
-      setRestaurants(prev => [...prev, savedRestaurant]);
+      // No need to add dateAdded here, Firestore service handles it
+      const savedRestaurant = await addRestaurantApi(restaurant);
+      // Prepend the new restaurant to the list for immediate UI update
+      setRestaurants(prev => [savedRestaurant, ...prev]);
     } catch (err) {
-      console.error('Failed to add restaurant:', err);
-      alert('Failed to add restaurant. Please try again.');
+      console.error('Failed to add visited restaurant:', err);
+      alert(`Failed to add visited restaurant: ${err.message}. Please try again.`);
     }
   };
 
-  const updateRestaurant = (updatedRestaurant) => {
-    const updatedRestaurants = restaurants.map((rest) =>
-      rest.id === updatedRestaurant.id ? updatedRestaurant : rest
-    );
-    setRestaurants(updatedRestaurants);
-    setFilteredRestaurants(updatedRestaurants);
+  // Update a VISITED restaurant (uses restaurantService)
+  const updateRestaurant = async (updatedRestaurant) => {
+    try {
+      const savedRestaurant = await updateRestaurantApi(updatedRestaurant);
+      const updatedList = restaurants.map((rest) =>
+        rest.id === savedRestaurant.id ? savedRestaurant : rest
+      );
+      setRestaurants(updatedList);
+      // No need to update filteredRestaurants separately if it depends on restaurants state
+    } catch (err) {
+      console.error('Failed to update visited restaurant:', err);
+      alert(`Failed to update visited restaurant: ${err.message}. Please try again.`);
+    }
   };
 
   const removeRestaurant = async (id) => {
     try {
       await removeRestaurantApi(id);
-      const updatedRestaurants = restaurants.filter((rest) => rest.id !== id);
-      setRestaurants(updatedRestaurants);
-      setFilteredRestaurants(updatedRestaurants);
+      const updatedList = restaurants.filter((rest) => rest.id !== id);
+      setRestaurants(updatedList);
     } catch (err) {
-      console.error('Failed to remove restaurant:', err);
-      alert('Failed to remove restaurant. Please try again.');
+      console.error('Failed to remove visited restaurant:', err);
+      alert(`Failed to remove visited restaurant: ${err.message}. Please try again.`);
     }
   };
 
@@ -135,7 +158,8 @@ function App() {
     }
   };
 
-  const addToVisit = (restaurant) => {
+  // Add a restaurant to the TO VISIT list (uses toVisitService)
+  const addToVisit = async (restaurant) => {
     const duplicate = restaurantsToVisit.some(
       (r) =>
         r.name.toLowerCase() === restaurant.name.toLowerCase() ||
@@ -145,17 +169,32 @@ function App() {
       alert("This restaurant already exists in your 'to visit' list!");
       return;
     }
-    const newRestaurant = { ...restaurant, id: Date.now(), dateAdded: new Date() };
-    setRestaurantsToVisit([...restaurantsToVisit, newRestaurant]);
+    try {
+      // Pass the basic restaurant info (name, address, location)
+      const savedToVisit = await addToVisitApi(restaurant);
+      // Prepend to the list for immediate UI update
+      setRestaurantsToVisit(prev => [savedToVisit, ...prev]);
+    } catch (err) {
+      console.error('Failed to add to-visit restaurant:', err);
+      alert(`Failed to add to-visit restaurant: ${err.message}. Please try again.`);
+    }
   };
 
-  const removeToVisit = (id) => {
-    const updatedToVisit = restaurantsToVisit.filter((r) => r.id !== id);
-    setRestaurantsToVisit(updatedToVisit);
+  // Remove a restaurant from the TO VISIT list (uses toVisitService)
+  const removeToVisit = async (id) => {
+    try {
+      await removeToVisitApi(id);
+      const updatedList = restaurantsToVisit.filter((r) => r.id !== id);
+      setRestaurantsToVisit(updatedList);
+    } catch (err) {
+      console.error('Failed to remove to-visit restaurant:', err);
+      alert(`Failed to remove to-visit restaurant: ${err.message}. Please try again.`);
+    }
   };
 
-  // Remove setUser from useAuth() destructuring if it's no longer provided by AuthContext
-  const { isAuthenticated } = useAuth();
+  // Use user object directly for isAuthenticated check
+  const { user, loading: authLoading } = useAuth();
+  const isAuthenticated = !!user; // Derive from user object
   const [showLogin, setShowLogin] = useState(false);
   const [showRegister, setShowRegister] = useState(false);
 
@@ -173,6 +212,11 @@ function App() {
       alert(`Logout failed: ${error.message}`);
     }
   };
+
+  // Render loading indicator while checking auth state
+  if (authLoading) {
+    return <AppContainer>Loading...</AppContainer>; // Or a proper spinner component
+  }
 
   return (
     <MapProvider>
@@ -218,11 +262,12 @@ function App() {
             )}
             <RestaurantList
               restaurants={filteredRestaurants.slice(0, displayLimit)}
+              // Pass the async updateRestaurant function directly
               updateRestaurant={isAuthenticated ? updateRestaurant : null}
               removeRestaurant={isAuthenticated ? removeRestaurant : null}
               isPoopMode={isPoopMode}
             />
-            
+
             <div style={{ width: '80%', margin: '10px auto', textAlign: 'left' }}>
               <select 
                 onChange={handleDisplayLimitChange} 
