@@ -1,65 +1,42 @@
-import { getAuthToken } from './authService';
+import { 
+  createUserWithEmailAndPassword, 
+  signInWithEmailAndPassword, 
+  signOut 
+} from "firebase/auth";
+import { auth } from '../firebaseConfig'; // Import the initialized auth service
 
-let API_URL = 'http://localhost:3002/api';
+// Note: We are removing the old API-based functions and helpers.
+// Firebase handles authentication state persistence automatically.
 
-// Update API URL if needed
-export const updateApiUrl = (newUrl) => {
-  API_URL = newUrl;
-};
-
-export const fetchRestaurantsToVisit = async () => {
+export const register = async (email, password) => {
   try {
-    const response = await fetch(`${API_URL}/tovisit`);
-    if (!response.ok) throw new Error('Failed to fetch to-visit restaurants');
-    return await response.json();
+    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+    // You might want to store additional user profile info in Firestore/Realtime Database here
+    return userCredential.user;
   } catch (error) {
-    console.error('Fetch to-visit restaurants error:', error);
-    return [];
+    console.error('Registration error:', error);
+    throw error; // Re-throw the error to be handled by the calling component
   }
 };
 
-export const addToVisitRestaurant = async (restaurant) => {
+export const login = async (email, password) => {
   try {
-    const token = getAuthToken();
-    if (!token) throw new Error('Authentication required');
-
-    const response = await fetch(`${API_URL}/tovisit`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': token
-      },
-      body: JSON.stringify(restaurant)
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.error || 'Failed to add to-visit restaurant');
-    }
-    
-    return await response.json();
+    const userCredential = await signInWithEmailAndPassword(auth, email, password);
+    return userCredential.user;
   } catch (error) {
-    console.error('Add to-visit restaurant error:', error);
-    throw error;
+    console.error('Login error:', error);
+    throw error; // Re-throw the error to be handled by the calling component
   }
 };
 
-export const deleteToVisitRestaurant = async (id) => {
+export const logout = async () => {
   try {
-    const token = getAuthToken();
-    if (!token) throw new Error('Authentication required');
-
-    const response = await fetch(`${API_URL}/tovisit/${id}`, {
-      method: 'DELETE',
-      headers: {
-        'Authorization': token
-      }
-    });
-
-    if (!response.ok) throw new Error('Failed to delete to-visit restaurant');
-    return true;
+    await signOut(auth);
   } catch (error) {
-    console.error('Delete to-visit restaurant error:', error);
-    throw error;
+    console.error('Logout error:', error);
+    throw error; // Re-throw the error to be handled by the calling component
   }
 };
+
+// No need for getCurrentUser, isAuthenticated, getAuthToken, updateApiUrl
+// Firebase's onAuthStateChanged handles state, and auth headers are managed differently if needed (e.g., for Cloud Functions).

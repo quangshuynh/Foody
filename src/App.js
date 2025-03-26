@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react'; // Ensure React is imported
 import { useAuth } from './contexts/AuthContext';
 import { MapProvider } from './contexts/MapContext';
 import LoginForm from './components/auth/LoginForm';
@@ -153,14 +154,24 @@ function App() {
     setRestaurantsToVisit(updatedToVisit);
   };
 
-  const { isAuthenticated, setUser } = useAuth();
+  // Remove setUser from useAuth() destructuring if it's no longer provided by AuthContext
+  const { isAuthenticated } = useAuth(); 
   const [showLogin, setShowLogin] = useState(false);
   const [showRegister, setShowRegister] = useState(false);
 
-  const handleLogout = () => {
-    setUser(null);
-    localStorage.removeItem('user');
-    localStorage.removeItem('token');
+  // Import the logout function from your updated authService
+  import { logout as firebaseLogout } from './services/authService'; 
+
+  const handleLogout = async () => {
+    try {
+      await firebaseLogout();
+      // No need to manually set user to null or remove items from localStorage.
+      // The onAuthStateChanged listener in AuthContext handles the state update.
+      console.log("User logged out successfully.");
+    } catch (error) {
+      console.error("Logout failed:", error);
+      alert(`Logout failed: ${error.message}`);
+    }
   };
 
   return (
