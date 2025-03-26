@@ -53,10 +53,14 @@ export const addToVisit = async (restaurant) => {
     delete newToVisitData.id;
 
     const docRef = await addDoc(toVisitCollectionRef, newToVisitData);
+
+    // Log the audit event *after* successful add
+    await logAuditEvent('CREATE', 'toVisitRestaurants', docRef.id, { name: newToVisitData.name, address: newToVisitData.address });
+
     return { ...newToVisitData, id: docRef.id, dateAdded: new Date() }; // Optimistic update
   } catch (error) {
     console.error("Add 'to visit' restaurant error:", error);
-    throw error;
+    throw error; // Re-throw error after logging failure or handling
   }
 };
 
@@ -68,11 +72,16 @@ export const removeToVisit = async (id) => {
 
   try {
     const restaurantDocRef = doc(db, 'toVisitRestaurants', id);
+    // Consider fetching the doc name/address before deleting if needed for the log details
     await deleteDoc(restaurantDocRef);
+
+    // Log the audit event *after* successful delete
+    await logAuditEvent('DELETE', 'toVisitRestaurants', id);
+
     // Firestore rules should ensure only the owner can delete
     return true; // Indicate success
   } catch (error) {
     console.error("Delete 'to visit' restaurant error:", error);
-    throw error;
+    throw error; // Re-throw error after logging failure or handling
   }
 };

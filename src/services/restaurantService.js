@@ -55,12 +55,15 @@ export const updateRestaurant = async (restaurant) => {
     // delete updateData.dateAdded;
 
     await updateDoc(restaurantDocRef, updateData);
+    // Log the audit event *after* successful update
+    await logAuditEvent('UPDATE', 'visitedRestaurants', restaurant.id, { updatedFields: Object.keys(updateData) });
+
     // Return the updated restaurant data (or just success)
     // Fetching the updated doc might be needed if serverTimestamp is crucial immediately
     return { ...restaurant, updatedAt: new Date() }; // Return optimistic update
   } catch (error) {
     console.error('Update restaurant error:', error);
-    throw error;
+    throw error; // Re-throw error after logging failure or handling
   }
 }; // <-- Added missing closing brace
 
@@ -80,11 +83,15 @@ export const addRestaurant = async (restaurant) => {
     };
 
     const docRef = await addDoc(restaurantsCollectionRef, newRestaurantData);
+
+    // Log the audit event *after* successful add
+    await logAuditEvent('CREATE', 'visitedRestaurants', docRef.id, { name: newRestaurantData.name, address: newRestaurantData.address });
+
     // Return the new restaurant data including the Firestore generated ID
     return { ...newRestaurantData, id: docRef.id, dateAdded: new Date() }; // Return optimistic update
   } catch (error) {
     console.error('Add restaurant error:', error);
-    throw error;
+    throw error; // Re-throw error after logging failure or handling
   }
 }; // <-- Added missing closing brace
 
@@ -96,11 +103,16 @@ export const removeRestaurant = async (id) => {
 
   try {
     const restaurantDocRef = doc(db, 'visitedRestaurants', id);
+    // Consider fetching the doc name/address before deleting if needed for the log details
     await deleteDoc(restaurantDocRef);
+
+    // Log the audit event *after* successful delete
+    await logAuditEvent('DELETE', 'visitedRestaurants', id);
+
     // Firestore rules should ensure only the owner can delete
     return true; // Indicate success
   } catch (error) {
     console.error('Delete restaurant error:', error);
-    throw error;
+    throw error; // Re-throw error after logging failure or handling
   }
 };

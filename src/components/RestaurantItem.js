@@ -168,10 +168,18 @@ function RestaurantItem({ restaurant, updateRestaurant, removeRestaurant }) {
         averageRating: Math.round(averageRating * 10) / 10
       });
 
+      // Log the audit event *after* successful rating update/add
+      await logAuditEvent(
+        existingRating ? 'UPDATE_RATING' : 'CREATE_RATING',
+        'visitedRestaurants',
+        restaurant.id,
+        { rating: newRatingData.rating, wouldReturn: newRatingData.wouldReturn, commentProvided: !!newRatingData.comment }
+      );
+
       setShowRatingModal(false);
     } catch (error) {
       console.error('Failed to update rating:', error);
-      alert(`Failed to update rating: ${error.message}. Please try again.`);
+      alert(`Failed to update rating: ${error.message}. Please try again.`); // Keep user feedback
     }
   };
 
