@@ -14,17 +14,12 @@ import {
 // Collection reference
 const toVisitCollectionRef = collection(db, 'toVisitRestaurants');
 
-// Fetch 'to visit' restaurants for the current logged-in user
+// Fetch ALL 'to visit' restaurants (public read)
 export const fetchToVisitRestaurants = async () => {
-  const user = auth.currentUser;
-  if (!user) {
-    console.log("No user logged in, cannot fetch 'to visit' restaurants.");
-    return [];
-  }
-
+  // No user check needed for public read
   try {
-    const q = query(toVisitCollectionRef, where("userId", "==", user.uid));
-    const querySnapshot = await getDocs(q);
+    // Create a query against the collection (no user filter)
+    const querySnapshot = await getDocs(toVisitCollectionRef);
     const restaurants = querySnapshot.docs.map(doc => ({
       id: doc.id,
       ...doc.data(),

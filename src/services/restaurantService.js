@@ -14,18 +14,12 @@ import {
 // Collection reference
 const restaurantsCollectionRef = collection(db, 'visitedRestaurants');
 
-// Fetch restaurants for the current logged-in user
+// Fetch ALL visited restaurants (public read)
 export const fetchVisitedRestaurants = async () => {
-  const user = auth.currentUser;
-  if (!user) {
-    console.log("No user logged in, cannot fetch visited restaurants.");
-    return []; // Return empty array if no user is logged in
-  }
-
+  // No user check needed for public read
   try {
-    // Create a query against the collection, filtering by userId
-    const q = query(restaurantsCollectionRef, where("userId", "==", user.uid));
-    const querySnapshot = await getDocs(q);
+    // Create a query against the collection (no user filter)
+    const querySnapshot = await getDocs(restaurantsCollectionRef);
     const restaurants = querySnapshot.docs.map(doc => ({
       id: doc.id, // Use Firestore document ID
       ...doc.data(),
