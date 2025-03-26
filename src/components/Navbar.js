@@ -97,11 +97,12 @@ const AuthButton = styled.button`
 
 // New styled component for username display
 const UserInfo = styled.span`
-  color: #ccc; /* Lighter color for username */
+  color: #00bcd4; /* Use theme primary color */
   margin-right: 15px;
-  font-size: 0.95rem;
-  font-family: 'CircularSpotifyText-Bold', sans-serif; /* Using an existing font */
-  font-weight: 500;
+  font-size: 1.05rem; /* Slightly larger */
+  font-family: 'saucetomato', sans-serif; /* Use a different font */
+  font-weight: 500; /* Keep weight */
+  align-self: center; /* Vertically center within the flex container */
   
   @media (max-width: 600px) {
     margin-right: 0;
