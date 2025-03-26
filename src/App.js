@@ -192,7 +192,7 @@ function App() {
   };
 
   // Use user object directly for isAuthenticated check
-  const { user, loading: authLoading } = useAuth();
+  // user and authLoading are already available from the useAuth() call at the top of the component
   const isAuthenticated = !!user; // Derive from user object
   const [showLogin, setShowLogin] = useState(false);
   const [showRegister, setShowRegister] = useState(false);
