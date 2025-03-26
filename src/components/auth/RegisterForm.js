@@ -6,7 +6,8 @@ import { checkUsernameExists } from '../../services/userService'; // Import user
 import debounce from '../../utils/debounce'; // We'll create this utility
 
 const FormContainer = styled.div`
-  max-width: 400px;
+  width: 400px;          
+  min-height: 370px;      
   margin: 20px auto;
   padding: 20px;
   background: #2a2a2a;
@@ -17,6 +18,7 @@ const FormContainer = styled.div`
   position: relative;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
 `;
+
 
 const Input = styled.input`
   width: 80%;
@@ -59,13 +61,13 @@ const CloseButton = styled.button`
   }
 `;
 
-const ContinueAsGuestButton = styled(Button)`
-  background: #424242;
-  margin-top: 15px;
-  &:hover {
-    background: #616161;
-  }
-`;
+// const ContinueAsGuestButton = styled(Button)`
+//   background: #424242;
+//   margin-top: 15px;
+//   &:hover {
+//     background: #616161;
+//   }
+// `;
 
 const ErrorMessage = styled.p`
   color: #ff4081;
@@ -73,7 +75,7 @@ const ErrorMessage = styled.p`
   text-align: center;
 `;
 
-function RegisterForm({ onSuccess }) {
+function RegisterForm({ onClose, onSuccess }) {
   const [username, setUsername] = useState('');
   const [usernameAvailable, setUsernameAvailable] = useState(true);
   const [usernameLoading, setUsernameLoading] = useState(false);
@@ -168,15 +170,18 @@ function RegisterForm({ onSuccess }) {
     }
   };
 
-  const handleContinueAsGuest = () => {
-    if (onSuccess) onSuccess();
-  };
+  // const handleContinueAsGuest = () => {
+  //   if (onSuccess) onSuccess();
+  // };
 
   return (
     <FormContainer>
-      <CloseButton onClick={onSuccess} aria-label="Close">×</CloseButton>
+      <CloseButton onClick={onClose} aria-label="Close">×</CloseButton>
       <h2 style={{ fontFamily: 'rushdriver, sans-serif', marginBottom: '10px' }}>Register</h2>
-      <form onSubmit={handleSubmit} style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+      <form 
+        onSubmit={handleSubmit} 
+        style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}
+      >
         <Input
           type="text"
           placeholder="Username (min. 3 chars, a-z, 0-9, _, -)"
@@ -186,22 +191,25 @@ function RegisterForm({ onSuccess }) {
           aria-invalid={!usernameAvailable}
           aria-describedby="username-status"
         />
-        <div id="username-status" style={{ height: '1.2em', fontSize: '0.8em', color: usernameAvailable ? 'lightgreen' : '#ff4081' }}>
+        <div 
+          id="username-status" 
+          style={{ height: '1.2em', fontSize: '0.8em', color: usernameAvailable ? 'lightgreen' : '#ff4081' }}
+        >
           {usernameLoading ? 'Checking...' : (username && username.length >= 3 ? (usernameAvailable ? 'Available' : 'Username taken') : '')}
         </div>
         <Input
           type="email"
           placeholder="Email"
           value={email}
-          onChange={(e) => setEmail(e.target.value)} // Changed handler
-          required // Added required attribute
+          onChange={(e) => setEmail(e.target.value)}
+          required
         />
         <Input
           type="password"
-          placeholder="Password (min. 6 characters)" // Added hint
+          placeholder="Password (min. 6 characters)"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          required // Added required attribute
+          required
         />
         <Input
           type="password"
