@@ -109,12 +109,17 @@ function App() {
       return;
     }
     try {
-      const savedRestaurant = await updateRestaurantApi(updatedRestaurant);
+      // savedRestaurant contains the fields returned by the service (optimistic or actual)
+      const savedRestaurant = await updateRestaurantApi(updatedRestaurant); 
       const updatedList = restaurants.map((rest) =>
-        rest.id === savedRestaurant.id ? savedRestaurant : rest
+        // If this is the restaurant that was updated...
+        rest.id === savedRestaurant.id 
+          // ...merge the existing data (rest) with the updated fields (savedRestaurant)
+          ? { ...rest, ...savedRestaurant } 
+          // ...otherwise, keep the original restaurant object
+          : rest 
       );
       setRestaurants(updatedList);
-      // No need to update filteredRestaurants separately if it depends on restaurants state
     } catch (err) {
       console.error('Failed to update visited restaurant:', err);
       alert(`Failed to update visited restaurant: ${err.message}. Please try again.`);

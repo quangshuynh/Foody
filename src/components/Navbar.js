@@ -7,9 +7,14 @@ const NavContainer = styled.nav`
   position: sticky;
   top: 0;
   z-index: 1000;
-  padding: 0 20px;
+  padding: 0 20px; /* Default padding for desktop */
   height: 60px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  transition: padding 0.3s ease; /* Smooth transition */
+
+  @media (max-width: 768px) {
+    padding: 0 10px; /* Reduced padding on mobile */
+  }
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -25,6 +30,11 @@ const Logo = styled.div`
   color: #00bcd4;
   cursor: pointer;
   text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+  transition: font-size 0.3s ease; /* Smooth transition */
+
+  @media (max-width: 768px) {
+    font-size: 2.5rem; /* Slightly smaller logo on mobile */
+  }
 `;
 
 const CenterMenu = styled.div`
@@ -146,12 +156,12 @@ const MobileAuthButton = styled.button`
   color: #f5f5f5;
   border: ${(props) =>
     props.$primary ? 'none' : '1px solid #00bcd4'};
-  padding: 2px 6px;
+  padding: 2px 5px; /* Slightly reduced padding */
   border-radius: 4px;
   cursor: pointer;
-  font-size: 0.8rem;
+  font-size: 0.75rem; /* Slightly smaller font */
   font-family: 'saucetomato', sans-serif;
-  letter-spacing: 1px;
+  letter-spacing: 0.5px; /* Reduced letter spacing */
   font-weight: 400;
   transition: all 0.2s ease;
 
@@ -191,9 +201,11 @@ const UserInfo = styled.span`
   font-size: 1.05rem;
   font-family: 'saucetomato', sans-serif;
   font-weight: 500;
+  align-self: center; /* Vertically center within the flex container */
   
   @media (max-width: 768px) {
-    margin-right: 0;
+    margin-right: 5px; /* Add small margin to separate from logout */
+    font-size: 0.9rem; /* Slightly smaller on mobile */
   }
 `;
 
