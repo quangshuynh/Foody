@@ -329,7 +329,7 @@ function VisitItem({ restaurant, removeToVisit, updateToVisit }) {
       setShowRatingModal(false);
     } catch (error) {
       console.error('Failed to update rating for to-visit:', error);
-      alert(`Failed to update rating: ${error.message}. Please try again.`);
+      toast.error(`Failed to update rating: ${error.message}. Please try again.`); // Use toast.error
     }
   };
 

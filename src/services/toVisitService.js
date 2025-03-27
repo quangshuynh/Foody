@@ -79,7 +79,8 @@ export const updateToVisit = async (restaurant) => {
     await logAuditEvent('UPDATE', 'toVisitRestaurants', restaurant.id, { updatedFields: Object.keys(updateData) });
 
     // Return the updated restaurant data (or just success)
-    return { ...restaurant, updatedAt: new Date() }; // Return optimistic update
+    // Convert updatedAt to ISO string for consistency with fetch
+    return { ...restaurant, updatedAt: new Date().toISOString() }; // Return optimistic update as ISO string
   } catch (error) {
     console.error("Update 'to visit' restaurant error:", error);
     throw error; // Re-throw error after logging failure or handling

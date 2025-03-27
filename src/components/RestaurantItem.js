@@ -268,7 +268,7 @@ function RestaurantItem({ restaurant, updateRestaurant, removeRestaurant }) {
       setShowRatingModal(false);
     } catch (error) {
       console.error('Failed to update rating:', error);
-      alert(`Failed to update rating: ${error.message}. Please try again.`); // Keep user feedback
+      toast.error(`Failed to update rating: ${error.message}. Please try again.`); // Use toast.error
     }
   };
 

@@ -100,7 +100,7 @@ function App() {
       setRestaurants(prev => [savedRestaurant, ...prev]);
     } catch (err) {
       console.error('Failed to add visited restaurant:', err);
-      alert(`Failed to add visited restaurant: ${err.message}. Please try again.`);
+      toast.error(`Failed to add visited restaurant: ${err.message}. Please try again.`); // Use toast.error
     }
   };
 
@@ -117,7 +117,7 @@ function App() {
       setRestaurants(updatedList);
     } catch (err) {
       console.error('Failed to update visited restaurant:', err);
-      alert(`Failed to update visited restaurant: ${err.message}. Please try again.`);
+      toast.error(`Failed to update visited restaurant: ${err.message}. Please try again.`); // Use toast.error
     }
   };
 
@@ -132,7 +132,7 @@ function App() {
       setRestaurants(updatedList);
     } catch (err) {
       console.error('Failed to remove visited restaurant:', err);
-      alert(`Failed to remove visited restaurant: ${err.message}. Please try again.`);
+      toast.error(`Failed to remove visited restaurant: ${err.message}. Please try again.`); // Use toast.error
     }
   };
 
@@ -190,7 +190,7 @@ function App() {
       setRestaurantsToVisit(prev => [savedToVisit, ...prev]);
     } catch (err) {
       console.error('Failed to add to-visit restaurant:', err);
-      alert(`Failed to add to-visit restaurant: ${err.message}. Please try again.`);
+      toast.error(`Failed to add to-visit restaurant: ${err.message}. Please try again.`); // Use toast.error
     }
   };
 
@@ -205,7 +205,7 @@ function App() {
       setRestaurantsToVisit(updatedList);
     } catch (err) {
       console.error('Failed to remove to-visit restaurant:', err);
-      alert(`Failed to remove to-visit restaurant: ${err.message}. Please try again.`);
+      toast.error(`Failed to remove to-visit restaurant: ${err.message}. Please try again.`); // Use toast.error
     }
   };
 
@@ -223,7 +223,7 @@ function App() {
       setRestaurantsToVisit(updatedList);
     } catch (err) {
       console.error('Failed to update to-visit restaurant:', err);
-      alert(`Failed to update to-visit restaurant: ${err.message}. Please try again.`);
+      toast.error(`Failed to update to-visit restaurant: ${err.message}. Please try again.`); // Use toast.error
     }
   };
 
@@ -238,7 +238,7 @@ function App() {
       console.log("User logged out successfully.");
     } catch (error) {
       console.error("Logout failed:", error);
-      alert(`Logout failed: ${error.message}`);
+      toast.error(`Logout failed: ${error.message}`); // Use toast.error
     }
   };
 

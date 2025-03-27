@@ -59,7 +59,8 @@ export const updateRestaurant = async (restaurant) => {
 
     // Return the updated restaurant data (or just success)
     // Fetching the updated doc might be needed if serverTimestamp is crucial immediately
-    return { ...restaurant, updatedAt: new Date() }; // Return optimistic update
+    // Convert updatedAt to ISO string for consistency with fetch
+    return { ...restaurant, updatedAt: new Date().toISOString() }; // Return optimistic update as ISO string
   } catch (error) {
     console.error('Update restaurant error:', error);
     throw error; // Re-throw error after logging failure or handling
