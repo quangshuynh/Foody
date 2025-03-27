@@ -44,6 +44,8 @@ function App() {
   const [displayLimit, setDisplayLimit] = useState(5);
   const [isPoopMode, setIsPoopMode] = useState(false);
 
+  const sectionOrder = ['visited', 'toVisit', 'recommended']; // Moved declaration up
+
   // Refs for CSSTransition nodes
   const nodeRefs = useRef({});
   nodeRefs.current = sectionOrder.reduce((acc, key) => {
@@ -51,8 +53,6 @@ function App() {
     return acc;
   }, nodeRefs.current);
 
-
-  const sectionOrder = ['visited', 'toVisit', 'recommended'];
 
   // Update previous section and direction when selectedSection changes
   useEffect(() => {
