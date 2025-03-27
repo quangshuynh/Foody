@@ -316,7 +316,7 @@ function RestaurantItem({ restaurant, updateRestaurant, removeRestaurant }) {
               justifyContent: 'center'
             }}>
               <a 
-                href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(restaurant.address)}`} 
+                href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(restaurant.name)} ${encodeURIComponent(restaurant.address)}`}
                 target="_blank" 
                 rel="noopener noreferrer"
                 style={{ color: '#b4c2fa', textDecoration: 'none', fontWeight: 'bold' }}
