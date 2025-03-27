@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react'; 
+import React, { useState, useEffect, useRef } from 'react';
+import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import { useAuth } from './contexts/AuthContext';
 import { MapProvider } from './contexts/MapContext';
 import LoginForm from './components/auth/LoginForm';
@@ -16,7 +17,8 @@ import RestaurantMap from './components/RestaurantMap';
 import Footer from './components/Footer';
 import ModalOverlay from './components/ModalOverlay';
 import Navbar from './components/Navbar';
-import AddRestaurant from './components/AddRestaurant'; 
+import AddRestaurant from './components/AddRestaurant';
+import './App.css'; // Import App.css for transition styles
 
 const AppContainer = styled.div`
   font-family: 'Roboto', sans-serif;
@@ -288,63 +290,77 @@ function App() {
           </ModalOverlay>
         )}
 
+        {/* Container for Transition Group */}
+        <div style={{ position: 'relative', overflow: 'hidden', minHeight: '50vh' }}> {/* Adjust minHeight as needed */}
+          <TransitionGroup component={null} childFactory={child => React.cloneElement(child, { classNames: slideDirection })}>
+            <CSSTransition
+              key={selectedSection}
+              timeout={500} // Match CSS transition duration
+              classNames={slideDirection} // Use dynamic direction class
+            >
+              <div className="section-container"> {/* Wrapper for positioning */}
+                {selectedSection === 'visited' && (
+                  <>
+                    <h2>Visited Restaurants</h2>
+                    <div style={{ width: '80%', margin: '0 auto' }}>
+                      <SearchBar searchRestaurants={searchRestaurants} />
+                    </div>
+                    {isAuthenticated && (
+                      <AddRestaurant addRestaurant={addRestaurant} />
+                    )}
+                    <RestaurantList
+                      restaurants={filteredRestaurants.slice(0, displayLimit)}
+                      // Pass the async updateRestaurant function directly
+                      updateRestaurant={isAuthenticated ? updateRestaurant : null}
+                      removeRestaurant={isAuthenticated ? removeRestaurant : null}
+                      isPoopMode={isPoopMode}
+                    />
 
-        {selectedSection === 'visited' && (
-          <>
-            <h2>Visited Restaurants</h2>
-            <div style={{ width: '80%', margin: '0 auto' }}>
-              <SearchBar searchRestaurants={searchRestaurants} />
-            </div>
-            {isAuthenticated && (
-              <AddRestaurant addRestaurant={addRestaurant} />
-            )}
-            <RestaurantList
-              restaurants={filteredRestaurants.slice(0, displayLimit)}
-              // Pass the async updateRestaurant function directly
-              updateRestaurant={isAuthenticated ? updateRestaurant : null}
-              removeRestaurant={isAuthenticated ? removeRestaurant : null}
-              isPoopMode={isPoopMode}
-            />
+                    <div style={{ width: '80%', margin: '10px auto', textAlign: 'left' }}>
+                      <select
+                        onChange={handleDisplayLimitChange}
+                        value={isPoopMode ? "poop" : displayLimit}
+                        style={{
+                          padding: '8px',
+                          borderRadius: '4px',
+                          background: '#2a2a2a',
+                          color: '#f5f5f5',
+                          border: '1px solid #00bcd4',
+                          cursor: 'pointer'
+                        }}
+                      >
+                        <option value="5">5</option>
+                        <option value="10">10</option>
+                        <option value="15">15</option>
+                        <option value="20">20</option>
+                        <option value="50">50</option>
+                        <option value="poop">💩</option>
+                      </select>
+                    </div>
+                  </>
+                )}
+                {selectedSection === 'toVisit' && (
+                  <>
+                    <h2>Restaurants to Visit</h2>
+                    <RestaurantsToVisit
+                      restaurantsToVisit={restaurantsToVisit}
+                      addToVisit={isAuthenticated ? addToVisit : null}
+                      removeToVisit={isAuthenticated ? removeToVisit : null}
+                    />
+                  </>
+                )}
+                {selectedSection === 'recommended' && (
+                  <>
+                    <h2>Recommended Restaurants</h2>
+                    <RecommendedRestaurants recommendedRestaurants={recommendedRestaurants} />
+                  </>
+                )}
+              </div>
+            </CSSTransition>
+          </TransitionGroup>
+        </div>
 
-            <div style={{ width: '80%', margin: '10px auto', textAlign: 'left' }}>
-              <select
-                onChange={handleDisplayLimitChange}
-                value={isPoopMode ? "poop" : displayLimit}
-                style={{
-                  padding: '8px',
-                  borderRadius: '4px',
-                  background: '#2a2a2a',
-                  color: '#f5f5f5',
-                  border: '1px solid #00bcd4',
-                  cursor: 'pointer'
-                }}
-              >
-                <option value="5">5</option>
-                <option value="10">10</option>
-                <option value="15">15</option>
-                <option value="20">20</option>
-                <option value="50">50</option>
-                <option value="poop">💩</option>
-              </select>
-            </div>
-          </>
-        )}
-        {selectedSection === 'toVisit' && (
-          <>
-            <h2>Restaurants to Visit</h2>
-            <RestaurantsToVisit
-              restaurantsToVisit={restaurantsToVisit}
-              addToVisit={isAuthenticated ? addToVisit : null}
-              removeToVisit={isAuthenticated ? removeToVisit : null}
-            />
-          </>
-        )}
-        {selectedSection === 'recommended' && (
-          <>
-            <h2>Recommended Restaurants</h2>
-            <RecommendedRestaurants recommendedRestaurants={recommendedRestaurants} />
-          </>
-        )}
+        {/* Keep Map and Footer outside the transition */}
         <RestaurantMap restaurants={[...restaurants, ...restaurantsToVisit, ...recommendedRestaurants]} />
         <Footer />
       </AppContainer>
