@@ -4,10 +4,8 @@ import { useAuth } from '../contexts/AuthContext';
 
 const NavContainer = styled.nav`
   background-color: #1a1a1a;
-  position: fixed;
+  position: sticky; /* Changed from fixed to sticky */
   top: 0;
-  left: 0;
-  right: 0;
   z-index: 1000;
   display: flex;
   justify-content: space-between;
@@ -18,9 +16,9 @@ const NavContainer = styled.nav`
   
   @media (max-width: 768px) {
     flex-direction: column;
-    align-items: flex-start;
+    align-items: center;
     height: auto;
-    padding: 10px 20px;
+    padding: 10px;
   }
 `;
 
@@ -31,6 +29,12 @@ const Logo = styled.div`
   cursor: pointer;
   text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
   margin-right: 20px;
+
+  @media (max-width: 768px) {
+    font-size: 2rem;
+    margin-right: 0;
+    margin-bottom: 10px;
+  }
 `;
 
 const NavItems = styled.div`
@@ -40,12 +44,19 @@ const NavItems = styled.div`
   padding: 5px;
   border-radius: 8px;
   margin-left: 10px;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    width: 100%;
+    margin: 0 0 10px 0;
+  }
 `;
 
 const NavItem = styled.button`
-  background: ${(props) => props.$active ? 'rgba(0, 188, 212, 0.2)' : 'transparent'};
+  background: ${(props) =>
+    props.$active ? 'rgba(0, 188, 212, 0.2)' : 'transparent'};
   border: none;
-  color: ${(props) => props.$active ? '#00bcd4' : '#f5f5f5'};
+  color: ${(props) => (props.$active ? '#00bcd4' : '#f5f5f5')};
   font-size: 1.1rem;
   margin: 0 10px;
   cursor: pointer;
@@ -54,8 +65,9 @@ const NavItem = styled.button`
   border-bottom: ${(props) =>
     props.$active ? '3px solid #00bcd4' : '3px solid transparent'};
   transition: all 0.3s ease;
-  font-weight: ${(props) => props.$active ? '500' : 'normal'};
-  box-shadow: ${(props) => props.$active ? '0 2px 4px rgba(0, 0, 0, 0.3)' : 'none'};
+  font-weight: ${(props) => (props.$active ? '500' : 'normal')};
+  box-shadow: ${(props) =>
+    props.$active ? '0 2px 4px rgba(0, 0, 0, 0.3)' : 'none'};
   font-family: 'donutsmatcha', sans-serif;
   letter-spacing: 1px;
 
@@ -63,6 +75,12 @@ const NavItem = styled.button`
     color: #00bcd4;
     transform: translateY(-2px);
     background: rgba(0, 188, 212, 0.1);
+  }
+
+  @media (max-width: 768px) {
+    margin: 5px 0;
+    width: 100%;
+    text-align: center;
   }
 `;
 
@@ -72,13 +90,16 @@ const AuthButtons = styled.div`
   
   @media (max-width: 600px) {
     margin-top: 10px;
+    flex-direction: column;
+    align-items: center;
   }
 `;
 
 const AuthButton = styled.button`
-  background: ${props => props.$primary ? '#00bcd4' : 'transparent'};
+  background: ${(props) => (props.$primary ? '#00bcd4' : 'transparent')};
   color: #f5f5f5;
-  border: ${props => props.$primary ? 'none' : '1px solid #00bcd4'};
+  border: ${(props) =>
+    props.$primary ? 'none' : '1px solid #00bcd4'};
   padding: 6px 12px;
   border-radius: 4px;
   cursor: pointer;
@@ -89,32 +110,41 @@ const AuthButton = styled.button`
   transition: all 0.2s ease;
   
   &:hover {
-    background: ${props => props.$primary ? '#00a1b5' : 'rgba(0, 188, 212, 0.1)'};
+    background: ${(props) =>
+      props.$primary ? '#00a1b5' : 'rgba(0, 188, 212, 0.1)'};
     transform: translateY(-1px);
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
   }
-`;
 
-// New styled component for username display
-const UserInfo = styled.span`
-  color: #00bcd4; /* Use theme primary color */
-  margin-right: 15px;
-  font-size: 1.05rem; /* Slightly larger */
-  font-family: 'saucetomato', sans-serif; /* Use a different font */
-  font-weight: 500; /* Keep weight */
-  align-self: center; /* Vertically center within the flex container */
-  
   @media (max-width: 600px) {
-    margin-right: 0;
-    margin-bottom: 5px; /* Add space below on mobile */
-    display: block; /* Make it block on mobile */
-    text-align: right; /* Align to right on mobile */
+    padding: 8px 14px;
+    font-size: 0.85rem;
   }
 `;
 
+const UserInfo = styled.span`
+  color: #00bcd4;
+  margin-right: 15px;
+  font-size: 1.05rem;
+  font-family: 'saucetomato', sans-serif;
+  font-weight: 500;
+  align-self: center;
+  
+  @media (max-width: 600px) {
+    margin-right: 0;
+    margin-bottom: 5px;
+    display: block;
+    text-align: right;
+  }
+`;
 
-const Navbar = ({ selectedSection, setSelectedSection, onShowLogin, onShowRegister, onLogout }) => {
-  // Get userProfile along with isAuthenticated
+const Navbar = ({
+  selectedSection,
+  setSelectedSection,
+  onShowLogin,
+  onShowRegister,
+  onLogout,
+}) => {
   const { isAuthenticated, userProfile } = useAuth();
 
   return (
@@ -148,7 +178,6 @@ const Navbar = ({ selectedSection, setSelectedSection, onShowLogin, onShowRegist
           </>
         ) : (
           <>
-            {/* Display username if profile exists */}
             {userProfile && <UserInfo>Hi, {userProfile.username}!</UserInfo>}
             <AuthButton onClick={onLogout}>Logout</AuthButton>
           </>
