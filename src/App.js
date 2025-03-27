@@ -349,11 +349,6 @@ function App() {
                 )}
                 {/* Map is now inside the transitioning container */}
                 <RestaurantMap restaurants={[...restaurants, ...restaurantsToVisit, ...recommendedRestaurants]} />
-              </div>
-            </CSSTransition>
-          </TransitionGroup>
-                {/* Map is now inside the transitioning container */}
-                <RestaurantMap restaurants={[...restaurants, ...restaurantsToVisit, ...recommendedRestaurants]} />
                 {/* Footer is now inside the transitioning container */}
                 <Footer />
               </div>
