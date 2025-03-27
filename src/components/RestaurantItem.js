@@ -413,10 +413,10 @@ function RestaurantItem({ restaurant, updateRestaurant, removeRestaurant }) {
               >
                 {capitalizeWords(restaurant.address)}
               </a>
-              <FiCopy 
+              <FiCopy
                 onClick={() => {
                   navigator.clipboard.writeText(restaurant.address);
-                  alert('Address copied to clipboard!');
+                  toast.info('Address copied to clipboard!'); // Use toast
                 }}
                 title="Copy address to clipboard"
                 style={{ color: '#00bcd4', cursor: 'pointer', marginLeft: '10px', fontSize: '1rem' }}

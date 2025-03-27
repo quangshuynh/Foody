@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import styled from 'styled-components';
 // Import necessary icons and components
-import { FaTrash, FaMapMarkerAlt, FaEdit, FaStar, FaComment } from 'react-icons/fa';
+import { FaTrash, FaMapMarkerAlt, FaEdit, FaStar } from 'react-icons/fa'; // Removed FaComment
 import { FiCopy } from 'react-icons/fi';
 import { useAuth } from '../contexts/AuthContext';
 import { useMap } from '../contexts/MapContext';
@@ -253,8 +253,8 @@ function VisitItem({ restaurant, removeToVisit, updateToVisit }) {
     setEditLoading(false);
   };
 
-  // Rating handler (similar to RestaurantItem, but updates 'toVisitRestaurants')
-  const handleRatingSubmit = async (rating, wouldReturn, comment = '') => {
+  // Simplified rating handler for 'To Visit' (only updates rating)
+  const handleRatingSubmit = async (rating) => { // Only takes rating
     if (!user) {
       alert('Please log in to rate this restaurant.');
       return;
@@ -270,21 +270,26 @@ function VisitItem({ restaurant, removeToVisit, updateToVisit }) {
       const currentRatings = currentData.ratings || [];
       const existingRating = currentRatings.find(r => r.userId === user.uid);
 
+      // Simplified rating data - no comment or wouldReturn
       const newRatingData = {
         userId: user.uid,
         userEmail: user.email,
         rating,
-        wouldReturn,
-        comment: comment.trim(),
         date: Timestamp.fromDate(new Date())
+        // Removed wouldReturn and comment
       };
 
       let ratingsUpdate = [];
       let averageRating = 0;
 
       if (existingRating) {
+        // Create a new rating object without the old comment/wouldReturn if they existed
+        const updatedExistingRating = { ...existingRating, rating: newRatingData.rating, date: newRatingData.date };
+        delete updatedExistingRating.comment;
+        delete updatedExistingRating.wouldReturn;
+
         await updateDoc(restaurantDocRef, { ratings: arrayRemove(existingRating) });
-        await updateDoc(restaurantDocRef, { ratings: arrayUnion(newRatingData) });
+        await updateDoc(restaurantDocRef, { ratings: arrayUnion(updatedExistingRating) });
         const updatedDocSnap = await getDoc(restaurantDocRef);
         ratingsUpdate = updatedDocSnap.data().ratings || [];
       } else {
@@ -303,15 +308,21 @@ function VisitItem({ restaurant, removeToVisit, updateToVisit }) {
       // Call the updateToVisit prop passed from App.js
       updateToVisit({
         ...restaurant,
-        ratings: ratingsUpdate.map(r => ({ ...r, date: r.date.toDate() })),
+        // Ensure ratings in local state also don't have comment/wouldReturn for consistency
+        ratings: ratingsUpdate.map(r => ({
+            userId: r.userId,
+            userEmail: r.userEmail,
+            rating: r.rating,
+            date: r.date.toDate ? r.date.toDate() : r.date // Handle potential timestamp conversion
+        })),
         averageRating: Math.round(averageRating * 10) / 10
       });
 
       await logAuditEvent(
         existingRating ? 'UPDATE_RATING' : 'CREATE_RATING',
-        'toVisitRestaurants', // Log against the correct collection
+        'toVisitRestaurants',
         restaurant.id,
-        { rating: newRatingData.rating, wouldReturn: newRatingData.wouldReturn, commentProvided: !!newRatingData.comment }
+        { rating: newRatingData.rating } // Simplified log details
       );
 
       setShowRatingModal(false);
@@ -323,14 +334,15 @@ function VisitItem({ restaurant, removeToVisit, updateToVisit }) {
 
 
   return (
-    // Attach the ref to the main container
-    <ItemContainer ref={itemRef}>
+    // Attach the ref and an ID to the main container
+    <ItemContainer ref={itemRef} id={`restaurant-item-${restaurant.id}`}>
       {/* Rating Modal */}
       {showRatingModal && (
         <RatingModal
-          onSubmit={handleRatingSubmit}
+          onSubmit={handleRatingSubmit} // Pass simplified handler
           onClose={() => setShowRatingModal(false)}
           currentRating={(restaurant.ratings || []).find(r => r?.userId === user?.uid)?.rating || 0}
+          isSimpleMode={true} // Add prop to hide comment/wouldReturn
         />
       )}
 
@@ -348,8 +360,7 @@ function VisitItem({ restaurant, removeToVisit, updateToVisit }) {
             <FaTrash onClick={handleRemove} title="Remove" />
           </>
         )}
-        {/* Add Comment icon */}
-        <FaComment onClick={() => setShowComments(!showComments)} title="Comments" />
+        {/* Removed Comment icon */}
       </IconContainer>
 
       {/* Conditional Rendering: Edit Form or Display View */}
@@ -414,7 +425,7 @@ function VisitItem({ restaurant, removeToVisit, updateToVisit }) {
           <FiCopy
             onClick={() => {
               navigator.clipboard.writeText(restaurant.address);
-              alert('Address copied to clipboard!');
+              toast.info('Address copied to clipboard!'); // Use toast
             }}
             title="Copy address to clipboard"
             style={{ color: '#00bcd4', cursor: 'pointer', marginLeft: '10px', fontSize: '1rem' }}
@@ -442,6 +453,7 @@ function VisitItem({ restaurant, removeToVisit, updateToVisit }) {
                 .sort((a, b) => new Date(b.date) - new Date(a.date))}
             />
           )}
+          {/* Removed Comments display section */}
         </>
       )}
     </ItemContainer>

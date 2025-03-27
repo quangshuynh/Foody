@@ -246,6 +246,19 @@ function App() {
 
   return (
     <MapProvider>
+      {/* Add ToastContainer here */}
+      <ToastContainer
+        position="top-center"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="dark" // Use dark theme
+      />
       <Navbar
         selectedSection={selectedSection}
         setSelectedSection={setSelectedSection}
@@ -315,6 +328,8 @@ function App() {
                       removeToVisit={isAuthenticated ? removeToVisit : null}
                       // Pass updateToVisit handler
                       updateToVisit={isAuthenticated ? updateToVisit : null}
+                      // Pass poop mode state
+                      isPoopMode={isToVisitPoopMode}
                     />
                   </>
                 )}

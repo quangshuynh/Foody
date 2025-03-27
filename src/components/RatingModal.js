@@ -55,8 +55,10 @@ const Button = styled.button`
   }
 `;
 
-function RatingModal({ onSubmit, onClose, currentRating = 0 }) {
+// Added isSimpleMode prop
+function RatingModal({ onSubmit, onClose, currentRating = 0, isSimpleMode = false }) {
   const [rating, setRating] = useState(currentRating);
+  // Only manage wouldReturn and comment if not in simple mode
   const [wouldReturn, setWouldReturn] = useState(true);
   const [comment, setComment] = useState('');
 
@@ -65,7 +67,12 @@ function RatingModal({ onSubmit, onClose, currentRating = 0 }) {
       alert('Please select a rating');
       return;
     }
-    onSubmit(rating, wouldReturn, comment);
+    // Pass only rating if in simple mode
+    if (isSimpleMode) {
+      onSubmit(rating);
+    } else {
+      onSubmit(rating, wouldReturn, comment);
+    }
   };
 
   return (
@@ -83,25 +90,30 @@ function RatingModal({ onSubmit, onClose, currentRating = 0 }) {
             />
           ))}
         </StarContainer>
-        <div>
-          <Button 
-            onClick={() => setWouldReturn(true)}
-            primary={wouldReturn}
-          >
-            <FaThumbsUp /> Would Return
-          </Button>
-          <Button 
-            onClick={() => setWouldReturn(false)}
-            primary={!wouldReturn}
-          >
-            <FaThumbsDown /> Would Not Return
-          </Button>
-        </div>
-        <TextArea
-          value={comment}
-          onChange={(e) => setComment(e.target.value)}
-          placeholder="Add your comment (optional)..."
-        />
+        {/* Conditionally render Would Return and Comment */}
+        {!isSimpleMode && (
+          <>
+            <div>
+              <Button
+                onClick={() => setWouldReturn(true)}
+                primary={wouldReturn}
+              >
+                <FaThumbsUp /> Would Return
+              </Button>
+              <Button
+                onClick={() => setWouldReturn(false)}
+                primary={!wouldReturn}
+              >
+                <FaThumbsDown /> Would Not Return
+              </Button>
+            </div>
+            <TextArea
+              value={comment}
+              onChange={(e) => setComment(e.target.value)}
+              placeholder="Add your comment (optional)..."
+            />
+          </>
+        )}
         <div style={{ marginTop: '20px' }}>
           <Button primary onClick={handleSubmit}>Submit Rating</Button>
           <Button onClick={onClose}>Cancel</Button>
