@@ -44,6 +44,14 @@ function App() {
   const [displayLimit, setDisplayLimit] = useState(5);
   const [isPoopMode, setIsPoopMode] = useState(false);
 
+  // Refs for CSSTransition nodes
+  const nodeRefs = useRef({});
+  nodeRefs.current = sectionOrder.reduce((acc, key) => {
+    acc[key] = acc[key] || React.createRef();
+    return acc;
+  }, nodeRefs.current);
+
+
   const sectionOrder = ['visited', 'toVisit', 'recommended'];
 
   // Update previous section and direction when selectedSection changes
@@ -295,10 +303,13 @@ function App() {
           <TransitionGroup component={null} childFactory={child => React.cloneElement(child, { classNames: slideDirection })}>
             <CSSTransition
               key={selectedSection}
+              nodeRef={nodeRefs.current[selectedSection]} // Pass the specific nodeRef
               timeout={500} // Match CSS transition duration
               classNames={slideDirection} // Use dynamic direction class
+              unmountOnExit // Optional: helps cleanup
             >
-              <div className="section-container"> {/* Wrapper for positioning */}
+              {/* Attach the ref to the direct child of CSSTransition */}
+              <div ref={nodeRefs.current[selectedSection]} className="section-container"> {/* Wrapper for positioning */}
                 {selectedSection === 'visited' && (
                   <>
                     <h2>Visited Restaurants</h2>
