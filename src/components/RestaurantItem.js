@@ -207,7 +207,7 @@ function RestaurantItem({ restaurant, updateRestaurant, removeRestaurant }) {
         ...restaurant,
         ratings: ratingsUpdate.map(r => ({ // Convert Timestamps back for local state if needed
           ...r,
-          date: r.date.Timestamp.fromDate(new Date())
+          date: r.date.toDate()
         })),
         averageRating: Math.round(averageRating * 10) / 10
       });
@@ -384,7 +384,7 @@ function RestaurantItem({ restaurant, updateRestaurant, removeRestaurant }) {
               </DateText>
               {restaurant.updatedAt && (
                 <Tooltip className="tooltip">
-                  Updated on: {new Date(restaurant.updatedAt).toLocaleString()}
+                  Updated on: {restaurant.updatedAt ? restaurant.updatedAt.toDate().toLocaleString() : 'N/A'}
                 </Tooltip>
               )}
             </DateWrapper>
