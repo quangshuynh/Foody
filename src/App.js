@@ -285,7 +285,7 @@ function App() {
             <CSSTransition
               key={selectedSection}
               nodeRef={nodeRefs.current[selectedSection]} // Pass the specific nodeRef
-              timeout={300} // Adjust timeout for potentially faster fade/scale
+              timeout={500} // Match new CSS duration
               classNames="scale-fade" // Use consistent class name
               unmountOnExit // Optional: helps cleanup
             >
@@ -347,13 +347,14 @@ function App() {
                     <RecommendedRestaurants recommendedRestaurants={recommendedRestaurants} />
                   </>
                 )}
+                {/* Map is now inside the transitioning container */}
+                <RestaurantMap restaurants={[...restaurants, ...restaurantsToVisit, ...recommendedRestaurants]} />
               </div>
             </CSSTransition>
           </TransitionGroup>
         </div>
 
-        {/* Keep Map and Footer outside the transition */}
-        <RestaurantMap restaurants={[...restaurants, ...restaurantsToVisit, ...recommendedRestaurants]} />
+        {/* Footer remains outside the transition */}
         <Footer />
       </AppContainer>
     </MapProvider>

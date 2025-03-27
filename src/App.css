@@ -33,7 +33,7 @@
 .scale-fade-enter-active {
   opacity: 1;
   transform: scale(1);
-  transition: opacity 300ms ease-out, transform 300ms ease-out;
+  transition: opacity 500ms ease-out, transform 500ms ease-out; /* Increased duration */
 }
 .scale-fade-exit {
   opacity: 1;
@@ -42,7 +42,7 @@
 .scale-fade-exit-active {
   opacity: 0;
   transform: scale(0.95);
-  transition: opacity 300ms ease-in, transform 300ms ease-in;
+  transition: opacity 500ms ease-in, transform 500ms ease-in; /* Increased duration */
 }
 
 
