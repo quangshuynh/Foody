@@ -166,13 +166,6 @@ function capitalizeWords(str) {
 
 // Added updateToVisit prop
 function VisitItem({ restaurant, removeToVisit, updateToVisit }) {
-import React, { useState, useRef } from 'react'; // Import useRef
-// ... other imports ...
-
-// ... styled components ...
-
-// Added updateToVisit prop
-function VisitItem({ restaurant, removeToVisit, updateToVisit }) {
   const { user, isAuthenticated } = useAuth(); // Get user for rating
   const { focusLocation } = useMap();
   const itemRef = useRef(null); // Add a ref for the item container
