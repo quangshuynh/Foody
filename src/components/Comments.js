@@ -1,7 +1,7 @@
-import React from 'react'; // Removed useState, useEffect
+import React, { useState, useEffect } from 'react'; // Re-added useState, useEffect
 import styled from 'styled-components';
 import { FaThumbsUp, FaThumbsDown, FaStar } from 'react-icons/fa';
-// Removed userService import
+import { getUsernamesByIds } from '../services/userService'; // Re-added userService import
 
 const CommentsContainer = styled.div`
   margin-top: 20px;
@@ -17,7 +17,41 @@ const CommentItem = styled.div`
 `;
 
 function Comments({ comments }) {
-  // Removed username fetching state and effect
+  const [usernames, setUsernames] = useState({}); // State to store fetched usernames { userId: username }
+  const [loadingUsernames, setLoadingUsernames] = useState(false);
+
+  // Fetch usernames when comments change
+  useEffect(() => {
+    const fetchUsernames = async () => {
+      if (!comments || comments.length === 0) {
+        setUsernames({}); // Clear usernames if no comments
+        return;
+      }
+
+      // Extract unique user IDs from comments
+      const userIds = [...new Set(comments.map(comment => comment.userId).filter(Boolean))];
+
+      if (userIds.length > 0) {
+        setLoadingUsernames(true);
+        try {
+          const fetchedUsernames = await getUsernamesByIds(userIds);
+          setUsernames(fetchedUsernames);
+        } catch (error) {
+          console.error("Failed to fetch usernames for comments:", error);
+          // Keep existing usernames or clear? Decide based on desired behavior.
+          // For now, we'll clear on error to avoid showing stale/incorrect names
+          setUsernames({});
+        } finally {
+          setLoadingUsernames(false);
+        }
+      } else {
+        setUsernames({}); // Clear if no valid user IDs found
+      }
+    };
+
+    fetchUsernames();
+  }, [comments]); // Re-run when comments array changes
+
 
   // Helper to format Firestore Timestamp or ISO string date
   const formatDate = (dateInput) => {
@@ -33,11 +67,13 @@ function Comments({ comments }) {
   return (
     <CommentsContainer>
       <h4>Comments</h4>
-      {/* Removed loading indicator */}
+      {loadingUsernames && <p>Loading usernames...</p>}
       {comments && comments.length > 0 ? (
         comments.map((comment, index) => {
-          // Display email directly, fallback to generic user ID
-          const displayName = comment.userEmail || `User (${comment.userId?.substring(0, 6)}...)`;
+          // Prioritize fetched username, then email, then generic user ID
+          const displayName = usernames[comment.userId] // Use fetched username if available
+                             || comment.userEmail       // Fallback to email
+                             || `User (${comment.userId?.substring(0, 6)}...)`; // Fallback to partial ID
           return (
             <CommentItem key={index}>
               <strong>{displayName}</strong> - {formatDate(comment.date)}

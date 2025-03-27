@@ -66,7 +66,7 @@ function RestaurantsToVisit({ restaurantsToVisit, addToVisit, removeToVisit, upd
           key={restaurant.id}
           // Apply poop mode overrides if active
           restaurant={isPoopMode ? { ...restaurant, name: uniqueNames[index], address: uniqueAddresses[index] } : restaurant}
-          restaurant={restaurant}
+          // Removed duplicate restaurant prop
           removeToVisit={isAuthenticated ? removeToVisit : null} // Ensure functions are passed only if authenticated
           updateToVisit={isAuthenticated ? updateToVisit : null} // Pass update function
         />

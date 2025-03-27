@@ -11,6 +11,7 @@ import RatingModal from './RatingModal'; // Import RatingModal component
 import { db } from '../firebaseConfig'; // Import db for potential direct updates if needed
 import { doc, updateDoc, arrayUnion, arrayRemove, getDoc, Timestamp } from 'firebase/firestore';
 import { logAuditEvent } from '../services/auditLogService';
+import { toast } from 'react-toastify'; // Import toast
 
 const ItemContainer = styled.div`
   background: #2a2a2a;
