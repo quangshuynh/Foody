@@ -47,7 +47,7 @@ const DesktopMenu = styled.div`
 
 const MobileMenu = styled.div`
   background: #1a1a1a;
-  width: 100%;
+  min-width: 90vh;
   padding: 10px 20px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
   display: flex;
