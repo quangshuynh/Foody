@@ -62,9 +62,54 @@ const Input = styled.input`
   color: #f5f5f5;
 `;
 
+const DateWrapper = styled.div`
+  position: relative;
+  display: inline-block;
+  cursor: pointer;
+  margin-top: 5px;
+
+  &:hover .tooltip {
+    visibility: visible;
+    opacity: 1;
+  }
+`;
+
 const DateText = styled.p`
   font-size: 0.8rem;
   color: #aaa;
+  margin: 0;
+  text-align: center;
+`;
+
+const Tooltip = styled.div`
+  visibility: hidden;
+  background-color: rgba(50, 50, 50, 0.85);
+  color: #fff;
+  text-align: center;
+  border-radius: 8px;
+  padding: 10px 12px;
+  position: absolute;
+  z-index: 1;
+  bottom: 130%;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.875rem;
+  opacity: 0;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  min-width: 220px;
+  white-space: nowrap;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 8px;
+    border-style: solid;
+    border-color: rgba(50, 50, 50, 0.85) transparent transparent transparent;
+  }
 `;
 
 function capitalizeWords(str) {
@@ -88,7 +133,6 @@ function RestaurantItem({ restaurant, updateRestaurant, removeRestaurant }) {
   
   const handleMapFocus = (location) => {
     focusLocation(location);
-    // Scroll to map
     const mapElement = document.getElementById('restaurant-map');
     if (mapElement) {
       setTimeout(() => {
@@ -333,16 +377,26 @@ function RestaurantItem({ restaurant, updateRestaurant, removeRestaurant }) {
               />
             </p>
           )}
-          <DateText>Added on: {new Date(restaurant.dateAdded).toLocaleString()}</DateText>
-          <Rating rating={restaurant.averageRating} />
+          <div style={{ textAlign: 'center', marginTop: '10px' }}>
+            <DateWrapper>
+              <DateText>
+                Added on: {new Date(restaurant.dateAdded).toLocaleString()}
+              </DateText>
+              {restaurant.updatedAt && (
+                <Tooltip className="tooltip">
+                  Updated on: {new Date(restaurant.updatedAt).toLocaleString()}
+                </Tooltip>
+              )}
+            </DateWrapper>
+          </div>
+          <div style={{ textAlign: 'center', margin: '8px 0' }}>
+            <Rating rating={restaurant.averageRating} />
+          </div>
           {showComments && (
             <Comments
-              // Filter for ratings that have a non-empty comment
               comments={(restaurant.ratings || [])
                 .filter(r => r?.comment)
-                // Sort comments by date, newest first
-                .sort((a, b) => new Date(b.date) - new Date(a.date))
-              }
+                .sort((a, b) => new Date(b.date) - new Date(a.date))}
             />
           )}
         </>

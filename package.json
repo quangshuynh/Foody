@@ -25,7 +25,7 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "predeploy": "npm run build",
-    "deploy": "gh-pages -d build"
+    "deploy": "git add . && git commit -m \"%npm_config_message%\" && git push -u origin \"%npm_config_branch%\" && npm run build && firebase deploy"
   },
   "eslintConfig": {
     "extends": [
