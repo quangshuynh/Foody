@@ -83,26 +83,28 @@ function capitalizeWords(str) {
 // Component to handle map view changes
 function MapController({ selectedLocation, focusId }) {
   const map = useLeafletMap();
-  
+  const mapElementRef = map.getContainer(); // Get map container element
+
   useEffect(() => {
     if (selectedLocation) {
       map.flyTo(
-        [selectedLocation.lat, selectedLocation.lng], 
-        16, 
-        { animate: true, duration: 2, easeLinearit: 0.3 }
+        [selectedLocation.lat, selectedLocation.lng],
+        16, // Zoom level
+        { animate: true, duration: 1.5, easeLinearity: 0.5 } // Adjusted duration/easing
       );
-      
-      // Center the map on the screen
-      map.once('moveend', () => {
-        map.panInside([selectedLocation.lat, selectedLocation.lng], {
-          padding: [50, 50],
-          animate: true
-        });
-      });
+
+      // Scroll map container into view
+      if (mapElementRef) {
+        // Use a slight delay to ensure flyTo starts
+        setTimeout(() => {
+            mapElementRef.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }, 150); // Delay slightly longer than item scroll
+      }
     }
-  }, [selectedLocation, focusId, map]);
-  
-  return null;
+    // focusId dependency ensures this runs even if selectedLocation object is the same
+  }, [selectedLocation, focusId, map, mapElementRef]);
+
+  return null; // This component does not render anything itself
 }
 
 function RestaurantMap({ restaurants }) {
