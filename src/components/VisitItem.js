@@ -1,4 +1,4 @@
-import React, { useState } from 'react'; // Import useState
+import React, { useState, useRef } from 'react';
 import styled from 'styled-components';
 // Import necessary icons and components
 import { FaTrash, FaMapMarkerAlt, FaEdit, FaStar, FaComment } from 'react-icons/fa';
