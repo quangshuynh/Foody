@@ -53,8 +53,6 @@ const HamburgerButton = styled.button`
   font-size: 2rem;
   cursor: pointer;
   display: none;
-  margin-bottom: 3px;
-  margin-right: -5px;
   
   @media (max-width: 768px) {
     display: block;
@@ -79,10 +77,10 @@ const NavItem = styled.button`
     props.$active ? 'rgba(0, 188, 212, 0.2)' : 'transparent'};
   border: none;
   color: ${(props) => (props.$active ? '#00bcd4' : '#f5f5f5')};
-  font-size: 1.1rem;
+  font-size: 1rem;
   margin: 0 10px;
   cursor: pointer;
-  padding: 10px 15px;
+  padding: 8px 12px;
   border-radius: 5px;
   border-bottom: ${(props) =>
     props.$active ? '3px solid #00bcd4' : '3px solid transparent'};
@@ -103,6 +101,8 @@ const NavItem = styled.button`
     width: 100%;
     text-align: center;
     margin: 5px 0;
+    font-size: 0.95rem;
+    padding: 6px 10px;
   }
 `;
 
@@ -117,28 +117,36 @@ const AuthButtons = styled.div`
   }
 `;
 
-const MobileAuthButtons = styled(AuthButtons)`
+const MobileHeaderContainer = styled.div`
   display: none;
   
   @media (max-width: 768px) {
     display: flex;
-    flex-direction: row;
     align-items: center;
-    width: auto;
-    margin-left: 320px;
-  }
-  
-  @media (min-width: 769px) {
-    display: none;
+    justify-content: flex-end;
+    width: 100%;
+    /* No extra gap here, so elements sit closer */
   }
 `;
 
-const MobileAuthButton = styled(AuthButtons)`
+const MobileAuthButtons = styled.div`
+  display: none;
+
+  @media (max-width: 768px) {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 4px;          /* keep the buttons close together */
+    margin-right: 4px; /* small space before the hamburger icon */
+  }
+`;
+
+const MobileAuthButton = styled.button`
   background: ${(props) => (props.$primary ? '#00bcd4' : 'transparent')};
   color: #f5f5f5;
   border: ${(props) =>
     props.$primary ? 'none' : '1px solid #00bcd4'};
-  padding: 4px 8px;
+  padding: 2px 6px;
   border-radius: 4px;
   cursor: pointer;
   font-size: 0.8rem;
@@ -160,10 +168,10 @@ const AuthButton = styled.button`
   color: #f5f5f5;
   border: ${(props) =>
     props.$primary ? 'none' : '1px solid #00bcd4'};
-  padding: 6px 12px;
+  padding: 4px 8px;
   border-radius: 4px;
   cursor: pointer;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   font-family: 'saucetomato', sans-serif;
   letter-spacing: 1px;
   font-weight: 400;
@@ -197,7 +205,7 @@ const MobileMenu = styled.div`
   max-width: 100vw;
   box-sizing: border-box;
   background: #1a1a1a;
-  padding: 10px 20px;
+  padding: 8px 16px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
   display: flex;
   flex-direction: column;
@@ -228,7 +236,6 @@ const Navbar = ({
         setMobileMenuOpen(false);
       }
     };
-
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
@@ -239,6 +246,7 @@ const Navbar = ({
         <LogoLink href="https://foody-rit.web.app/">
           <Logo>Foody</Logo>
         </LogoLink>
+
         <CenterMenu>
           <NavItems>
             <NavItem
@@ -261,6 +269,7 @@ const Navbar = ({
             </NavItem>
           </NavItems>
         </CenterMenu>
+
         <RightMenu>
           <AuthButtons>
             {!isAuthenticated ? (
@@ -272,36 +281,35 @@ const Navbar = ({
               </>
             ) : (
               <>
-                {userProfile && (
-                  <UserInfo>Hi, {userProfile.username}!</UserInfo>
-                )}
+                {userProfile && <UserInfo>Hi, {userProfile.username}!</UserInfo>}
                 <AuthButton onClick={onLogout}>Logout</AuthButton>
               </>
             )}
           </AuthButtons>
         </RightMenu>
-        {/* Mobile version: auth buttons to the left of the hamburger menu */}
-        <MobileAuthButtons>
-          {!isAuthenticated ? (
-            <>
-              <MobileAuthButton onClick={onShowLogin}>Login</MobileAuthButton>
-              <MobileAuthButton $primary onClick={onShowRegister}>
-                Register
-              </MobileAuthButton>
-            </>
-          ) : (
-            <>
-              {userProfile && (
-                <UserInfo>Hi, {userProfile.username}!</UserInfo>
-              )}
-              <MobileAuthButton onClick={onLogout}>Logout</MobileAuthButton>
-            </>
-          )}
-        </MobileAuthButtons>
-        <HamburgerButton onClick={toggleMobileMenu}>
-          ☰
-        </HamburgerButton>
+
+        <MobileHeaderContainer>
+          <MobileAuthButtons>
+            {!isAuthenticated ? (
+              <>
+                <MobileAuthButton onClick={onShowLogin}>Login</MobileAuthButton>
+                <MobileAuthButton $primary onClick={onShowRegister}>
+                  Register
+                </MobileAuthButton>
+              </>
+            ) : (
+              <>
+                {userProfile && <UserInfo>Hi, {userProfile.username}!</UserInfo>}
+                <MobileAuthButton onClick={onLogout}>Logout</MobileAuthButton>
+              </>
+            )}
+          </MobileAuthButtons>
+          <HamburgerButton onClick={toggleMobileMenu}>
+            ☰
+          </HamburgerButton>
+        </MobileHeaderContainer>
       </NavContainer>
+
       {isMobileMenuOpen && (
         <MobileMenu>
           <NavItems>
