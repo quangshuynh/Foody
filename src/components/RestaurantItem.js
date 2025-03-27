@@ -379,13 +379,9 @@ function RestaurantItem({ restaurant, updateRestaurant, removeRestaurant }) {
           )}
           <div style={{ textAlign: 'center', marginTop: '10px' }}>
             <DateWrapper>
-              <DateText>
-                Added on: {new Date(restaurant.dateAdded).toLocaleString()}
-              </DateText>
+            <DateText>Added on: {restaurant.dateAdded ? (restaurant.dateAdded.toDate ? restaurant.dateAdded.toDate().toLocaleString() : new Date(restaurant.dateAdded).toLocaleString()) : 'N/A'}</DateText>
               {restaurant.updatedAt && (
-                <Tooltip className="tooltip">
-                  Updated on: {restaurant.updatedAt ? restaurant.updatedAt.toDate().toLocaleString() : 'N/A'}
-                </Tooltip>
+                <Tooltip className="tooltip"> Updated on: {restaurant.updatedAt ? (restaurant.updatedAt.toDate ? restaurant.updatedAt.toDate().toLocaleString() : new Date(restaurant.updatedAt).toLocaleString()) : 'N/A'}</Tooltip>              
               )}
             </DateWrapper>
           </div>
