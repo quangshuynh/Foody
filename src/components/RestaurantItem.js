@@ -9,7 +9,8 @@ import { useAuth } from '../contexts/AuthContext';
 import { useMap } from '../contexts/MapContext';
 import { db } from '../firebaseConfig';
 import { doc, updateDoc, arrayUnion, arrayRemove, getDoc, Timestamp } from 'firebase/firestore';
-import { logAuditEvent } from '../services/auditLogService'; 
+import { logAuditEvent } from '../services/auditLogService';
+import { toast } from 'react-toastify'; // Import toast
 
 const ItemContainer = styled.div`
   background: #2a2a2a;
