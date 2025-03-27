@@ -169,14 +169,20 @@ function RestaurantItem({ restaurant, updateRestaurant, removeRestaurant }) {
   const [showRatingModal, setShowRatingModal] = useState(false);
   const { user, isAuthenticated } = useAuth();
   const { focusLocation } = useMap();
-  
+  const itemRef = useRef(null); // Add a ref for the item container
+
   const handleMapFocus = (location) => {
-    focusLocation(location);
-    const mapElement = document.getElementById('restaurant-map');
-    if (mapElement) {
-      setTimeout(() => {
-        mapElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }, 100);
+    if (location) {
+      focusLocation(location); // Trigger map flyTo
+      // Scroll the item into view
+      if (itemRef.current) {
+        // Use a slight delay to allow map animation to start
+        setTimeout(() => {
+          itemRef.current.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }, 100);
+      }
+    } else {
+      console.warn("Attempted to focus map with no location data.");
     }
   };
 

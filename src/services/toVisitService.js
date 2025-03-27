@@ -1,6 +1,6 @@
 // src/services/toVisitService.js - Firestore Version
 import { db, auth } from '../firebaseConfig';
-import { collection, getDocs, addDoc, deleteDoc, doc, Timestamp } from 'firebase/firestore';
+import { collection, getDocs, addDoc, deleteDoc, doc, Timestamp, updateDoc } from 'firebase/firestore'; // Added updateDoc
 import { logAuditEvent } from './auditLogService'; // Import audit log service
 
 // Collection reference

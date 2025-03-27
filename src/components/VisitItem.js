@@ -166,8 +166,16 @@ function capitalizeWords(str) {
 
 // Added updateToVisit prop
 function VisitItem({ restaurant, removeToVisit, updateToVisit }) {
+import React, { useState, useRef } from 'react'; // Import useRef
+// ... other imports ...
+
+// ... styled components ...
+
+// Added updateToVisit prop
+function VisitItem({ restaurant, removeToVisit, updateToVisit }) {
   const { user, isAuthenticated } = useAuth(); // Get user for rating
   const { focusLocation } = useMap();
+  const itemRef = useRef(null); // Add a ref for the item container
 
   // State for editing
   const [isEditing, setIsEditing] = useState(false);
@@ -186,11 +194,17 @@ function VisitItem({ restaurant, removeToVisit, updateToVisit }) {
     }
   };
 
-  // Simplified map focus handler - relies on MapContext and flyTo effect
+  // Updated map focus handler with scrollIntoView
   const handleMapFocus = (location) => {
     if (location) {
-      focusLocation(location);
-      // No need for scrollIntoView here, MapController handles centering
+      focusLocation(location); // Trigger map flyTo
+      // Scroll the item into view
+      if (itemRef.current) {
+        // Use a slight delay to allow map animation to start
+        setTimeout(() => {
+          itemRef.current.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }, 100);
+      }
     } else {
       console.warn("Attempted to focus map with no location data.");
     }
@@ -316,7 +330,8 @@ function VisitItem({ restaurant, removeToVisit, updateToVisit }) {
 
 
   return (
-    <ItemContainer>
+    // Attach the ref to the main container
+    <ItemContainer ref={itemRef}>
       {/* Rating Modal */}
       {showRatingModal && (
         <RatingModal
