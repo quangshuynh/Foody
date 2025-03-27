@@ -21,50 +21,33 @@
   position: relative; /* Changed from absolute to take up space */
   top: 0;
   left: 0;
+  /* Ensure transitions originate from the center */
+  transform-origin: center center;
 }
 
-/* Forward Transition (e.g., Visited -> To Visit) */
-.forward-enter {
-  transform: translateX(100%);
+/* --- Scale + Fade Transition --- */
+.scale-fade-enter {
   opacity: 0;
+  transform: scale(0.95);
 }
-.forward-enter-active {
-  transform: translateX(0);
+.scale-fade-enter-active {
   opacity: 1;
-  transition: transform 500ms ease-in-out, opacity 500ms ease-in-out;
+  transform: scale(1);
+  transition: opacity 300ms ease-out, transform 300ms ease-out;
 }
-.forward-exit {
-  transform: translateX(0);
+.scale-fade-exit {
   opacity: 1;
+  transform: scale(1);
 }
-.forward-exit-active {
-  transform: translateX(-100%);
+.scale-fade-exit-active {
   opacity: 0;
-  transition: transform 500ms ease-in-out, opacity 500ms ease-in-out;
-}
-
-/* Backward Transition (e.g., To Visit -> Visited) */
-.backward-enter {
-  transform: translateX(-100%);
-  opacity: 0;
-}
-.backward-enter-active {
-  transform: translateX(0);
-  opacity: 1;
-  transition: transform 500ms ease-in-out, opacity 500ms ease-in-out;
-}
-.backward-exit {
-  transform: translateX(0);
-  opacity: 1;
-}
-.backward-exit-active {
-  transform: translateX(100%);
-  opacity: 0;
-  transition: transform 500ms ease-in-out, opacity 500ms ease-in-out;
+  transform: scale(0.95);
+  transition: opacity 300ms ease-in, transform 300ms ease-in;
 }
 
 
 /* --- Dropdown Fade Styles --- */
+/* (Keep existing dropdown styles) */
 .dropdown-container {
   width: 80%;
   margin: 10px auto;

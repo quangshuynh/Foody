@@ -39,12 +39,11 @@ function App() {
 
   const [filteredRestaurants, setFilteredRestaurants] = useState(restaurants);
   const [selectedSection, setSelectedSection] = useState('visited');
-  const [prevSection, setPrevSection] = useState(selectedSection); // Track previous section
-  const [slideDirection, setSlideDirection] = useState('forward'); // 'forward' or 'backward'
+  // Removed prevSection and slideDirection state
   const [displayLimit, setDisplayLimit] = useState(5);
   const [isPoopMode, setIsPoopMode] = useState(false);
 
-  const sectionOrder = ['visited', 'toVisit', 'recommended']; // Moved declaration up
+  const sectionOrder = ['visited', 'toVisit', 'recommended'];
 
   // Refs for CSSTransition nodes
   const nodeRefs = useRef({});
@@ -53,25 +52,7 @@ function App() {
     return acc;
   }, nodeRefs.current);
 
-
-  // Update previous section and direction when selectedSection changes
-  useEffect(() => {
-    const currentIdx = sectionOrder.indexOf(selectedSection);
-    const prevIdx = sectionOrder.indexOf(prevSection);
-
-    if (currentIdx > prevIdx) {
-      setSlideDirection('forward');
-    } else if (currentIdx < prevIdx) {
-      setSlideDirection('backward');
-    }
-    // If indices are the same, direction doesn't matter
-
-    // Update prevSection *after* determining direction
-    const timeoutId = setTimeout(() => setPrevSection(selectedSection), 0); // Update after render cycle
-    return () => clearTimeout(timeoutId);
-
-  }, [selectedSection, prevSection]); // Rerun when selectedSection changes
-
+  // Removed useEffect for slideDirection calculation
 
   // Fetch data on initial load and when auth state might change (though reads are now public)
   useEffect(() => {
@@ -304,8 +285,8 @@ function App() {
             <CSSTransition
               key={selectedSection}
               nodeRef={nodeRefs.current[selectedSection]} // Pass the specific nodeRef
-              timeout={500} // Match CSS transition duration
-              classNames={slideDirection} // Use dynamic direction class
+              timeout={300} // Adjust timeout for potentially faster fade/scale
+              classNames="scale-fade" // Use consistent class name
               unmountOnExit // Optional: helps cleanup
             >
               {/* Attach the ref to the direct child of CSSTransition */}
