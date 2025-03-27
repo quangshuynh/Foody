@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react'; 
+import React, { useState, useEffect, useRef } from 'react';
+import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import { useAuth } from './contexts/AuthContext';
 import { MapProvider } from './contexts/MapContext';
 import LoginForm from './components/auth/LoginForm';
@@ -16,7 +17,8 @@ import RestaurantMap from './components/RestaurantMap';
 import Footer from './components/Footer';
 import ModalOverlay from './components/ModalOverlay';
 import Navbar from './components/Navbar';
-import AddRestaurant from './components/AddRestaurant'; 
+import AddRestaurant from './components/AddRestaurant';
+import './App.css'; // Import App.css for transition styles
 
 const AppContainer = styled.div`
   font-family: 'Roboto', sans-serif;
@@ -37,8 +39,20 @@ function App() {
 
   const [filteredRestaurants, setFilteredRestaurants] = useState(restaurants);
   const [selectedSection, setSelectedSection] = useState('visited');
+  // Removed prevSection and slideDirection state
   const [displayLimit, setDisplayLimit] = useState(5);
   const [isPoopMode, setIsPoopMode] = useState(false);
+
+  const sectionOrder = ['visited', 'toVisit', 'recommended'];
+
+  // Refs for CSSTransition nodes
+  const nodeRefs = useRef({});
+  nodeRefs.current = sectionOrder.reduce((acc, key) => {
+    acc[key] = acc[key] || React.createRef();
+    return acc;
+  }, nodeRefs.current);
+
+  // Removed useEffect for slideDirection calculation
 
   // Fetch data on initial load and when auth state might change (though reads are now public)
   useEffect(() => {
@@ -265,65 +279,83 @@ function App() {
           </ModalOverlay>
         )}
 
+        {/* Container for Transition Group */}
+        <div style={{ position: 'relative' }}> {/* Removed minHeight and overflow: hidden */}
+          <TransitionGroup component={null} /* Removed childFactory, relying on key */ >
+            <CSSTransition
+              key={selectedSection}
+              nodeRef={nodeRefs.current[selectedSection]} // Pass the specific nodeRef
+              timeout={500} // Match new CSS duration
+              classNames="scale-fade" // Use consistent class name
+              unmountOnExit // Optional: helps cleanup
+            >
+              {/* Attach the ref to the direct child of CSSTransition */}
+              <div ref={nodeRefs.current[selectedSection]} className="section-container"> {/* Wrapper for positioning */}
+                {selectedSection === 'visited' && (
+                  <>
+                    <h2>Visited Restaurants</h2>
+                    <div style={{ width: '80%', margin: '0 auto' }}>
+                      <SearchBar searchRestaurants={searchRestaurants} />
+                    </div>
+                    {isAuthenticated && (
+                      <AddRestaurant addRestaurant={addRestaurant} />
+                    )}
+                    <RestaurantList
+                      restaurants={filteredRestaurants.slice(0, displayLimit)}
+                      // Pass the async updateRestaurant function directly
+                      updateRestaurant={isAuthenticated ? updateRestaurant : null}
+                      removeRestaurant={isAuthenticated ? removeRestaurant : null}
+                      isPoopMode={isPoopMode}
+                    />
+                    {/* Separate container for the dropdown with fade effect */}
+                    <div className={`dropdown-container ${selectedSection === 'visited' ? 'visible' : ''}`}>
+                      <select
+                        onChange={handleDisplayLimitChange}
+                        value={isPoopMode ? "poop" : displayLimit}
+                        style={{
+                          padding: '8px',
+                          borderRadius: '4px',
+                          background: '#2a2a2a',
+                          color: '#f5f5f5',
+                          border: '1px solid #00bcd4',
+                          cursor: 'pointer'
+                        }}
+                      >
+                        <option value="5">5</option>
+                        <option value="10">10</option>
+                        <option value="15">15</option>
+                        <option value="20">20</option>
+                        <option value="50">50</option>
+                        <option value="poop">💩</option>
+                      </select>
+                    </div> {/* End dropdown-container */}
+                  </>
+                )}
+                {selectedSection === 'toVisit' && (
+                  <>
+                    <h2>Restaurants to Visit</h2>
+                    <RestaurantsToVisit
+                      restaurantsToVisit={restaurantsToVisit}
+                      addToVisit={isAuthenticated ? addToVisit : null}
+                      removeToVisit={isAuthenticated ? removeToVisit : null}
+                    />
+                  </>
+                )}
+                {selectedSection === 'recommended' && (
+                  <>
+                    <h2>Recommended Restaurants</h2>
+                    <RecommendedRestaurants recommendedRestaurants={recommendedRestaurants} />
+                  </>
+                )}
+                {/* Map is now inside the transitioning container */}
+                <RestaurantMap restaurants={[...restaurants, ...restaurantsToVisit, ...recommendedRestaurants]} />
+                {/* Footer is now inside the transitioning container */}
+                <Footer />
+              </div>
+            </CSSTransition>
+          </TransitionGroup>
+        </div>
 
-        {selectedSection === 'visited' && (
-          <>
-            <h2>Visited Restaurants</h2>
-            <div style={{ width: '80%', margin: '0 auto' }}>
-              <SearchBar searchRestaurants={searchRestaurants} />
-            </div>
-            {isAuthenticated && (
-              <AddRestaurant addRestaurant={addRestaurant} />
-            )}
-            <RestaurantList
-              restaurants={filteredRestaurants.slice(0, displayLimit)}
-              // Pass the async updateRestaurant function directly
-              updateRestaurant={isAuthenticated ? updateRestaurant : null}
-              removeRestaurant={isAuthenticated ? removeRestaurant : null}
-              isPoopMode={isPoopMode}
-            />
-
-            <div style={{ width: '80%', margin: '10px auto', textAlign: 'left' }}>
-              <select
-                onChange={handleDisplayLimitChange}
-                value={isPoopMode ? "poop" : displayLimit}
-                style={{
-                  padding: '8px',
-                  borderRadius: '4px',
-                  background: '#2a2a2a',
-                  color: '#f5f5f5',
-                  border: '1px solid #00bcd4',
-                  cursor: 'pointer'
-                }}
-              >
-                <option value="5">5</option>
-                <option value="10">10</option>
-                <option value="15">15</option>
-                <option value="20">20</option>
-                <option value="50">50</option>
-                <option value="poop">💩</option>
-              </select>
-            </div>
-          </>
-        )}
-        {selectedSection === 'toVisit' && (
-          <>
-            <h2>Restaurants to Visit</h2>
-            <RestaurantsToVisit
-              restaurantsToVisit={restaurantsToVisit}
-              addToVisit={isAuthenticated ? addToVisit : null}
-              removeToVisit={isAuthenticated ? removeToVisit : null}
-            />
-          </>
-        )}
-        {selectedSection === 'recommended' && (
-          <>
-            <h2>Recommended Restaurants</h2>
-            <RecommendedRestaurants recommendedRestaurants={recommendedRestaurants} />
-          </>
-        )}
-        <RestaurantMap restaurants={[...restaurants, ...restaurantsToVisit, ...recommendedRestaurants]} />
-        <Footer />
       </AppContainer>
     </MapProvider>
   );

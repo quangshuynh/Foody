@@ -13,6 +13,59 @@
   }
 }
 
+/* --- Transition Styles --- */
+
+/* Container for the transitioning sections */
+.section-container {
+  width: 100%;
+  position: relative; /* Changed from absolute to take up space */
+  top: 0;
+  left: 0;
+  /* Ensure transitions originate from the center */
+  transform-origin: center center;
+}
+
+/* --- Scale + Fade Transition --- */
+.scale-fade-enter {
+  opacity: 0;
+  transform: scale(0.95);
+}
+.scale-fade-enter-active {
+  opacity: 1;
+  transform: scale(1);
+  transition: opacity 500ms ease-out, transform 500ms ease-out; /* Increased duration */
+}
+.scale-fade-exit {
+  opacity: 1;
+  transform: scale(1);
+}
+.scale-fade-exit-active {
+  opacity: 0;
+  transform: scale(0.95);
+  transition: opacity 500ms ease-in, transform 500ms ease-in; /* Increased duration */
+}
+
+
+/* --- Dropdown Fade Styles --- */
+/* (Keep existing dropdown styles) */
+.dropdown-container {
+  width: 80%;
+  margin: 10px auto;
+  text-align: left;
+  opacity: 0;
+  transition: opacity 300ms ease-in-out 100ms; /* Fade out fast, slight delay on fade-in */
+  /* Ensure it doesn't affect layout when invisible */
+  max-height: 0; 
+  overflow: hidden;
+}
+
+.dropdown-container.visible {
+  opacity: 1;
+  max-height: 100px; /* Allow space for the dropdown */
+  transition: opacity 300ms ease-in-out 200ms; /* Fade in slightly slower, after slide starts */
+}
+
+
 .App-header {
   background-color: #282c34;
   min-height: 100vh;
