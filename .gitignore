@@ -64,4 +64,4 @@ Thumbs.db
 # firebase
 .firebase
 ./firebase/
-/src/firebaseConfig.js
+src/firebaseConfig.js
