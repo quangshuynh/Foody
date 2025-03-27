@@ -24,7 +24,7 @@ const AppContainer = styled.div`
   color: #f5f5f5;
   text-align: center;
   min-height: 90vh;
-  padding: 20px;
+  padding: 6px;
   margin-top: 20px; 
 `;
 

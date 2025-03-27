@@ -11,8 +11,12 @@ const NavContainer = styled.nav`
   height: 60px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: space-between;
+`;
+
+const LogoLink = styled.a`
+  text-decoration: none;
 `;
 
 const Logo = styled.div`
@@ -23,20 +27,17 @@ const Logo = styled.div`
   text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
 `;
 
-const HamburgerButton = styled.button`
-  background: none;
-  border: none;
-  color: #f5f5f5;
-  font-size: 2rem;
-  cursor: pointer;
-  display: none;
+const CenterMenu = styled.div`
+  display: flex;
+  justify-content: center;
+  flex: 1;
   
   @media (max-width: 768px) {
-    display: block;
+    display: none;
   }
 `;
 
-const DesktopMenu = styled.div`
+const RightMenu = styled.div`
   display: flex;
   align-items: center;
   
@@ -45,23 +46,19 @@ const DesktopMenu = styled.div`
   }
 `;
 
-const MobileMenu = styled.div`
-  position: fixed;
-  top: 60px;
-  left: 0;
-  width: 100%;
-  max-width: 100vw;
-  box-sizing: border-box;
-  background: #1a1a1a;
-  padding: 10px 20px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 10px;
-  z-index: 999;
-  max-height: calc(100vh - 60px);
-  overflow-y: auto;
+const HamburgerButton = styled.button`
+  background: none;
+  border: none;
+  color: #f5f5f5;
+  font-size: 2rem;
+  cursor: pointer;
+  display: none;
+  margin-bottom: 3px;
+  margin-right: -5px;
+  
+  @media (max-width: 768px) {
+    display: block;
+  }
 `;
 
 const NavItems = styled.div`
@@ -70,12 +67,10 @@ const NavItems = styled.div`
   background: rgba(26, 26, 26, 0.8);
   padding: 5px;
   border-radius: 8px;
-  margin-left: 10px;
   
   @media (max-width: 768px) {
     flex-direction: column;
     width: 100%;
-    margin: 0;
   }
 `;
 
@@ -117,8 +112,46 @@ const AuthButtons = styled.div`
   
   @media (max-width: 768px) {
     flex-direction: column;
-    width: 100%;
     align-items: center;
+    width: 100%;
+  }
+`;
+
+const MobileAuthButtons = styled(AuthButtons)`
+  display: none;
+  
+  @media (max-width: 768px) {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    width: auto;
+    margin-left: 320px;
+  }
+  
+  @media (min-width: 769px) {
+    display: none;
+  }
+`;
+
+const MobileAuthButton = styled(AuthButtons)`
+  background: ${(props) => (props.$primary ? '#00bcd4' : 'transparent')};
+  color: #f5f5f5;
+  border: ${(props) =>
+    props.$primary ? 'none' : '1px solid #00bcd4'};
+  padding: 4px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-family: 'saucetomato', sans-serif;
+  letter-spacing: 1px;
+  font-weight: 400;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: ${(props) =>
+      props.$primary ? '#00a1b5' : 'rgba(0, 188, 212, 0.1)'};
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
   }
 `;
 
@@ -156,6 +189,25 @@ const UserInfo = styled.span`
   }
 `;
 
+const MobileMenu = styled.div`
+  position: fixed;
+  top: 60px;
+  left: 0;
+  width: 100%;
+  max-width: 100vw;
+  box-sizing: border-box;
+  background: #1a1a1a;
+  padding: 10px 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  z-index: 999;
+  max-height: calc(100vh - 60px);
+  overflow-y: auto;
+`;
+
 const Navbar = ({
   selectedSection,
   setSelectedSection,
@@ -184,8 +236,10 @@ const Navbar = ({
   return (
     <>
       <NavContainer>
-        <Logo>Foody</Logo>
-        <DesktopMenu>
+        <LogoLink href="https://foody-rit.web.app/">
+          <Logo>Foody</Logo>
+        </LogoLink>
+        <CenterMenu>
           <NavItems>
             <NavItem
               $active={selectedSection === 'visited'}
@@ -206,6 +260,8 @@ const Navbar = ({
               Recommended
             </NavItem>
           </NavItems>
+        </CenterMenu>
+        <RightMenu>
           <AuthButtons>
             {!isAuthenticated ? (
               <>
@@ -223,7 +279,25 @@ const Navbar = ({
               </>
             )}
           </AuthButtons>
-        </DesktopMenu>
+        </RightMenu>
+        {/* Mobile version: auth buttons to the left of the hamburger menu */}
+        <MobileAuthButtons>
+          {!isAuthenticated ? (
+            <>
+              <MobileAuthButton onClick={onShowLogin}>Login</MobileAuthButton>
+              <MobileAuthButton $primary onClick={onShowRegister}>
+                Register
+              </MobileAuthButton>
+            </>
+          ) : (
+            <>
+              {userProfile && (
+                <UserInfo>Hi, {userProfile.username}!</UserInfo>
+              )}
+              <MobileAuthButton onClick={onLogout}>Logout</MobileAuthButton>
+            </>
+          )}
+        </MobileAuthButtons>
         <HamburgerButton onClick={toggleMobileMenu}>
           ☰
         </HamburgerButton>
@@ -259,23 +333,6 @@ const Navbar = ({
               Recommended
             </NavItem>
           </NavItems>
-          <AuthButtons>
-            {!isAuthenticated ? (
-              <>
-                <AuthButton onClick={onShowLogin}>Login</AuthButton>
-                <AuthButton $primary onClick={onShowRegister}>
-                  Register
-                </AuthButton>
-              </>
-            ) : (
-              <>
-                {userProfile && (
-                  <UserInfo>Hi, {userProfile.username}!</UserInfo>
-                )}
-                <AuthButton onClick={onLogout}>Logout</AuthButton>
-              </>
-            )}
-          </AuthButtons>
         </MobileMenu>
       )}
     </>
