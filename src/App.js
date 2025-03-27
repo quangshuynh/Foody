@@ -19,7 +19,9 @@ import Footer from './components/Footer';
 import ModalOverlay from './components/ModalOverlay';
 import Navbar from './components/Navbar';
 import AddRestaurant from './components/AddRestaurant';
-import './App.css'; 
+import './App.css';
+import { ToastContainer, toast } from 'react-toastify'; // Import toast
+import 'react-toastify/dist/ReactToastify.css'; // Import toast CSS
 
 const AppContainer = styled.div`
   font-family: 'Roboto', sans-serif;

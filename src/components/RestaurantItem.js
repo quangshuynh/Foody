@@ -331,11 +331,11 @@ function RestaurantItem({ restaurant, updateRestaurant, removeRestaurant }) {
   };
 
   return (
-    // Attach the ref to the main container
-    <ItemContainer ref={itemRef}>
+    // Attach the ref and an ID to the main container
+    <ItemContainer ref={itemRef} id={`restaurant-item-${restaurant.id}`}>
       <IconContainer>
-        <FaMapMarkerAlt 
-          onClick={() => handleMapFocus(restaurant.location)} 
+        <FaMapMarkerAlt
+          onClick={() => handleMapFocus(restaurant.location)}
           title="Show on Map"
           style={{ color: '#ff4081' }}
         />
