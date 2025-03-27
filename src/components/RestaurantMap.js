@@ -6,6 +6,26 @@ import '../styles/MapDarkMode.css';
 import L from 'leaflet';
 import { useMap } from '../contexts/MapContext';
 import RestaurantMarker from './RestaurantMarker';
+import { toast } from 'react-toastify'; // Import toast
+import { FiCopy } from 'react-icons/fi'; // Import FiCopy
+
+// Helper function to scroll to an element by ID (copied from RestaurantMarker attempt)
+const scrollToItem = (id) => {
+  const element = document.getElementById(`restaurant-item-${id}`);
+  if (element) {
+    element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    // Optional: Add a visual cue like a temporary highlight
+    element.style.transition = 'background-color 0.5s ease-in-out';
+    element.style.backgroundColor = 'rgba(0, 188, 212, 0.3)';
+    setTimeout(() => {
+      element.style.backgroundColor = ''; // Reset background
+    }, 1500); // Remove highlight after 1.5 seconds
+  } else {
+    console.warn(`Element with ID restaurant-item-${id} not found. It might be on a different page or section.`);
+    // Optionally, provide feedback to the user that the item isn't visible
+    toast.warn("Restaurant not currently visible in the list. It might be in a different section or page."); // Use toast for feedback
+  }
+};
 
 // Create custom icons for different types of restaurants
 const createCustomIcon = (color) => {
@@ -141,9 +161,26 @@ function RestaurantMap({ restaurants }) {
               icon={visitedIcon}
             >
               <Popup>
-                <strong>{restaurant.name}</strong>
+                {/* Make name clickable */}
+                <strong
+                  style={{ cursor: 'pointer', color: '#00bcd4' }}
+                  onClick={() => scrollToItem(restaurant.id)} // Use helper function
+                  title="Scroll to item in list"
+                >
+                  {restaurant.name}
+                </strong>
                 <br />
-                {capitalizeWords(restaurant.address)}
+                {/* Make address clickable */}
+                <span
+                  style={{ cursor: 'pointer' }}
+                  onClick={() => {
+                    navigator.clipboard.writeText(restaurant.address);
+                    toast.info('Address copied to clipboard!');
+                  }}
+                  title="Copy address"
+                >
+                  {capitalizeWords(restaurant.address)} <FiCopy size="0.8em" style={{ verticalAlign: 'middle', marginLeft: '4px' }}/>
+                </span>
                 <div style={{ marginTop: '5px' }}>
                   {restaurant.averageRating
                     ? `Rating: ${restaurant.averageRating} / 5`
@@ -163,9 +200,26 @@ function RestaurantMap({ restaurants }) {
               icon={toVisitIcon}
             >
               <Popup>
-                <strong>{restaurant.name}</strong>
+                {/* Make name clickable */}
+                <strong
+                  style={{ cursor: 'pointer', color: '#00bcd4' }}
+                  onClick={() => scrollToItem(restaurant.id)} // Use helper function
+                  title="Scroll to item in list"
+                >
+                  {restaurant.name}
+                </strong>
                 <br />
-                {capitalizeWords(restaurant.address)}
+                {/* Make address clickable */}
+                <span
+                  style={{ cursor: 'pointer' }}
+                  onClick={() => {
+                    navigator.clipboard.writeText(restaurant.address);
+                    toast.info('Address copied to clipboard!');
+                  }}
+                  title="Copy address"
+                >
+                  {capitalizeWords(restaurant.address)} <FiCopy size="0.8em" style={{ verticalAlign: 'middle', marginLeft: '4px' }}/>
+                </span>
                 <div style={{ marginTop: '5px', color: '#ff4081' }}>
                   On your "To Visit" list
                 </div>
@@ -183,9 +237,26 @@ function RestaurantMap({ restaurants }) {
               icon={recommendedIcon}
             >
               <Popup>
-                <strong>{restaurant.name}</strong>
+                {/* Make name clickable */}
+                <strong
+                  style={{ cursor: 'pointer', color: '#00bcd4' }}
+                  onClick={() => scrollToItem(restaurant.id)} // Use helper function
+                  title="Scroll to item in list"
+                >
+                  {restaurant.name}
+                </strong>
                 <br />
-                {capitalizeWords(restaurant.address)}
+                {/* Make address clickable */}
+                <span
+                  style={{ cursor: 'pointer' }}
+                  onClick={() => {
+                    navigator.clipboard.writeText(restaurant.address);
+                    toast.info('Address copied to clipboard!');
+                  }}
+                  title="Copy address"
+                >
+                  {capitalizeWords(restaurant.address)} <FiCopy size="0.8em" style={{ verticalAlign: 'middle', marginLeft: '4px' }}/>
+                </span>
                 <div style={{ marginTop: '5px', color: '#ffc107' }}>
                   Recommended
                 </div>
