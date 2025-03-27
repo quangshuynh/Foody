@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -46,14 +46,22 @@ const DesktopMenu = styled.div`
 `;
 
 const MobileMenu = styled.div`
+  position: fixed;
+  top: 60px;
+  left: 0;
+  width: 100%;
+  max-width: 100vw;
+  box-sizing: border-box;
   background: #1a1a1a;
-  min-width: 90vh;
   padding: 10px 20px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 10px;
+  z-index: 999;
+  max-height: calc(100vh - 60px);
+  overflow-y: auto;
 `;
 
 const NavItems = styled.div`
@@ -161,6 +169,17 @@ const Navbar = ({
   const toggleMobileMenu = () => {
     setMobileMenuOpen((prev) => !prev);
   };
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth > 768) {
+        setMobileMenuOpen(false);
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   return (
     <>
