@@ -117,10 +117,6 @@ const AuthButtons = styled.div`
   }
 `;
 
-/* 
-  MobileHeaderContainer: container for BOTH the mobile auth buttons 
-  and the hamburger menu, so they're in a single row 
-*/
 const MobileHeaderContainer = styled.div`
   display: none;
   
@@ -133,10 +129,6 @@ const MobileHeaderContainer = styled.div`
   }
 `;
 
-/*
-  MobileAuthButtons: reduce gap so the buttons are close to each other,
-  and we can add a tiny margin-right if we want them close to the hamburger.
-*/
 const MobileAuthButtons = styled.div`
   display: none;
 
@@ -255,7 +247,6 @@ const Navbar = ({
           <Logo>Foody</Logo>
         </LogoLink>
 
-        {/* Desktop menu */}
         <CenterMenu>
           <NavItems>
             <NavItem
@@ -279,7 +270,6 @@ const Navbar = ({
           </NavItems>
         </CenterMenu>
 
-        {/* Desktop auth */}
         <RightMenu>
           <AuthButtons>
             {!isAuthenticated ? (
@@ -298,7 +288,6 @@ const Navbar = ({
           </AuthButtons>
         </RightMenu>
 
-        {/* Mobile: auth + hamburger in one row */}
         <MobileHeaderContainer>
           <MobileAuthButtons>
             {!isAuthenticated ? (
