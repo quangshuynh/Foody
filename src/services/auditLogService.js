@@ -40,7 +40,5 @@ export const logAuditEvent = async (action, collectionName, docId, details = {})
 
   } catch (error) {
     console.error("Failed to create audit log:", error);
-    // Decide how to handle logging failures. Should it block the main action? Probably not.
-    // Consider sending this error to a monitoring service.
   }
 };

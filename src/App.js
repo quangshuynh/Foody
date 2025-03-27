@@ -18,7 +18,7 @@ import Footer from './components/Footer';
 import ModalOverlay from './components/ModalOverlay';
 import Navbar from './components/Navbar';
 import AddRestaurant from './components/AddRestaurant';
-import './App.css'; // Import App.css for transition styles
+import './App.css'; 
 
 const AppContainer = styled.div`
   font-family: 'Roboto', sans-serif;
@@ -39,58 +39,41 @@ function App() {
 
   const [filteredRestaurants, setFilteredRestaurants] = useState(restaurants);
   const [selectedSection, setSelectedSection] = useState('visited');
-  // Removed prevSection and slideDirection state
   const [displayLimit, setDisplayLimit] = useState(5);
   const [isPoopMode, setIsPoopMode] = useState(false);
 
   const sectionOrder = ['visited', 'toVisit', 'recommended'];
-
-  // Refs for CSSTransition nodes
   const nodeRefs = useRef({});
   nodeRefs.current = sectionOrder.reduce((acc, key) => {
     acc[key] = acc[key] || React.createRef();
     return acc;
   }, nodeRefs.current);
 
-  // Removed useEffect for slideDirection calculation
-
-  // Fetch data on initial load and when auth state might change (though reads are now public)
   useEffect(() => {
     const loadData = async () => {
-      // Fetch all lists regardless of login state
       try {
         const [visitedData, toVisitData, recommendedData] = await Promise.all([
           fetchVisitedRestaurants(),
           fetchToVisitRestaurants(),
-          fetchRecommendedRestaurants() // Keep fetching recommended
+          fetchRecommendedRestaurants()
         ]);
         setRestaurants(visitedData);
         setRestaurantsToVisit(toVisitData);
         setRecommendedRestaurants(recommendedData);
       } catch (err) {
         console.error('Failed to load restaurant data:', err);
-        // Optionally show an error message to the user
       }
-
-      // Note: We no longer clear lists on logout, as guests can see them.
-      // The UI controls for editing/adding are handled by `isAuthenticated`.
     };
-
-    // Only load data once auth state is determined (to avoid potential flashes)
     if (!authLoading) {
       loadData();
     }
-  }, [authLoading]); // Re-run only when auth loading state changes
+  }, [authLoading]);
 
-  // Update filteredRestaurants whenever the main 'restaurants' list changes
   useEffect(() => {
-    // No need to sort here if fetchVisitedRestaurants already sorts
     setFilteredRestaurants(restaurants);
   }, [restaurants]);
 
-  // Add a new VISITED restaurant (uses restaurantService)
   const addRestaurant = async (restaurant) => {
-    // Check authentication before allowing add
     if (!isAuthenticated) {
       alert("Please log in to add a restaurant.");
       return;
@@ -105,9 +88,7 @@ function App() {
       return;
     }
     try {
-      // No need to add dateAdded here, Firestore service handles it
       const savedRestaurant = await addRestaurantApi(restaurant);
-      // Prepend the new restaurant to the list for immediate UI update
       setRestaurants(prev => [savedRestaurant, ...prev]);
     } catch (err) {
       console.error('Failed to add visited restaurant:', err);
@@ -115,23 +96,15 @@ function App() {
     }
   };
 
-  // Update a VISITED restaurant (uses restaurantService)
   const updateRestaurant = async (updatedRestaurant) => {
-    // Check authentication before allowing update
     if (!isAuthenticated) {
       alert("Please log in to update a restaurant.");
       return;
     }
     try {
-      // savedRestaurant contains the fields returned by the service (optimistic or actual)
       const savedRestaurant = await updateRestaurantApi(updatedRestaurant); 
       const updatedList = restaurants.map((rest) =>
-        // If this is the restaurant that was updated...
-        rest.id === savedRestaurant.id 
-          // ...merge the existing data (rest) with the updated fields (savedRestaurant)
-          ? { ...rest, ...savedRestaurant } 
-          // ...otherwise, keep the original restaurant object
-          : rest 
+        rest.id === savedRestaurant.id ? { ...rest, ...savedRestaurant } : rest
       );
       setRestaurants(updatedList);
     } catch (err) {
@@ -141,7 +114,6 @@ function App() {
   };
 
   const removeRestaurant = async (id) => {
-    // Check authentication before allowing remove
     if (!isAuthenticated) {
       alert("Please log in to remove a restaurant.");
       return;
@@ -178,9 +150,7 @@ function App() {
     }
   };
 
-  // Add a restaurant to the TO VISIT list (uses toVisitService)
   const addToVisit = async (restaurant) => {
-    // Check authentication before allowing add
     if (!isAuthenticated) {
       alert("Please log in to add a restaurant to visit.");
       return;
@@ -195,9 +165,7 @@ function App() {
       return;
     }
     try {
-      // Pass the basic restaurant info (name, address, location)
       const savedToVisit = await addToVisitApi(restaurant);
-      // Prepend to the list for immediate UI update
       setRestaurantsToVisit(prev => [savedToVisit, ...prev]);
     } catch (err) {
       console.error('Failed to add to-visit restaurant:', err);
@@ -205,9 +173,7 @@ function App() {
     }
   };
 
-  // Remove a restaurant from the TO VISIT list (uses toVisitService)
   const removeToVisit = async (id) => {
-    // Check authentication before allowing remove
     if (!isAuthenticated) {
       alert("Please log in to remove a restaurant from the 'to visit' list.");
       return;
@@ -222,19 +188,13 @@ function App() {
     }
   };
 
-  // Use user object directly for isAuthenticated check
-  // user and authLoading are already available from the useAuth() call at the top of the component
-  const isAuthenticated = !!user; // Derive from user object
+  const isAuthenticated = !!user; 
   const [showLogin, setShowLogin] = useState(false);
   const [showRegister, setShowRegister] = useState(false);
-
-  // The logout function is imported at the top level, remove the misplaced import below
 
   const handleLogout = async () => {
     try {
       await logout();
-      // No need to manually set user to null or remove items from localStorage.
-      // The onAuthStateChanged listener in AuthContext handles the state update.
       console.log("User logged out successfully.");
     } catch (error) {
       console.error("Logout failed:", error);
@@ -242,9 +202,8 @@ function App() {
     }
   };
 
-  // Render loading indicator while checking auth state OR profile state after login
   if (authLoading || (user && profileLoading)) {
-    return <AppContainer>Loading...</AppContainer>; // Show loading until profile is checked
+    return <AppContainer>Loading...</AppContainer>;
   }
 
   return (
@@ -279,18 +238,16 @@ function App() {
           </ModalOverlay>
         )}
 
-        {/* Container for Transition Group */}
-        <div style={{ position: 'relative' }}> {/* Removed minHeight and overflow: hidden */}
-          <TransitionGroup component={null} /* Removed childFactory, relying on key */ >
+        <div style={{ position: 'relative' }}>
+          <TransitionGroup component={null}>
             <CSSTransition
               key={selectedSection}
-              nodeRef={nodeRefs.current[selectedSection]} // Pass the specific nodeRef
-              timeout={500} // Match new CSS duration
-              classNames="scale-fade" // Use consistent class name
-              unmountOnExit // Optional: helps cleanup
+              nodeRef={nodeRefs.current[selectedSection]}
+              timeout={500}
+              classNames="scale-fade"
+              unmountOnExit
             >
-              {/* Attach the ref to the direct child of CSSTransition */}
-              <div ref={nodeRefs.current[selectedSection]} className="section-container"> {/* Wrapper for positioning */}
+              <div ref={nodeRefs.current[selectedSection]} className="section-container">
                 {selectedSection === 'visited' && (
                   <>
                     <h2>Visited Restaurants</h2>
@@ -302,35 +259,13 @@ function App() {
                     )}
                     <RestaurantList
                       restaurants={filteredRestaurants.slice(0, displayLimit)}
-                      // Pass the async updateRestaurant function directly
                       updateRestaurant={isAuthenticated ? updateRestaurant : null}
                       removeRestaurant={isAuthenticated ? removeRestaurant : null}
                       isPoopMode={isPoopMode}
                     />
-                    {/* Separate container for the dropdown with fade effect */}
-                    <div className={`dropdown-container ${selectedSection === 'visited' ? 'visible' : ''}`}>
-                      <select
-                        onChange={handleDisplayLimitChange}
-                        value={isPoopMode ? "poop" : displayLimit}
-                        style={{
-                          padding: '8px',
-                          borderRadius: '4px',
-                          background: '#2a2a2a',
-                          color: '#f5f5f5',
-                          border: '1px solid #00bcd4',
-                          cursor: 'pointer'
-                        }}
-                      >
-                        <option value="5">5</option>
-                        <option value="10">10</option>
-                        <option value="15">15</option>
-                        <option value="20">20</option>
-                        <option value="50">50</option>
-                        <option value="poop">💩</option>
-                      </select>
-                    </div> {/* End dropdown-container */}
                   </>
                 )}
+
                 {selectedSection === 'toVisit' && (
                   <>
                     <h2>Restaurants to Visit</h2>
@@ -341,21 +276,89 @@ function App() {
                     />
                   </>
                 )}
+
                 {selectedSection === 'recommended' && (
                   <>
                     <h2>Recommended Restaurants</h2>
                     <RecommendedRestaurants recommendedRestaurants={recommendedRestaurants} />
                   </>
                 )}
-                {/* Map is now inside the transitioning container */}
-                <RestaurantMap restaurants={[...restaurants, ...restaurantsToVisit, ...recommendedRestaurants]} />
-                {/* Footer is now inside the transitioning container */}
+
+                <div style={{ width: '80%', margin: '0 auto', textAlign: 'left' }}>
+                  {selectedSection === 'visited' && (
+                    <div
+                      className={`dropdown-container ${selectedSection === 'visited' ? 'visible' : ''}`}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        marginTop: '50px',
+                        gap: '12px',
+                        marginLeft: '100px'
+                      }}
+                    >
+                      <label
+                        htmlFor="display-limit"
+                        style={{
+                          fontWeight: '500',
+                          fontSize: '1rem',
+                          color: '#ccc',
+                          letterSpacing: '0.5px',
+                        }}
+                      >
+                        Display Limit:
+                      </label>
+
+                      <select
+                        id="display-limit"
+                        onChange={handleDisplayLimitChange}
+                        value={isPoopMode ? "poop" : displayLimit}
+                        style={{
+                          padding: '0.5rem 1rem',
+                          borderRadius: '0.375rem',
+                          background: '#2a2a2a',
+                          color: '#f5f5f5',
+                          border: '1px solid #00bcd4',
+                          cursor: 'pointer',
+                          boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
+                          transition: 'background 0.3s, border-color 0.3s',
+                        }}
+                        onMouseEnter={(e) => {
+                          e.target.style.borderColor = '#00e5ff';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.target.style.borderColor = '#00bcd4';
+                        }}
+                        onFocus={(e) => {
+                          e.target.style.borderColor = '#00e5ff';
+                        }}
+                        onBlur={(e) => {
+                          e.target.style.borderColor = '#00bcd4';
+                        }}
+                      >
+                        <option value="5">5</option>
+                        <option value="10">10</option>
+                        <option value="15">15</option>
+                        <option value="20">20</option>
+                        <option value="50">50</option>
+                        <option value="poop">💩</option>
+                      </select>
+                    </div>
+                  )}
+
+                  <RestaurantMap
+                    restaurants={[
+                      ...restaurants,
+                      ...restaurantsToVisit,
+                      ...recommendedRestaurants
+                    ]}
+                  />
+                </div>
+
                 <Footer />
               </div>
             </CSSTransition>
           </TransitionGroup>
         </div>
-
       </AppContainer>
     </MapProvider>
   );

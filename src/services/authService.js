@@ -1,4 +1,3 @@
-// src/services/authService.js - Firebase Version
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
