@@ -299,8 +299,8 @@ function App() {
         )}
 
         {/* Container for Transition Group */}
-        <div style={{ position: 'relative', overflow: 'hidden', minHeight: '50vh' }}> {/* Adjust minHeight as needed */}
-          <TransitionGroup component={null} childFactory={child => React.cloneElement(child, { classNames: slideDirection })}>
+        <div style={{ position: 'relative', overflow: 'hidden' }}> {/* Removed minHeight */}
+          <TransitionGroup component={null} /* Removed childFactory, relying on key */ >
             <CSSTransition
               key={selectedSection}
               nodeRef={nodeRefs.current[selectedSection]} // Pass the specific nodeRef
@@ -326,8 +326,8 @@ function App() {
                       removeRestaurant={isAuthenticated ? removeRestaurant : null}
                       isPoopMode={isPoopMode}
                     />
-
-                    <div style={{ width: '80%', margin: '10px auto', textAlign: 'left' }}>
+                    {/* Separate container for the dropdown with fade effect */}
+                    <div className={`dropdown-container ${selectedSection === 'visited' ? 'visible' : ''}`}>
                       <select
                         onChange={handleDisplayLimitChange}
                         value={isPoopMode ? "poop" : displayLimit}
@@ -347,7 +347,7 @@ function App() {
                         <option value="50">50</option>
                         <option value="poop">💩</option>
                       </select>
-                    </div>
+                    </div> {/* End dropdown-container */}
                   </>
                 )}
                 {selectedSection === 'toVisit' && (

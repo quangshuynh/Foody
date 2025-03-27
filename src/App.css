@@ -63,6 +63,26 @@
   transition: transform 500ms ease-in-out, opacity 500ms ease-in-out;
 }
 
+
+/* --- Dropdown Fade Styles --- */
+.dropdown-container {
+  width: 80%;
+  margin: 10px auto;
+  text-align: left;
+  opacity: 0;
+  transition: opacity 300ms ease-in-out 100ms; /* Fade out fast, slight delay on fade-in */
+  /* Ensure it doesn't affect layout when invisible */
+  max-height: 0; 
+  overflow: hidden;
+}
+
+.dropdown-container.visible {
+  opacity: 1;
+  max-height: 100px; /* Allow space for the dropdown */
+  transition: opacity 300ms ease-in-out 200ms; /* Fade in slightly slower, after slide starts */
+}
+
+
 .App-header {
   background-color: #282c34;
   min-height: 100vh;
