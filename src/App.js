@@ -299,7 +299,7 @@ function App() {
         )}
 
         {/* Container for Transition Group */}
-        <div style={{ position: 'relative', overflow: 'hidden' }}> {/* Removed minHeight */}
+        <div style={{ position: 'relative' }}> {/* Removed minHeight and overflow: hidden */}
           <TransitionGroup component={null} /* Removed childFactory, relying on key */ >
             <CSSTransition
               key={selectedSection}

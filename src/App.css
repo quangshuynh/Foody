@@ -18,7 +18,7 @@
 /* Container for the transitioning sections */
 .section-container {
   width: 100%;
-  position: absolute; /* Needed for positioning within the TransitionGroup container */
+  position: relative; /* Changed from absolute to take up space */
   top: 0;
   left: 0;
 }
