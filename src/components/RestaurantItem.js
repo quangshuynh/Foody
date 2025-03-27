@@ -331,7 +331,8 @@ function RestaurantItem({ restaurant, updateRestaurant, removeRestaurant }) {
   };
 
   return (
-    <ItemContainer>
+    // Attach the ref to the main container
+    <ItemContainer ref={itemRef}>
       <IconContainer>
         <FaMapMarkerAlt 
           onClick={() => handleMapFocus(restaurant.location)} 
