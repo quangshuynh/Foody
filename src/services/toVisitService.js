@@ -56,6 +56,36 @@ export const addToVisit = async (restaurant) => {
   }
 };
 
+// Update an existing 'to visit' restaurant document in Firestore
+export const updateToVisit = async (restaurant) => {
+  const user = auth.currentUser;
+  if (!user) throw new Error('Authentication required');
+  if (!restaurant.id) throw new Error('Restaurant ID is required for update');
+
+  try {
+    const restaurantDocRef = doc(db, 'toVisitRestaurants', restaurant.id);
+    // Prepare data for update, adding an updatedAt timestamp
+    const updateData = {
+      ...restaurant,
+      updatedAt: Timestamp.fromDate(new Date()) // Use client-side Timestamp for consistency or serverTimestamp()
+    };
+    // Remove id and potentially userId/dateAdded if they shouldn't be updated
+    delete updateData.id;
+    // delete updateData.userId; // Keep userId check in Firestore rules
+    // delete updateData.dateAdded;
+
+    await updateDoc(restaurantDocRef, updateData);
+    // Log the audit event *after* successful update
+    await logAuditEvent('UPDATE', 'toVisitRestaurants', restaurant.id, { updatedFields: Object.keys(updateData) });
+
+    // Return the updated restaurant data (or just success)
+    return { ...restaurant, updatedAt: new Date() }; // Return optimistic update
+  } catch (error) {
+    console.error("Update 'to visit' restaurant error:", error);
+    throw error; // Re-throw error after logging failure or handling
+  }
+};
+
 // Remove a restaurant from the 'to visit' list
 export const removeToVisit = async (id) => {
   const user = auth.currentUser;

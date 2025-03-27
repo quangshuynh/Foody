@@ -39,8 +39,13 @@ function App() {
 
   const [filteredRestaurants, setFilteredRestaurants] = useState(restaurants);
   const [selectedSection, setSelectedSection] = useState('visited');
-  const [displayLimit, setDisplayLimit] = useState(5);
-  const [isPoopMode, setIsPoopMode] = useState(false);
+  // State for Visited display limit
+  const [visitedDisplayLimit, setVisitedDisplayLimit] = useState(5);
+  const [isVisitedPoopMode, setIsVisitedPoopMode] = useState(false);
+  // State for ToVisit display limit
+  const [toVisitDisplayLimit, setToVisitDisplayLimit] = useState(5);
+  const [isToVisitPoopMode, setIsToVisitPoopMode] = useState(false);
+
 
   const sectionOrder = ['visited', 'toVisit', 'recommended'];
   const nodeRefs = useRef({});
@@ -128,14 +133,27 @@ function App() {
     }
   };
 
-  const handleDisplayLimitChange = (e) => {
+  // Handler for Visited display limit
+  const handleVisitedDisplayLimitChange = (e) => {
     const value = e.target.value;
     if (value === "poop") {
-      setIsPoopMode(true);
-      setDisplayLimit(5);
+      setIsVisitedPoopMode(true);
+      setVisitedDisplayLimit(5);
     } else {
-      setIsPoopMode(false);
-      setDisplayLimit(Number(value));
+      setIsVisitedPoopMode(false);
+      setVisitedDisplayLimit(Number(value));
+    }
+  };
+
+  // Handler for ToVisit display limit
+  const handleToVisitDisplayLimitChange = (e) => {
+    const value = e.target.value;
+    if (value === "poop") {
+      setIsToVisitPoopMode(true);
+      setToVisitDisplayLimit(5);
+    } else {
+      setIsToVisitPoopMode(false);
+      setToVisitDisplayLimit(Number(value));
     }
   };
 
@@ -258,10 +276,11 @@ function App() {
                       <AddRestaurant addRestaurant={addRestaurant} />
                     )}
                     <RestaurantList
-                      restaurants={filteredRestaurants.slice(0, displayLimit)}
+                      // Use visitedDisplayLimit and isVisitedPoopMode
+                      restaurants={filteredRestaurants.slice(0, visitedDisplayLimit)}
                       updateRestaurant={isAuthenticated ? updateRestaurant : null}
                       removeRestaurant={isAuthenticated ? removeRestaurant : null}
-                      isPoopMode={isPoopMode}
+                      isPoopMode={isVisitedPoopMode}
                     />
                   </>
                 )}
@@ -270,9 +289,12 @@ function App() {
                   <>
                     <h2>Restaurants to Visit</h2>
                     <RestaurantsToVisit
-                      restaurantsToVisit={restaurantsToVisit}
+                      // Use toVisitDisplayLimit
+                      restaurantsToVisit={restaurantsToVisit.slice(0, toVisitDisplayLimit)}
                       addToVisit={isAuthenticated ? addToVisit : null}
                       removeToVisit={isAuthenticated ? removeToVisit : null}
+                      // Pass updateToVisit handler
+                      updateToVisit={isAuthenticated ? updateToVisit : null}
                     />
                   </>
                 )}
@@ -309,9 +331,9 @@ function App() {
                       </label>
 
                       <select
-                        id="display-limit"
-                        onChange={handleDisplayLimitChange}
-                        value={isPoopMode ? "poop" : displayLimit}
+                        id="visited-display-limit" // Unique ID
+                        onChange={handleVisitedDisplayLimitChange} // Use specific handler
+                        value={isVisitedPoopMode ? "poop" : visitedDisplayLimit} // Use specific state
                         style={{
                           padding: '0.5rem 1rem',
                           borderRadius: '0.375rem',
@@ -334,6 +356,58 @@ function App() {
                         onBlur={(e) => {
                           e.target.style.borderColor = '#00bcd4';
                         }}
+                      >
+                        <option value="5">5</option>
+                        <option value="10">10</option>
+                        <option value="15">15</option>
+                        <option value="20">20</option>
+                        <option value="50">50</option>
+                        <option value="poop">💩</option>
+                      </select>
+                    </div>
+                  )}
+                  {/* Add Display Limit Dropdown for To Visit */}
+                  {selectedSection === 'toVisit' && (
+                    <div
+                      className={`dropdown-container ${selectedSection === 'toVisit' ? 'visible' : ''}`}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        marginTop: '50px', // Adjust as needed
+                        gap: '12px',
+                        marginLeft: '100px' // Adjust as needed
+                      }}
+                    >
+                      <label
+                        htmlFor="to-visit-display-limit"
+                        style={{
+                          fontWeight: '500',
+                          fontSize: '1rem',
+                          color: '#ccc',
+                          letterSpacing: '0.5px',
+                        }}
+                      >
+                        Display Limit:
+                      </label>
+                      <select
+                        id="to-visit-display-limit" // Unique ID
+                        onChange={handleToVisitDisplayLimitChange} // Use specific handler
+                        value={isToVisitPoopMode ? "poop" : toVisitDisplayLimit} // Use specific state
+                        style={{
+                          padding: '0.5rem 1rem',
+                          borderRadius: '0.375rem',
+                          background: '#2a2a2a',
+                          color: '#f5f5f5',
+                          border: '1px solid #00bcd4',
+                          cursor: 'pointer',
+                          boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
+                          transition: 'background 0.3s, border-color 0.3s',
+                        }}
+                        // Add hover/focus styles similar to the other dropdown
+                        onMouseEnter={(e) => { e.target.style.borderColor = '#00e5ff'; }}
+                        onMouseLeave={(e) => { e.target.style.borderColor = '#00bcd4'; }}
+                        onFocus={(e) => { e.target.style.borderColor = '#00e5ff'; }}
+                        onBlur={(e) => { e.target.style.borderColor = '#00bcd4'; }}
                       >
                         <option value="5">5</option>
                         <option value="10">10</option>
