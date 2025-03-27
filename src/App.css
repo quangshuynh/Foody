@@ -13,6 +13,56 @@
   }
 }
 
+/* --- Transition Styles --- */
+
+/* Container for the transitioning sections */
+.section-container {
+  width: 100%;
+  position: absolute; /* Needed for positioning within the TransitionGroup container */
+  top: 0;
+  left: 0;
+}
+
+/* Forward Transition (e.g., Visited -> To Visit) */
+.forward-enter {
+  transform: translateX(100%);
+  opacity: 0;
+}
+.forward-enter-active {
+  transform: translateX(0);
+  opacity: 1;
+  transition: transform 500ms ease-in-out, opacity 500ms ease-in-out;
+}
+.forward-exit {
+  transform: translateX(0);
+  opacity: 1;
+}
+.forward-exit-active {
+  transform: translateX(-100%);
+  opacity: 0;
+  transition: transform 500ms ease-in-out, opacity 500ms ease-in-out;
+}
+
+/* Backward Transition (e.g., To Visit -> Visited) */
+.backward-enter {
+  transform: translateX(-100%);
+  opacity: 0;
+}
+.backward-enter-active {
+  transform: translateX(0);
+  opacity: 1;
+  transition: transform 500ms ease-in-out, opacity 500ms ease-in-out;
+}
+.backward-exit {
+  transform: translateX(0);
+  opacity: 1;
+}
+.backward-exit-active {
+  transform: translateX(100%);
+  opacity: 0;
+  transition: transform 500ms ease-in-out, opacity 500ms ease-in-out;
+}
+
 .App-header {
   background-color: #282c34;
   min-height: 100vh;
