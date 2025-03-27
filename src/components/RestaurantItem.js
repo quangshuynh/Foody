@@ -20,6 +20,11 @@ const ItemContainer = styled.div`
   max-width: 600px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
   position: relative;
+  
+  @media (max-width: 480px) {
+    width: 95%;
+    padding: 15px;
+  }
 `;
 
 const IconContainer = styled.div`
@@ -52,14 +57,48 @@ const Button = styled.button`
   }
 `;
 
-const Input = styled.input`
-  padding: 10px;
-  margin: 10px 0;
-  width: 90%;
+const Input1 = styled.input`
+  width: 100%;
+  padding: 11px 4px;
+  margin: 8px 0;
+  text-indent: 5px;
   border: 1px solid #00bcd4;
-  border-radius: 5px;
-  background: #262626;
-  color: #f5f5f5;
+  border-radius: 8px;
+  background: #1e1e1e;
+  color: #fff;
+  transition: border 0.3s ease, box-shadow 0.3s ease;
+  outline: none;
+  margin-top: 25px;
+
+  font-family: 'Roboto', sans-serif;
+  font-size: 16px;
+  
+  &:focus {
+    border-color: #ff4081;
+    box-shadow: 0 0 8px rgba(255, 64, 129, 0.5);
+  }
+`;
+
+const Input2 = styled.input`
+  width: 100%;
+  padding: 11px 4px;
+  margin: 8px 0;
+  text-indent: 5px;
+  border: 1px solid #00bcd4;
+  border-radius: 8px;
+  background: #1e1e1e;
+  color: #fff;
+  transition: border 0.3s ease, box-shadow 0.3s ease;
+  outline: none;
+  margin-top: 4px;
+
+  font-family: 'Roboto', sans-serif;
+  font-size: 16px;
+  
+  &:focus {
+    border-color: #ff4081;
+    box-shadow: 0 0 8px rgba(255, 64, 129, 0.5);
+  }
 `;
 
 const DateWrapper = styled.div`
@@ -315,13 +354,13 @@ function RestaurantItem({ restaurant, updateRestaurant, removeRestaurant }) {
 
       {isEditing ? (
         <>
-          <Input
+          <Input1
             type="text"
             value={editName}
             onChange={(e) => setEditName(e.target.value)}
             placeholder="Restaurant Name (e.g., Dogtown)" 
           />
-          <Input
+          <Input2
             type="text"
             value={editAddress}
             onChange={(e) => setEditAddress(e.target.value)}
