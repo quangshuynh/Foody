@@ -5,9 +5,10 @@ import { MapProvider } from './contexts/MapContext';
 import LoginForm from './components/auth/LoginForm';
 import RegisterForm from './components/auth/RegisterForm';
 import { fetchVisitedRestaurants, addRestaurant as addRestaurantApi, updateRestaurant as updateRestaurantApi, removeRestaurant as removeRestaurantApi } from './services/restaurantService';
-import { fetchToVisitRestaurants, addToVisit as addToVisitApi, removeToVisit as removeToVisitApi } from './services/toVisitService';
+// Import updateToVisit service function
+import { fetchToVisitRestaurants, addToVisit as addToVisitApi, removeToVisit as removeToVisitApi, updateToVisit as updateToVisitApi } from './services/toVisitService';
 import { fetchRecommendedRestaurants } from './services/recommendedService';
-import { logout } from './services/authService'; 
+import { logout } from './services/authService';
 import styled from 'styled-components';
 import SearchBar from './components/SearchBar';
 import RestaurantList from './components/RestaurantList';
@@ -206,7 +207,26 @@ function App() {
     }
   };
 
-  const isAuthenticated = !!user; 
+  // Handler for updating a 'to visit' restaurant
+  const updateToVisit = async (updatedToVisit) => {
+    if (!isAuthenticated) {
+      alert("Please log in to update a restaurant.");
+      return;
+    }
+    try {
+      const savedToVisit = await updateToVisitApi(updatedToVisit);
+      const updatedList = restaurantsToVisit.map((rest) =>
+        rest.id === savedToVisit.id ? { ...rest, ...savedToVisit } : rest
+      );
+      setRestaurantsToVisit(updatedList);
+    } catch (err) {
+      console.error('Failed to update to-visit restaurant:', err);
+      alert(`Failed to update to-visit restaurant: ${err.message}. Please try again.`);
+    }
+  };
+
+
+  const isAuthenticated = !!user;
   const [showLogin, setShowLogin] = useState(false);
   const [showRegister, setShowRegister] = useState(false);
 

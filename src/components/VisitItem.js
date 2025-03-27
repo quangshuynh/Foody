@@ -196,20 +196,181 @@ function VisitItem({ restaurant, removeToVisit, updateToVisit }) {
     }
   };
 
+  // Edit handlers (similar to RestaurantItem)
+  const handleEdit = () => {
+    setIsEditing(true);
+  };
+
+  const handleEditCancel = () => {
+    setIsEditing(false);
+    setEditName(restaurant.name);
+    setEditAddress(restaurant.address);
+    setEditError('');
+  };
+
+  const handleEditSave = async () => {
+    if (!editName || !editAddress) {
+      setEditError('Please fill in all fields');
+      return;
+    }
+    setEditLoading(true);
+    setEditError('');
+    try {
+      if (editAddress !== restaurant.address) {
+        const res = await fetch(
+          `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(editAddress)}`
+        );
+        const data = await res.json();
+        if (data && data.length > 0) {
+          const { lat, lon } = data[0];
+          updateToVisit({
+            ...restaurant,
+            name: editName.trim(),
+            address: editAddress.trim(),
+            location: { lat: parseFloat(lat), lng: parseFloat(lon) },
+          });
+          setIsEditing(false);
+        } else {
+          setEditError('Address not found. Please enter a valid address.');
+        }
+      } else {
+        updateToVisit({
+          ...restaurant,
+          name: editName.trim()
+        });
+        setIsEditing(false);
+      }
+    } catch (err) {
+      setEditError('Error fetching location. Please try again.');
+    }
+    setEditLoading(false);
+  };
+
+  // Rating handler (similar to RestaurantItem, but updates 'toVisitRestaurants')
+  const handleRatingSubmit = async (rating, wouldReturn, comment = '') => {
+    if (!user) {
+      alert('Please log in to rate this restaurant.');
+      return;
+    }
+
+    const restaurantDocRef = doc(db, 'toVisitRestaurants', restaurant.id);
+
+    try {
+      const docSnap = await getDoc(restaurantDocRef);
+      if (!docSnap.exists()) throw new Error("Restaurant document not found.");
+
+      const currentData = docSnap.data();
+      const currentRatings = currentData.ratings || [];
+      const existingRating = currentRatings.find(r => r.userId === user.uid);
+
+      const newRatingData = {
+        userId: user.uid,
+        userEmail: user.email,
+        rating,
+        wouldReturn,
+        comment: comment.trim(),
+        date: Timestamp.fromDate(new Date())
+      };
+
+      let ratingsUpdate = [];
+      let averageRating = 0;
+
+      if (existingRating) {
+        await updateDoc(restaurantDocRef, { ratings: arrayRemove(existingRating) });
+        await updateDoc(restaurantDocRef, { ratings: arrayUnion(newRatingData) });
+        const updatedDocSnap = await getDoc(restaurantDocRef);
+        ratingsUpdate = updatedDocSnap.data().ratings || [];
+      } else {
+        await updateDoc(restaurantDocRef, { ratings: arrayUnion(newRatingData) });
+        ratingsUpdate = [...currentRatings, newRatingData];
+      }
+
+      if (ratingsUpdate.length > 0) {
+        averageRating = ratingsUpdate.reduce((acc, r) => acc + r.rating, 0) / ratingsUpdate.length;
+      }
+
+      await updateDoc(restaurantDocRef, {
+        averageRating: Math.round(averageRating * 10) / 10
+      });
+
+      // Call the updateToVisit prop passed from App.js
+      updateToVisit({
+        ...restaurant,
+        ratings: ratingsUpdate.map(r => ({ ...r, date: r.date.toDate() })),
+        averageRating: Math.round(averageRating * 10) / 10
+      });
+
+      await logAuditEvent(
+        existingRating ? 'UPDATE_RATING' : 'CREATE_RATING',
+        'toVisitRestaurants', // Log against the correct collection
+        restaurant.id,
+        { rating: newRatingData.rating, wouldReturn: newRatingData.wouldReturn, commentProvided: !!newRatingData.comment }
+      );
+
+      setShowRatingModal(false);
+    } catch (error) {
+      console.error('Failed to update rating for to-visit:', error);
+      alert(`Failed to update rating: ${error.message}. Please try again.`);
+    }
+  };
+
+
   return (
     <ItemContainer>
+      {/* Rating Modal */}
+      {showRatingModal && (
+        <RatingModal
+          onSubmit={handleRatingSubmit}
+          onClose={() => setShowRatingModal(false)}
+          currentRating={(restaurant.ratings || []).find(r => r?.userId === user?.uid)?.rating || 0}
+        />
+      )}
+
       <IconContainer>
-        <FaMapMarkerAlt 
-          onClick={() => handleMapFocus(restaurant.location)} 
+        <FaMapMarkerAlt
+          onClick={() => handleMapFocus(restaurant.location)}
           title="Show on Map"
           style={{ color: '#ff4081' }}
         />
         {isAuthenticated && (
-          <FaTrash onClick={handleRemove} title="Remove" />
+          <>
+            {/* Add Edit and Star icons */}
+            <FaEdit onClick={handleEdit} title="Edit" />
+            <FaStar onClick={() => setShowRatingModal(true)} title="Rate" />
+            <FaTrash onClick={handleRemove} title="Remove" />
+          </>
         )}
+        {/* Add Comment icon */}
+        <FaComment onClick={() => setShowComments(!showComments)} title="Comments" />
       </IconContainer>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <h3
+
+      {/* Conditional Rendering: Edit Form or Display View */}
+      {isEditing ? (
+        <>
+          <Input1
+            type="text"
+            value={editName}
+            onChange={(e) => setEditName(e.target.value)}
+            placeholder="Restaurant Name"
+          />
+          <Input2
+            type="text"
+            value={editAddress}
+            onChange={(e) => setEditAddress(e.target.value)}
+            placeholder="Street Address"
+          />
+          {editError && <p style={{ color: '#ff4081' }}>{editError}</p>}
+          <Button onClick={handleEditSave} disabled={editLoading}>
+            {editLoading ? 'Saving...' : 'Save'}
+          </Button>
+          <Button onClick={handleEditCancel} style={{ marginLeft: '10px', background: '#ff4081' }}>
+            Cancel
+          </Button>
+        </>
+      ) : (
+        <>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <h3
           style={{
             fontFamily: "'aligarh', sans-serif",
             color: '#f5f5f5',

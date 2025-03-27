@@ -8,14 +8,20 @@ const Container = styled.div`
   margin: 20px 0;
 `;
 
-function RestaurantsToVisit({ restaurantsToVisit, addToVisit, removeToVisit }) {
+// Added updateToVisit prop
+function RestaurantsToVisit({ restaurantsToVisit, addToVisit, removeToVisit, updateToVisit }) {
   const { isAuthenticated } = useAuth();
-  
+
   return (
     <Container>
       {isAuthenticated && <AddToVisit addToVisit={addToVisit} />}
       {restaurantsToVisit.map((restaurant) => (
-        <VisitItem key={restaurant.id} restaurant={restaurant} removeToVisit={removeToVisit} />
+        <VisitItem
+          key={restaurant.id}
+          restaurant={restaurant}
+          removeToVisit={isAuthenticated ? removeToVisit : null} // Ensure functions are passed only if authenticated
+          updateToVisit={isAuthenticated ? updateToVisit : null} // Pass update function
+        />
       ))}
     </Container>
   );
