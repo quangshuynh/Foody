@@ -163,7 +163,7 @@ function RestaurantItem({ restaurant, updateRestaurant, removeRestaurant }) {
         ...restaurant,
         ratings: ratingsUpdate.map(r => ({ // Convert Timestamps back for local state if needed
           ...r,
-          date: r.date.toDate().toISOString()
+          date: r.date.Timestamp.fromDate(new Date())
         })),
         averageRating: Math.round(averageRating * 10) / 10
       });
@@ -316,7 +316,7 @@ function RestaurantItem({ restaurant, updateRestaurant, removeRestaurant }) {
               justifyContent: 'center'
             }}>
               <a 
-                href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(restaurant.address)}`} 
+                href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(restaurant.name)} ${encodeURIComponent(restaurant.address)}`}
                 target="_blank" 
                 rel="noopener noreferrer"
                 style={{ color: '#b4c2fa', textDecoration: 'none', fontWeight: 'bold' }}
