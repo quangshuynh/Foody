@@ -25,7 +25,7 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "predeploy": "echo RUNNING FIREBASE DEPLOY SCRIPT",
-    "deploy": "git update-index --skip-worktree src/firebaseConfig.js && git add . && git commit -m \"%npm_config_message%\" && git push -u origin \"%npm_config_branch%\" && git update-index --no-skip-worktree src/firebaseConfig.js && npm run build && firebase deploy"
+    "deploy": "git update-index --skip-worktree src/firebaseConfig.js && git add . && git commit -m \"%npm_config_message%\" && git push -u origin \"%npm_config_branch%\" && git update-index --no-skip-worktree src/firebaseConfig.js && npm run build && firebase deploy && git update-index --skip-worktree src/firebaseConfig.js"
   },
   "eslintConfig": {
     "extends": [
