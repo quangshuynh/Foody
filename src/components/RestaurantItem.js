@@ -380,3 +380,5 @@ function RestaurantItem({ restaurant, openEditModal, removeRestaurant }) {
     </ItemContainer>
   );
 }
+
+export default RestaurantItem;
