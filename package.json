@@ -15,7 +15,6 @@
     "react-leaflet": "^5.0.0",
     "react-router-dom": "^7.2.0",
     "react-scripts": "^5.0.1",
-    "react-toastify": "^11.0.5",
     "react-transition-group": "^4.4.5",
     "styled-components": "^6.1.15",
     "web-vitals": "^2.1.4"
@@ -27,7 +26,7 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "predeploy": "echo RUNNING FIREBASE DEPLOY SCRIPT",
-    "deploy": "git update-index --skip-worktree src/firebaseConfig.js && git add . && git commit -m \"%npm_config_message%\" && git push -u origin \"%npm_config_branch%\" && git update-index --no-skip-worktree src/firebaseConfig.js && npm run build && firebase deploy && git update-index --skip-worktree src/firebaseConfig.js"
+    "deploy": "git add . && git commit -m \"%npm_config_message%\" && git push -u origin \"%npm_config_branch%\" && npm run build && firebase deploy"
   },
   "eslintConfig": {
     "extends": [
