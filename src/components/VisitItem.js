@@ -201,11 +201,12 @@ function VisitItem({ restaurant, removeToVisit, updateToVisit }) {
           itemRef.current.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         }, 100);
       }
-    } else {
-      console.warn("Attempted to focus map with no location data.");
-  };
+   } else {
+     console.warn("Attempted to focus map with no location data.");
+   } // <-- Added missing closing brace for the else block
+ };
 
-  // Trigger the modal via the prop
+ // Trigger the modal via the prop
   const handleEditClick = () => {
     if (openEditModal) {
       openEditModal(restaurant);
