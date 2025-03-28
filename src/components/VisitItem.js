@@ -1,13 +1,14 @@
 import React, { useState, useRef } from 'react';
 import styled from 'styled-components';
 // Import necessary icons and components
-import { FaTrash, FaMapMarkerAlt, FaEdit, FaStar } from 'react-icons/fa'; // Removed FaComment
+import { FaTrash, FaMapMarkerAlt, FaEdit, FaStar, FaTags } from 'react-icons/fa'; // Added FaTags
 import { FiCopy } from 'react-icons/fi';
 import { useAuth } from '../contexts/AuthContext';
 import { useMap } from '../contexts/MapContext';
 import Rating from './Rating'; // Import Rating component
 import Comments from './Comments'; // Import Comments component
 import RatingModal from './RatingModal'; // Import RatingModal component
+import TagDisplay from './TagDisplay'; // Import TagDisplay
 import { db } from '../firebaseConfig'; // Import db for potential direct updates if needed
 import { doc, updateDoc, arrayUnion, arrayRemove, getDoc, Timestamp } from 'firebase/firestore';
 import { logAuditEvent } from '../services/auditLogService';
@@ -168,20 +169,16 @@ function capitalizeWords(str) {
 }
 
 // Added updateToVisit prop
-function VisitItem({ restaurant, removeToVisit, updateToVisit }) {
+function VisitItem({ restaurant, removeToVisit, openEditModal }) {
   const { user, isAuthenticated } = useAuth(); // Get user for rating
   const { focusLocation } = useMap();
   const itemRef = useRef(null); // Add a ref for the item container
 
-  // State for editing
-  const [isEditing, setIsEditing] = useState(false);
-  const [editName, setEditName] = useState(restaurant.name);
-  const [editAddress, setEditAddress] = useState(restaurant.address);
-  const [editError, setEditError] = useState('');
-  const [editLoading, setEditLoading] = useState(false);
-
+  
   // State for rating
   const [showRatingModal, setShowRatingModal] = useState(false);
+  // State for tags display
+  const [showTags, setShowTags] = useState(false);
   // Removed showComments state
 
   const handleRemove = () => {
