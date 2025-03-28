@@ -376,6 +376,8 @@ function VisitItem({ restaurant, removeToVisit, updateToVisit }) {
     </ItemContainer>
   );
 }
+
+export default RestaurantItem;
         'toVisitRestaurants',
         restaurant.id,
         { rating: newRatingData.rating } // Simplified log details

@@ -375,5 +375,8 @@ function RestaurantItem({ restaurant, openEditModal, removeRestaurant }) {
                 .filter(r => r?.comment)
                 .sort((a, b) => new Date(b.date) - new Date(a.date))}
             />
-
-export default RestaurantItem;
+          )}
+        </>
+    </ItemContainer>
+  );
+}
