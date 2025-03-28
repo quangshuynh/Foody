@@ -43,13 +43,14 @@ export const updateRestaurant = async (restaurant) => {
   try {
     const restaurantDocRef = doc(db, 'visitedRestaurants', restaurant.id);
     // Prepare data for update, ensuring we don't overwrite userId and potentially dateAdded
-    // Add an updatedAt timestamp
-    const updateData = {
-      ...restaurant,
-      updatedAt: serverTimestamp()
-    };
-    // Remove id and potentially userId/dateAdded if they shouldn't be updated
-    delete updateData.id;
+   // Add an updatedAt timestamp
+   const updateData = {
+     ...restaurant,
+     updatedAt: serverTimestamp(),
+     tags: restaurant.tags || {} // Ensure tags field is included/updated
+   };
+   // Remove id and potentially userId/dateAdded if they shouldn't be updated
+   delete updateData.id;
     // delete updateData.userId; // Keep userId check in Firestore rules
     // delete updateData.dateAdded;
 
@@ -76,13 +77,14 @@ export const addRestaurant = async (restaurant) => {
     // Add userId and dateAdded timestamp to the restaurant data
     const newRestaurantData = {
       ...restaurant,
-      userId: user.uid,
-      dateAdded: serverTimestamp(),
-      ratings: restaurant.ratings || [], // Ensure ratings array exists
-      averageRating: restaurant.averageRating || 0 // Ensure averageRating exists
-    };
+     userId: user.uid,
+     dateAdded: serverTimestamp(),
+     ratings: restaurant.ratings || [], // Ensure ratings array exists
+     averageRating: restaurant.averageRating || 0, // Ensure averageRating exists
+     tags: restaurant.tags || {} // Ensure tags field exists (can be empty object)
+   };
 
-    const docRef = await addDoc(restaurantsCollectionRef, newRestaurantData);
+   const docRef = await addDoc(restaurantsCollectionRef, newRestaurantData);
 
     // Log the audit event *after* successful add
     await logAuditEvent('CREATE', 'visitedRestaurants', docRef.id, { name: newRestaurantData.name, address: newRestaurantData.address });

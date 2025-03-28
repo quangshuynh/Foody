@@ -2,13 +2,14 @@ import React, { useState, useRef } from 'react';
 import styled from 'styled-components';
 import Rating from './Rating';
 import Comments from './Comments';
-import { FaTrash, FaEdit, FaStar, FaComment, FaMapMarkerAlt } from 'react-icons/fa';
+import TagDisplay from './TagDisplay'; // Import TagDisplay
+import { FaTrash, FaEdit, FaStar, FaComment, FaMapMarkerAlt, FaTags } from 'react-icons/fa'; // Added FaTags
 import { FiCopy } from 'react-icons/fi';
 import RatingModal from './RatingModal';
 import { useAuth } from '../contexts/AuthContext';
 import { useMap } from '../contexts/MapContext';
 import { db } from '../firebaseConfig';
-import { doc, updateDoc, arrayUnion, arrayRemove, getDoc, Timestamp } from 'firebase/firestore';
+import { doc, updateDoc, arrayUnion, arrayRemove, getDoc, Timestamp, serverTimestamp } from 'firebase/firestore'; // Added serverTimestamp
 import { logAuditEvent } from '../services/auditLogService';
 import { toast } from 'react-toastify'; // Import toast
 

@@ -36,13 +36,14 @@ export const addToVisit = async (restaurant) => {
   }
 
   try {
-    const newToVisitData = {
-      ...restaurant, // Include name, address, location etc.
-      userId: user.uid,
-      dateAdded: Timestamp.fromDate(new Date())
-    };
-    // Remove any temporary 'id' if it exists from the input
-    delete newToVisitData.id;
+   const newToVisitData = {
+     ...restaurant, // Include name, address, location etc.
+     userId: user.uid,
+     dateAdded: Timestamp.fromDate(new Date()),
+     tags: restaurant.tags || {} // Ensure tags field exists
+   };
+   // Remove any temporary 'id' if it exists from the input
+   delete newToVisitData.id;
 
     const docRef = await addDoc(toVisitCollectionRef, newToVisitData);
 
@@ -64,13 +65,14 @@ export const updateToVisit = async (restaurant) => {
 
   try {
     const restaurantDocRef = doc(db, 'toVisitRestaurants', restaurant.id);
-    // Prepare data for update, adding an updatedAt timestamp
-    const updateData = {
-      ...restaurant,
-      updatedAt: Timestamp.fromDate(new Date()) // Use client-side Timestamp for consistency or serverTimestamp()
-    };
-    // Remove id and potentially userId/dateAdded if they shouldn't be updated
-    delete updateData.id;
+   // Prepare data for update, adding an updatedAt timestamp
+   const updateData = {
+     ...restaurant,
+     updatedAt: Timestamp.fromDate(new Date()), // Use client-side Timestamp for consistency or serverTimestamp()
+     tags: restaurant.tags || {} // Ensure tags field is included/updated
+   };
+   // Remove id and potentially userId/dateAdded if they shouldn't be updated
+   delete updateData.id;
     // delete updateData.userId; // Keep userId check in Firestore rules
     // delete updateData.dateAdded;
 

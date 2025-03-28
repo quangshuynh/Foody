@@ -201,12 +201,14 @@ function VisitItem({ restaurant, removeToVisit, updateToVisit }) {
       }
     } else {
       console.warn("Attempted to focus map with no location data.");
-    }
-  };
+   }
+ };
 
-  // Edit handlers (similar to RestaurantItem)
-  const handleEdit = () => {
-    setIsEditing(true);
+ // Trigger the modal via the prop
+ const handleEditClick = () => {
+   if (openEditModal) {
+     openEditModal(restaurant);
+   }
   };
 
   const handleEditCancel = () => {
@@ -251,12 +253,11 @@ function VisitItem({ restaurant, removeToVisit, updateToVisit }) {
     } catch (err) {
       setEditError('Error fetching location. Please try again.');
     }
-    setEditLoading(false);
-  };
+ };
 
-  // Simplified rating handler for 'To Visit' (only updates rating)
-  const handleRatingSubmit = async (rating) => { // Only takes rating
-    if (!user) {
+ // Simplified rating handler for 'To Visit' (only updates rating)
+ const handleRatingSubmit = async (rating) => { // Only takes rating
+   if (!user) {
       alert('Please log in to rate this restaurant.');
       return;
     }
@@ -303,13 +304,15 @@ function VisitItem({ restaurant, removeToVisit, updateToVisit }) {
       }
 
       await updateDoc(restaurantDocRef, {
-        averageRating: Math.round(averageRating * 10) / 10
-      });
+       averageRating: Math.round(averageRating * 10) / 10
+     });
 
-      // Call the updateToVisit prop passed from App.js
-      updateToVisit({
-        ...restaurant,
-        // Ensure ratings in local state also don't have comment/wouldReturn for consistency
+     // NOTE: Removed direct call to updateToVisit prop here.
+     // The parent component (App.js) should re-render based on the Firestore update.
+
+     await logAuditEvent(
+       existingRating ? 'UPDATE_RATING' : 'CREATE_RATING',
+       'toVisitRestaurants',
         ratings: ratingsUpdate.map(r => ({
             userId: r.userId,
             userEmail: r.userEmail,
@@ -353,21 +356,81 @@ function VisitItem({ restaurant, removeToVisit, updateToVisit }) {
           title="Show on Map"
           style={{ color: '#ff4081' }}
         />
-        {isAuthenticated && (
-          <>
-            {/* Add Edit and Star icons */}
-            <FaEdit onClick={handleEdit} title="Edit" />
-            <FaStar onClick={() => setShowRatingModal(true)} title="Rate" />
-            <FaTrash onClick={handleRemove} title="Remove" />
-          </>
-        )}
-        {/* Removed Comment icon */}
-      </IconContainer>
+       {isAuthenticated && (
+         <>
+           {/* Add Edit and Star icons */}
+           <FaEdit onClick={handleEditClick} title="Edit" /> {/* Updated onClick */}
+           <FaStar onClick={() => setShowRatingModal(true)} title="Rate" />
+           <FaTrash onClick={handleRemove} title="Remove" />
+         </>
+       )}
+       <FaTags onClick={() => setShowTags(!showTags)} title="Show Tags" /> {/* Add Tags button */}
+     </IconContainer>
 
-      {/* Conditional Rendering: Edit Form or Display View */}
-      {isEditing ? (
-        <>
-          <Input1
+     {/* Always show display view */}
+       <>
+         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+           <h3
+         style={{
+           fontFamily: "'aligarh', sans-serif",
+           color: '#f5f5f5',
+           fontSize: '1.7rem',
+           letterSpacing: '1px',
+           marginBottom: '2px'
+         }}
+       >
+             {restaurant.name}
+           </h3>
+         </div>
+         {restaurant.address && (
+           <p
+         style={{
+           fontFamily: "'playfair', sans-serif",
+           fontSize: '1.1rem',
+           color: '#fff',
+           marginTop: '0',
+           textAlign: 'center',
+           display: 'flex',
+           alignItems: 'center',
+           justifyContent: 'center'
+         }}
+       >
+         <a
+   href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(restaurant.name)} ${encodeURIComponent(restaurant.address)}`}
+           target="_blank"
+           rel="noopener noreferrer"
+           style={{ color: '#b4c2fa', textDecoration: 'none', fontWeight: 'bold' }}
+         >
+           {capitalizeWords(restaurant.address)}
+         </a>
+         <FiCopy
+           onClick={() => {
+             navigator.clipboard.writeText(restaurant.address);
+             toast.info('Address copied to clipboard!'); // Use toast
+           }}
+           title="Copy address to clipboard"
+           style={{ color: '#00bcd4', cursor: 'pointer', marginLeft: '10px', fontSize: '1rem' }}
+             />
+           </p>
+         )}
+         {/* Added Rating display */}
+         <div style={{ textAlign: 'center', margin: '8px 0' }}>
+           <Rating rating={restaurant.averageRating} />
+         </div>
+         {/* Added Date display with Tooltip */}
+         <div style={{ textAlign: 'center', marginTop: '10px' }}>
+           <DateWrapper>
+             <DateText>Added on: {restaurant.dateAdded ? (restaurant.dateAdded.toDate ? restaurant.dateAdded.toDate().toLocaleString() : new Date(restaurant.dateAdded).toLocaleString()) : 'N/A'}</DateText>
+             {restaurant.updatedAt && (
+               <Tooltip className="tooltip"> Updated on: {restaurant.updatedAt ? (restaurant.updatedAt.toDate ? restaurant.updatedAt.toDate().toLocaleString() : new Date(restaurant.updatedAt).toLocaleString()) : 'N/A'}</Tooltip>
+             )}
+          </DateWrapper>
+        </div>
+        {showTags && (
+          <TagDisplay tags={restaurant.tags} />
+        )}
+      </>
+  </ItemContainer>
             type="text"
             value={editName}
             onChange={(e) => setEditName(e.target.value)}
