@@ -44,7 +44,7 @@ const TagsContainer = styled.div`
   border-radius: 4px;
 `;
 
-const TagButton = styled.button`
+const TagButton = styled.button.attrs({ type: 'button' })` // Explicitly set type="button"
   background: ${props => props.$isSelected ? '#00bcd4' : '#4a4a4a'};
   color: ${props => props.$isSelected ? '#1a1a1a' : '#f5f5f5'};
   border: none;
