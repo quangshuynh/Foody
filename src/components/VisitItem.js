@@ -376,5 +376,7 @@ function VisitItem({ restaurant, removeToVisit, updateToVisit }) {
     </ItemContainer>
   );
 }
+    
+export default VisitItem;
 
 export default VisitItem;
