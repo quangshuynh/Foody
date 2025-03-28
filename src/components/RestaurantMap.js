@@ -127,16 +127,14 @@ function MapController({ selectedLocation, focusId }) {
   return null; // This component does not render anything itself
 }
 
-function RestaurantMap({ restaurants }) {
+// Accept separate props for each list type
+function RestaurantMap({ visitedRestaurants, toVisitRestaurants, recommendedRestaurants }) {
   const position = [43.1566, -77.6088]; // center on Rochester, NY
   const { selectedLocation, focusId } = useMap();
   const mapRef = useRef(null);
   const wrapperRef = useRef(null);
 
-  // Separate restaurants by type
-  const visitedRestaurants = restaurants.filter(r => r.rating !== undefined || r.averageRating !== undefined);
-  const toVisitRestaurants = restaurants.filter(r => r.rating === undefined && r.averageRating === undefined && !r.recommended);
-  const recommendedRestaurants = restaurants.filter(r => r.recommended);
+  // No need to filter internally anymore
 
   return (
     <MapWrapper ref={wrapperRef} id="restaurant-map">

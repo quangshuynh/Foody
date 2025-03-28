@@ -456,12 +456,11 @@ function App() {
                     </div>
                   )}
 
+                  {/* Pass separate arrays to RestaurantMap */}
                   <RestaurantMap
-                    restaurants={[
-                      ...restaurants,
-                      ...restaurantsToVisit,
-                      ...recommendedRestaurants
-                    ]}
+                    visitedRestaurants={restaurants}
+                    toVisitRestaurants={restaurantsToVisit}
+                    recommendedRestaurants={recommendedRestaurants}
                   />
                 </div>
 
