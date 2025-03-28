@@ -178,9 +178,9 @@ function VisitItem({ restaurant, removeToVisit, updateToVisit }) {
   const [editError, setEditError] = useState('');
   const [editLoading, setEditLoading] = useState(false);
 
-  // State for rating and comments
+  // State for rating
   const [showRatingModal, setShowRatingModal] = useState(false);
-  const [showComments, setShowComments] = useState(false); // Added comments state
+  // Removed showComments state
 
   const handleRemove = () => {
     if (window.confirm('Are you sure you want to remove this restaurant?')) {
@@ -446,15 +446,7 @@ function VisitItem({ restaurant, removeToVisit, updateToVisit }) {
               )}
             </DateWrapper>
           </div>
-          {/* Added Comments display */}
-          {showComments && (
-            <Comments
-              comments={(restaurant.ratings || [])
-                .filter(r => r?.comment)
-                .sort((a, b) => new Date(b.date) - new Date(a.date))}
-            />
-          )}
-          {/* Removed Comments display section */}
+          {/* Removed conditional Comments display */}
         </>
       )}
     </ItemContainer>
