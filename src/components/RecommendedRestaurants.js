@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import { FiCopy } from 'react-icons/fi';
+import { toast } from 'react-toastify'; 
 
 const Container = styled.div`
   margin: 20px auto;
@@ -215,10 +216,10 @@ const RecommendedRestaurants = () => {
                 <FiCopy
                   onClick={() => {
                     navigator.clipboard.writeText(getAddress(restaurant.tags));
-                    alert('Address copied to clipboard!');
+                    toast.info('Address copied to clipboard!');
                   }}
                   title="Copy address to clipboard"
-                  style={{ marginLeft: '10px', cursor: 'pointer' }}
+                  style={{ color: '#00bcd4', cursor: 'pointer', marginLeft: '10px', fontSize: '1rem' }}
                 />
               </RestaurantAddress>
             )}
