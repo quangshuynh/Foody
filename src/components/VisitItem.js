@@ -6,7 +6,6 @@ import { FiCopy } from 'react-icons/fi';
 import { useAuth } from '../contexts/AuthContext';
 import { useMap } from '../contexts/MapContext';
 import Rating from './Rating'; // Import Rating component
-import Comments from './Comments'; // Import Comments component
 import RatingModal from './RatingModal'; // Import RatingModal component
 import { db } from '../firebaseConfig'; // Import db for potential direct updates if needed
 import { doc, updateDoc, arrayUnion, arrayRemove, getDoc, Timestamp } from 'firebase/firestore';
