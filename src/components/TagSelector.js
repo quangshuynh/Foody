@@ -13,7 +13,7 @@ const CategorySection = styled.div`
   margin-bottom: 15px;
 `;
 
-const CategoryHeader = styled.button`
+const CategoryHeader = styled.button.attrs({ type: 'button' })` // Explicitly set type="button"
   background: none;
   border: none;
   color: #00bcd4;
