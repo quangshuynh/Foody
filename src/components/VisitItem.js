@@ -186,10 +186,10 @@ function VisitItem({ restaurant, removeToVisit, updateToVisit }) {
     if (window.confirm('Are you sure you want to remove this restaurant?')) {
       removeToVisit(restaurant.id);
     }
-  };
+ };
 
-  // Updated map focus handler with scrollIntoView
-  const handleMapFocus = (location) => {
+ // Updated map focus handler with scrollIntoView
+ const handleMapFocus = (location) => {
     if (location) {
       focusLocation(location); // Trigger map flyTo
       // Scroll the item into view
@@ -201,57 +201,12 @@ function VisitItem({ restaurant, removeToVisit, updateToVisit }) {
       }
     } else {
       console.warn("Attempted to focus map with no location data.");
-   }
- };
-
- // Trigger the modal via the prop
- const handleEditClick = () => {
-   if (openEditModal) {
-     openEditModal(restaurant);
-   }
   };
 
-  const handleEditCancel = () => {
-    setIsEditing(false);
-    setEditName(restaurant.name);
-    setEditAddress(restaurant.address);
-    setEditError('');
-  };
-
-  const handleEditSave = async () => {
-    if (!editName || !editAddress) {
-      setEditError('Please fill in all fields');
-      return;
-    }
-    setEditLoading(true);
-    setEditError('');
-    try {
-      if (editAddress !== restaurant.address) {
-        const res = await fetch(
-          `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(editAddress)}`
-        );
-        const data = await res.json();
-        if (data && data.length > 0) {
-          const { lat, lon } = data[0];
-          updateToVisit({
-            ...restaurant,
-            name: editName.trim(),
-            address: editAddress.trim(),
-            location: { lat: parseFloat(lat), lng: parseFloat(lon) },
-          });
-          setIsEditing(false);
-        } else {
-          setEditError('Address not found. Please enter a valid address.');
-        }
-      } else {
-        updateToVisit({
-          ...restaurant,
-          name: editName.trim()
-        });
-        setIsEditing(false);
-      }
-    } catch (err) {
-      setEditError('Error fetching location. Please try again.');
+  // Trigger the modal via the prop
+  const handleEditClick = () => {
+    if (openEditModal) {
+      openEditModal(restaurant);
     }
  };
 
@@ -354,12 +309,12 @@ function VisitItem({ restaurant, removeToVisit, updateToVisit }) {
         <FaMapMarkerAlt
           onClick={() => handleMapFocus(restaurant.location)}
           title="Show on Map"
-          style={{ color: '#ff4081' }}
-        />
+         style={{ color: '#ff4081' }}
+       />
        {isAuthenticated && (
          <>
            {/* Add Edit and Star icons */}
-           <FaEdit onClick={handleEditClick} title="Edit" /> {/* Updated onClick */}
+           <FaEdit onClick={handleEditClick} title="Edit" /> {/* Use the correct handler */}
            <FaStar onClick={() => setShowRatingModal(true)} title="Rate" />
            <FaTrash onClick={handleRemove} title="Remove" />
          </>
@@ -435,25 +390,6 @@ function VisitItem({ restaurant, removeToVisit, updateToVisit }) {
             value={editName}
             onChange={(e) => setEditName(e.target.value)}
             placeholder="Restaurant Name"
-          />
-          <Input2
-            type="text"
-            value={editAddress}
-            onChange={(e) => setEditAddress(e.target.value)}
-            placeholder="Street Address"
-          />
-          {editError && <p style={{ color: '#ff4081' }}>{editError}</p>}
-          <Button onClick={handleEditSave} disabled={editLoading}>
-            {editLoading ? 'Saving...' : 'Save'}
-          </Button>
-          <Button onClick={handleEditCancel} style={{ marginLeft: '10px', background: '#ff4081' }}>
-            Cancel
-          </Button>
-        </>
-      ) : (
-        <>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <h3
           style={{
             fontFamily: "'aligarh', sans-serif",
             color: '#f5f5f5',
