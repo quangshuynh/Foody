@@ -64,4 +64,5 @@ Thumbs.db
 # firebase
 .firebase
 ./firebase/
-src/firebaseConfig.js
+# src/firebaseConfig.js # Keep firebaseConfig.js in git, but ignore .env
+.env # Ignore environment variables file
