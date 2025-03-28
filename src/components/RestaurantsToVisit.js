@@ -10,6 +10,8 @@ const Container = styled.div`
 
 // Removed addToVisit, updateToVisit props, added openEditModal
 function RestaurantsToVisit({ restaurantsToVisit, removeToVisit, openEditModal, isPoopMode }) {
+// Added updateToVisit and isPoopMode props
+function RestaurantsToVisit({ restaurantsToVisit, addToVisit, removeToVisit, updateToVisit, isPoopMode }) {
   const { isAuthenticated } = useAuth();
 
   // Poop mode logic similar to RestaurantList
@@ -72,6 +74,18 @@ function RestaurantsToVisit({ restaurantsToVisit, removeToVisit, openEditModal, 
          // For now, let's assume rating updates are handled within VisitItem or via App.js re-render
        />
      ))}
+  return (
+    <Container>
+      {isAuthenticated && <AddToVisit addToVisit={addToVisit} />}
+      {restaurantsToVisit.map((restaurant, index) => (
+        <VisitItem
+          key={restaurant.id}
+          // Apply poop mode overrides if active
+          restaurant={isPoopMode ? { ...restaurant, name: uniqueNames[index], address: uniqueAddresses[index] } : restaurant}
+          removeToVisit={isAuthenticated ? removeToVisit : null} // Ensure functions are passed only if authenticated
+          updateToVisit={isAuthenticated ? updateToVisit : null} // Pass update function
+        />
+      ))}
     </Container>
   );
 }

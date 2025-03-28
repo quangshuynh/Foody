@@ -19,6 +19,7 @@ import Footer from './components/Footer';
 import ModalOverlay from './components/ModalOverlay';
 import RestaurantFormModal from './components/RestaurantFormModal';
 import Navbar from './components/Navbar';
+import AddRestaurant from './components/AddRestaurant';
 import './App.css';
 import { ToastContainer, toast } from 'react-toastify'; // Import toast
 import 'react-toastify/dist/ReactToastify.css'; // Import toast CSS
@@ -194,6 +195,30 @@ function App() {
     }
   };
 
+  // Handler for Visited display limit
+  const handleVisitedDisplayLimitChange = (e) => {
+    const value = e.target.value;
+    if (value === "poop") {
+      setIsVisitedPoopMode(true);
+      setVisitedDisplayLimit(5);
+    } else {
+      setIsVisitedPoopMode(false);
+      setVisitedDisplayLimit(Number(value));
+    }
+  };
+
+  // Handler for ToVisit display limit
+  const handleToVisitDisplayLimitChange = (e) => {
+    const value = e.target.value;
+    if (value === "poop") {
+      setIsToVisitPoopMode(true);
+      setToVisitDisplayLimit(5);
+    } else {
+      setIsToVisitPoopMode(false);
+      setToVisitDisplayLimit(Number(value));
+    }
+  };
+
   // Handler for ToVisit display limit
   const handleToVisitDisplayLimitChange = (e) => {
     const value = e.target.value;
@@ -293,6 +318,28 @@ function App() {
     setIsFormModalOpen(false);
     setEditingRestaurant(null); // Clear editing state when closing
   };
+    }
+  };
+
+  // Handler for updating a 'to visit' restaurant
+  const updateToVisit = async (updatedToVisit) => {
+    if (!isAuthenticated) {
+      alert("Please log in to update a restaurant.");
+      return;
+    }
+    try {
+      const savedToVisit = await updateToVisitApi(updatedToVisit);
+      const updatedList = restaurantsToVisit.map((rest) =>
+        rest.id === savedToVisit.id ? { ...rest, ...savedToVisit } : rest
+      );
+      setRestaurantsToVisit(updatedList);
+    } catch (err) {
+      console.error('Failed to update to-visit restaurant:', err);
+      toast.error(`Failed to update to-visit restaurant: ${err.message}. Please try again.`); // Use toast.error
+    }
+  };
+
+
   const isAuthenticated = !!user;
   const [showLogin, setShowLogin] = useState(false);
   const [showRegister, setShowRegister] = useState(false);
@@ -390,6 +437,9 @@ function App() {
                     <RestaurantList
                       restaurants={filteredRestaurants.slice(0, visitedDisplayLimit)}
                       openEditModal={isAuthenticated ? (restaurant) => openEditModal(restaurant, 'visited') : null} // Pass function to open edit modal
+                      // Use visitedDisplayLimit and isVisitedPoopMode
+                      restaurants={filteredRestaurants.slice(0, visitedDisplayLimit)}
+                      updateRestaurant={isAuthenticated ? updateRestaurant : null}
                       removeRestaurant={isAuthenticated ? removeRestaurant : null}
                       isPoopMode={isVisitedPoopMode}
                     />
@@ -409,6 +459,12 @@ function App() {
                       restaurantsToVisit={restaurantsToVisit.slice(0, toVisitDisplayLimit)}
                       removeToVisit={isAuthenticated ? removeToVisit : null}
                       openEditModal={isAuthenticated ? (restaurant) => openEditModal(restaurant, 'toVisit') : null} // Pass function to open edit modal
+                      // Use toVisitDisplayLimit
+                      restaurantsToVisit={restaurantsToVisit.slice(0, toVisitDisplayLimit)}
+                      addToVisit={isAuthenticated ? addToVisit : null}
+                      removeToVisit={isAuthenticated ? removeToVisit : null}
+                      // Pass updateToVisit handler
+                      updateToVisit={isAuthenticated ? updateToVisit : null}
                       // Pass poop mode state
                       isPoopMode={isToVisitPoopMode}
                     />

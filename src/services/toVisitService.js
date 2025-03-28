@@ -73,6 +73,13 @@ export const updateToVisit = async (restaurant) => {
    };
    // Remove id and potentially userId/dateAdded if they shouldn't be updated
    delete updateData.id;
+    // Prepare data for update, adding an updatedAt timestamp
+    const updateData = {
+      ...restaurant,
+      updatedAt: Timestamp.fromDate(new Date()) // Use client-side Timestamp for consistency or serverTimestamp()
+    };
+    // Remove id and potentially userId/dateAdded if they shouldn't be updated
+    delete updateData.id;
     // delete updateData.userId; // Keep userId check in Firestore rules
     // delete updateData.dateAdded;
 

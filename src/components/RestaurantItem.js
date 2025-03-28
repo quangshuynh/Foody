@@ -12,6 +12,7 @@ import { db } from '../firebaseConfig';
 import { doc, updateDoc, arrayUnion, arrayRemove, getDoc, Timestamp } from 'firebase/firestore';
 import { logAuditEvent } from '../services/auditLogService';
 import { toast } from 'react-toastify'; 
+import { toast } from 'react-toastify'; // Import toast
 
 const ItemContainer = styled.div`
   background: #2a2a2a;
@@ -211,6 +212,7 @@ function RestaurantItem({ restaurant, openEditModal, removeRestaurant }) {
     } catch (error) {
       console.error('Failed to update rating:', error);
       toast.error(`Failed to update rating: ${error.message}. Please try again.`);
+      toast.error(`Failed to update rating: ${error.message}. Please try again.`); // Use toast.error
     }
   };
 
@@ -227,6 +229,7 @@ function RestaurantItem({ restaurant, openEditModal, removeRestaurant }) {
   };
 
   return (
+    // Attach the ref and an ID to the main container
     <ItemContainer ref={itemRef} id={`restaurant-item-${restaurant.id}`}>
       <IconContainer>
         <FaMapMarkerAlt
@@ -293,6 +296,86 @@ function RestaurantItem({ restaurant, openEditModal, removeRestaurant }) {
               }}
               title="Copy address to clipboard"
               style={{ color: '#00bcd4', cursor: 'pointer', marginLeft: '10px', fontSize: '1rem' }}
+      {isEditing ? (
+        <>
+          <Input1
+            type="text"
+            value={editName}
+            onChange={(e) => setEditName(e.target.value)}
+            placeholder="Restaurant Name (e.g., Dogtown)" 
+          />
+          <Input2
+            type="text"
+            value={editAddress}
+            onChange={(e) => setEditAddress(e.target.value)}
+            placeholder="Street Address (e.g., 691 Monroe Ave)" 
+          />
+          {editError && <p style={{ color: '#ff4081' }}>{editError}</p>}
+          <Button onClick={handleEditSave} disabled={editLoading}>
+            {editLoading ? 'Saving...' : 'Save'}
+          </Button>
+          <Button onClick={handleEditCancel} style={{ marginLeft: '10px', background: '#ff4081' }}>
+            Cancel
+          </Button>
+        </>
+      ) : (
+        <>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <h3 style={{ 
+              fontFamily: "'aligarh', sans-serif", 
+              color: '#f5f5f5', 
+              fontSize: '1.7rem',
+              letterSpacing: '1px',
+              marginBottom: '2px'
+            }}>
+              {restaurant.name}
+            </h3>
+          </div>
+          {restaurant.address && (
+            <p style={{ 
+              fontFamily: "'playfair', sans-serif", 
+              fontSize: '1.1rem', 
+              color: '#fff',
+              marginTop: '0',
+              textAlign: 'center',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}>
+              <a 
+                href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(restaurant.name)} ${encodeURIComponent(restaurant.address)}`}
+                target="_blank" 
+                rel="noopener noreferrer"
+                style={{ color: '#b4c2fa', textDecoration: 'none', fontWeight: 'bold' }}
+              >
+                {capitalizeWords(restaurant.address)}
+              </a>
+              <FiCopy
+                onClick={() => {
+                  navigator.clipboard.writeText(restaurant.address);
+                  toast.info('Address copied to clipboard!'); // Use toast
+                }}
+                title="Copy address to clipboard"
+                style={{ color: '#00bcd4', cursor: 'pointer', marginLeft: '10px', fontSize: '1rem' }}
+              />
+            </p>
+          )}
+          <div style={{ textAlign: 'center', marginTop: '10px' }}>
+            <DateWrapper>
+            <DateText>Added on: {restaurant.dateAdded ? (restaurant.dateAdded.toDate ? restaurant.dateAdded.toDate().toLocaleString() : new Date(restaurant.dateAdded).toLocaleString()) : 'N/A'}</DateText>
+              {restaurant.updatedAt && (
+                <Tooltip className="tooltip"> Updated on: {restaurant.updatedAt ? (restaurant.updatedAt.toDate ? restaurant.updatedAt.toDate().toLocaleString() : new Date(restaurant.updatedAt).toLocaleString()) : 'N/A'}</Tooltip>              
+              )}
+            </DateWrapper>
+          </div>
+          <div style={{ textAlign: 'center', margin: '8px 0' }}>
+            <Rating rating={restaurant.averageRating} />
+          </div>
+          {showComments && (
+            <Comments
+              comments={(restaurant.ratings || [])
+                .filter(r => r?.comment)
+                .sort((a, b) => new Date(b.date) - new Date(a.date))}
             />
           </p>
         )}
