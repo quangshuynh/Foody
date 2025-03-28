@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import { FiCopy } from 'react-icons/fi';
-import { toast } from 'react-toastify'; 
+import { FaMapMarkerAlt } from 'react-icons/fa'; // <-- New: Import FaMapMarkerAlt
+import { toast } from 'react-toastify';
+import { useMap } from '../contexts/MapContext'; // <-- New: Import useMap context
 
 const Container = styled.div`
   margin: 20px auto;
@@ -61,6 +63,7 @@ const List = styled.ul`
   padding: 0;
 `;
 
+// Modified: Add position: relative so the absolute IconContainer works as expected
 const ListItem = styled.li`
   background: #2a2a2a;
   margin: 15px 0;
@@ -69,6 +72,7 @@ const ListItem = styled.li`
   display: flex;
   flex-direction: column;
   align-items: center;
+  position: relative;
 `;
 
 const RestaurantName = styled.h3`
@@ -96,6 +100,23 @@ const RestaurantAddress = styled.p`
   }
 `;
 
+// New: IconContainer with styling similar to VisitItem
+const IconContainer = styled.div`
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  display: flex;
+  gap: 10px;
+  svg {
+    cursor: pointer;
+    color: #00bcd4;
+    transition: color 0.3s;
+    &:hover {
+      color: #00a1b5;
+    }
+  }
+`;
+
 const RecommendedRestaurants = () => {
   const [zipcode, setZipcode] = useState("14623");
   const [radius, setRadius] = useState("3");
@@ -103,6 +124,27 @@ const RecommendedRestaurants = () => {
   const [recommendedRestaurants, setRecommendedRestaurants] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+
+  const { focusLocation } = useMap();
+
+  const handleMapFocus = (restaurant) => {
+    let lat, lon;
+    if (restaurant.lat && (restaurant.lon || restaurant.lng)) {
+      lat = restaurant.lat;
+      lon = restaurant.lon || restaurant.lng;
+    } 
+    else if (restaurant.center && restaurant.center.lat && (restaurant.center.lon || restaurant.center.lng)) {
+      lat = restaurant.center.lat;
+      lon = restaurant.center.lon || restaurant.center.lng;
+    }
+  
+    if (lat !== undefined && lon !== undefined) {
+      focusLocation({ lat, lng: lon });    
+    } else {
+      console.warn('No valid location data available for this restaurant');
+    }
+  };
+  
 
   const fetchCoordinates = async (zip) => {
     try {
@@ -196,11 +238,18 @@ const RecommendedRestaurants = () => {
       {loading && <p>Loading recommendations...</p>}
       {error && <p>{error}</p>}
       {!loading && recommendedRestaurants.length === 0 && (
-        <p>No recommendations yet. Click the button to randomize!</p>
+        <p>Click the button to randomize!</p>
       )}
       <List>
         {recommendedRestaurants.map((restaurant) => (
           <ListItem key={restaurant.id}>
+            <IconContainer>
+              <FaMapMarkerAlt
+                onClick={() => handleMapFocus(restaurant)}
+                title="Show on Map"
+                style={{ color: '#ff4081' }} 
+              />
+            </IconContainer>
             <RestaurantName>
               {restaurant.tags && restaurant.tags.name ? restaurant.tags.name : "Unnamed Restaurant"}
             </RestaurantName>

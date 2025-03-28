@@ -1,16 +1,16 @@
 import React, { useState, useRef } from 'react';
 import styled from 'styled-components';
-import { FaTrash, FaMapMarkerAlt, FaEdit, FaStar, FaTags } from 'react-icons/fa'; // Added FaTags
+import { FaTrash, FaMapMarkerAlt, FaEdit, FaStar, FaTags } from 'react-icons/fa'; 
 import { FiCopy } from 'react-icons/fi';
 import { useAuth } from '../contexts/AuthContext';
 import { useMap } from '../contexts/MapContext';
-import Rating from './Rating'; // Import Rating component
-import RatingModal from './RatingModal'; // Import RatingModal component
-import TagDisplay from './TagDisplay'; // Import TagDisplay
-import { db } from '../firebaseConfig'; // Import db for potential direct updates if needed
+import Rating from './Rating';
+import RatingModal from './RatingModal'; 
+import TagDisplay from './TagDisplay'; 
+import { db } from '../firebaseConfig'; 
 import { doc, updateDoc, arrayUnion, arrayRemove, getDoc, Timestamp } from 'firebase/firestore';
 import { logAuditEvent } from '../services/auditLogService';
-import { toast } from 'react-toastify'; // Import toast
+import { toast } from 'react-toastify'; 
 
 export default VisitItem;
 
@@ -53,7 +53,6 @@ const DateText = styled.p`
   text-align: center; // Center align
 `;
 
-// Added DateWrapper and Tooltip from RestaurantItem
 const DateWrapper = styled.div`
   position: relative;
   display: inline-block;
@@ -106,18 +105,14 @@ function capitalizeWords(str) {
     .join(' ');
 }
 
-// Added updateToVisit prop
 function VisitItem({ restaurant, removeToVisit, openEditModal }) {
-  const { user, isAuthenticated } = useAuth(); // Get user for rating
+  const { user, isAuthenticated } = useAuth(); 
   const { focusLocation } = useMap();
-  const itemRef = useRef(null); // Add a ref for the item container
+  const itemRef = useRef(null); 
 
   
-  // State for rating
   const [showRatingModal, setShowRatingModal] = useState(false);
-  // State for tags display
   const [showTags, setShowTags] = useState(false);
-  // Removed showComments state
 
   const handleRemove = () => {
     if (window.confirm('Are you sure you want to remove this restaurant?')) {
@@ -125,31 +120,26 @@ function VisitItem({ restaurant, removeToVisit, openEditModal }) {
     }
  };
 
- // Updated map focus handler with scrollIntoView
  const handleMapFocus = (location) => {
     if (location) {
-      focusLocation(location); // Trigger map flyTo
-      // Scroll the item into view
+      focusLocation(location); 
       if (itemRef.current) {
-        // Use a slight delay to allow map animation to start
         setTimeout(() => {
           itemRef.current.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         }, 100);
       }
    } else {
      console.warn("Attempted to focus map with no location data.");
-   } // <-- Added missing closing brace for the else block
+   }
  };
 
- // Trigger the modal via the prop
   const handleEditClick = () => {
     if (openEditModal) {
       openEditModal(restaurant);
     }
  };
 
- // Simplified rating handler for 'To Visit' (only updates rating)
- const handleRatingSubmit = async (rating) => { // Only takes rating
+ const handleRatingSubmit = async (rating) => { 
    if (!user) {
       alert('Please log in to rate this restaurant.');
       return;
@@ -239,16 +229,14 @@ function VisitItem({ restaurant, removeToVisit, openEditModal }) {
        />
        {isAuthenticated && (
          <>
-           {/* Add Edit and Star icons */}
-           <FaEdit onClick={handleEditClick} title="Edit" /> {/* Use the correct handler */}
+           <FaEdit onClick={handleEditClick} title="Edit" /> 
            <FaStar onClick={() => setShowRatingModal(true)} title="Rate" />
            <FaTrash onClick={handleRemove} title="Remove" />
          </>
        )}
-       <FaTags onClick={() => setShowTags(!showTags)} title="Show Tags" /> {/* Add Tags button */}
+       <FaTags onClick={() => setShowTags(!showTags)} title="Show Tags" /> 
      </IconContainer>
 
-     {/* Always show display view */}
        <>
          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
            <h3
@@ -287,18 +275,16 @@ function VisitItem({ restaurant, removeToVisit, openEditModal }) {
          <FiCopy
            onClick={() => {
              navigator.clipboard.writeText(restaurant.address);
-             toast.info('Address copied to clipboard!'); // Use toast
+             toast.info('Address copied to clipboard!'); 
            }}
            title="Copy address to clipboard"
            style={{ color: '#00bcd4', cursor: 'pointer', marginLeft: '10px', fontSize: '1rem' }}
              />
            </p>
          )}
-         {/* Added Rating display */}
          <div style={{ textAlign: 'center', margin: '8px 0' }}>
            <Rating rating={restaurant.averageRating} />
          </div>
-         {/* Added Date display with Tooltip */}
          <div style={{ textAlign: 'center', marginTop: '10px' }}>
            <DateWrapper>
              <DateText>Added on: {restaurant.dateAdded ? (restaurant.dateAdded.toDate ? restaurant.dateAdded.toDate().toLocaleString() : new Date(restaurant.dateAdded).toLocaleString()) : 'N/A'}</DateText>

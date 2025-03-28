@@ -356,7 +356,6 @@ function App() {
           </ModalOverlay>
         )}
 
-        {/* Add/Edit Restaurant Modal */}
         {isFormModalOpen && isAuthenticated && (
           <RestaurantFormModal
             restaurantToEdit={editingRestaurant}
@@ -389,7 +388,7 @@ function App() {
                     )}
                     <RestaurantList
                       restaurants={filteredRestaurants.slice(0, visitedDisplayLimit)}
-                      openEditModal={isAuthenticated ? (restaurant) => openEditModal(restaurant, 'visited') : null} // Pass function to open edit modal
+                      openEditModal={isAuthenticated ? (restaurant) => openEditModal(restaurant, 'visited') : null} 
                       removeRestaurant={isAuthenticated ? removeRestaurant : null}
                       isPoopMode={isVisitedPoopMode}
                     />
@@ -399,7 +398,6 @@ function App() {
                 {selectedSection === 'toVisit' && (
                   <>
                     <h2>Restaurants to Visit</h2>
-                    {/* Replace AddToVisit component with a button */}
                     {isAuthenticated && (
                       <AddButton onClick={() => openAddModal('toVisit')} title="Add Restaurant To Visit">
                         <FaPlus />
@@ -408,8 +406,7 @@ function App() {
                     <RestaurantsToVisit
                       restaurantsToVisit={restaurantsToVisit.slice(0, toVisitDisplayLimit)}
                       removeToVisit={isAuthenticated ? removeToVisit : null}
-                      openEditModal={isAuthenticated ? (restaurant) => openEditModal(restaurant, 'toVisit') : null} // Pass function to open edit modal
-                      // Pass poop mode state
+                      openEditModal={isAuthenticated ? (restaurant) => openEditModal(restaurant, 'toVisit') : null} 
                       isPoopMode={isToVisitPoopMode}
                     />
                   </>
@@ -447,9 +444,9 @@ function App() {
                       </label>
 
                       <select
-                        id="visited-display-limit" // Unique ID
-                        onChange={handleVisitedDisplayLimitChange} // Use specific handler
-                        value={isVisitedPoopMode ? "poop" : visitedDisplayLimit} // Use specific state
+                        id="visited-display-limit" 
+                        onChange={handleVisitedDisplayLimitChange} 
+                        value={isVisitedPoopMode ? "poop" : visitedDisplayLimit} 
                         style={{
                           padding: '0.5rem 1rem',
                           borderRadius: '0.375rem',
@@ -482,16 +479,15 @@ function App() {
                       </select>
                     </div>
                   )}
-                  {/* Add Display Limit Dropdown for To Visit */}
                   {selectedSection === 'toVisit' && (
                     <div
                       className={`dropdown-container ${selectedSection === 'toVisit' ? 'visible' : ''}`}
                       style={{
                         display: 'flex',
                         alignItems: 'center',
-                        marginTop: '50px', // Adjust as needed
+                        marginTop: '50px', 
                         gap: '12px',
-                        marginLeft: '100px' // Adjust as needed
+                        marginLeft: '100px' 
                       }}
                     >
                       <label
@@ -506,9 +502,9 @@ function App() {
                         Display Limit:
                       </label>
                       <select
-                        id="to-visit-display-limit" // Unique ID
-                        onChange={handleToVisitDisplayLimitChange} // Use specific handler
-                        value={isToVisitPoopMode ? "poop" : toVisitDisplayLimit} // Use specific state
+                        id="to-visit-display-limit" 
+                        onChange={handleToVisitDisplayLimitChange} 
+                        value={isToVisitPoopMode ? "poop" : toVisitDisplayLimit} 
                         style={{
                           padding: '0.5rem 1rem',
                           borderRadius: '0.375rem',
@@ -519,7 +515,6 @@ function App() {
                           boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
                           transition: 'background 0.3s, border-color 0.3s',
                         }}
-                        // Add hover/focus styles similar to the other dropdown
                         onMouseEnter={(e) => { e.target.style.borderColor = '#00e5ff'; }}
                         onMouseLeave={(e) => { e.target.style.borderColor = '#00bcd4'; }}
                         onFocus={(e) => { e.target.style.borderColor = '#00e5ff'; }}
@@ -535,7 +530,6 @@ function App() {
                     </div>
                   )}
 
-                  {/* Pass separate arrays to RestaurantMap */}
                   <RestaurantMap
                     visitedRestaurants={restaurants}
                     toVisitRestaurants={restaurantsToVisit}
