@@ -268,17 +268,114 @@ function VisitItem({ restaurant, removeToVisit, updateToVisit }) {
      await logAuditEvent(
        existingRating ? 'UPDATE_RATING' : 'CREATE_RATING',
        'toVisitRestaurants',
-        ratings: ratingsUpdate.map(r => ({
-            userId: r.userId,
-            userEmail: r.userEmail,
-            rating: r.rating,
-            date: r.date.toDate ? r.date.toDate() : r.date // Handle potential timestamp conversion
-        })),
-        averageRating: Math.round(averageRating * 10) / 10
-      });
+        restaurant.id,
+        { rating: newRatingData.rating } // Simplified log details
+      );
 
-      await logAuditEvent(
-        existingRating ? 'UPDATE_RATING' : 'CREATE_RATING',
+      setShowRatingModal(false);
+    } catch (error) {
+      console.error('Failed to update rating for to-visit:', error);
+      toast.error(`Failed to update rating: ${error.message}. Please try again.`); // Use toast.error
+    }
+  };
+
+
+  return (
+    // Attach the ref and an ID to the main container
+    <ItemContainer ref={itemRef} id={`restaurant-item-${restaurant.id}`}>
+      {/* Rating Modal */}
+      {showRatingModal && (
+        <RatingModal
+          onSubmit={handleRatingSubmit} // Pass simplified handler
+          onClose={() => setShowRatingModal(false)}
+          currentRating={(restaurant.ratings || []).find(r => r?.userId === user?.uid)?.rating || 0}
+          isSimpleMode={true} // Add prop to hide comment/wouldReturn
+        />
+      )}
+
+      <IconContainer>
+        <FaMapMarkerAlt
+          onClick={() => handleMapFocus(restaurant.location)}
+          title="Show on Map"
+         style={{ color: '#ff4081' }}
+       />
+       {isAuthenticated && (
+         <>
+           {/* Add Edit and Star icons */}
+           <FaEdit onClick={handleEditClick} title="Edit" /> {/* Use the correct handler */}
+           <FaStar onClick={() => setShowRatingModal(true)} title="Rate" />
+           <FaTrash onClick={handleRemove} title="Remove" />
+         </>
+       )}
+       <FaTags onClick={() => setShowTags(!showTags)} title="Show Tags" /> {/* Add Tags button */}
+     </IconContainer>
+
+     {/* Always show display view */}
+       <>
+         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+           <h3
+         style={{
+           fontFamily: "'aligarh', sans-serif",
+           color: '#f5f5f5',
+           fontSize: '1.7rem',
+           letterSpacing: '1px',
+           marginBottom: '2px'
+         }}
+       >
+             {restaurant.name}
+           </h3>
+         </div>
+         {restaurant.address && (
+           <p
+         style={{
+           fontFamily: "'playfair', sans-serif",
+           fontSize: '1.1rem',
+           color: '#fff',
+           marginTop: '0',
+           textAlign: 'center',
+           display: 'flex',
+           alignItems: 'center',
+           justifyContent: 'center'
+         }}
+       >
+         <a
+   href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(restaurant.name)} ${encodeURIComponent(restaurant.address)}`}
+           target="_blank"
+           rel="noopener noreferrer"
+           style={{ color: '#b4c2fa', textDecoration: 'none', fontWeight: 'bold' }}
+         >
+           {capitalizeWords(restaurant.address)}
+         </a>
+         <FiCopy
+           onClick={() => {
+             navigator.clipboard.writeText(restaurant.address);
+             toast.info('Address copied to clipboard!'); // Use toast
+           }}
+           title="Copy address to clipboard"
+           style={{ color: '#00bcd4', cursor: 'pointer', marginLeft: '10px', fontSize: '1rem' }}
+             />
+           </p>
+         )}
+         {/* Added Rating display */}
+         <div style={{ textAlign: 'center', margin: '8px 0' }}>
+           <Rating rating={restaurant.averageRating} />
+         </div>
+         {/* Added Date display with Tooltip */}
+         <div style={{ textAlign: 'center', marginTop: '10px' }}>
+           <DateWrapper>
+             <DateText>Added on: {restaurant.dateAdded ? (restaurant.dateAdded.toDate ? restaurant.dateAdded.toDate().toLocaleString() : new Date(restaurant.dateAdded).toLocaleString()) : 'N/A'}</DateText>
+             {restaurant.updatedAt && (
+               <Tooltip className="tooltip"> Updated on: {restaurant.updatedAt ? (restaurant.updatedAt.toDate ? restaurant.updatedAt.toDate().toLocaleString() : new Date(restaurant.updatedAt).toLocaleString()) : 'N/A'}</Tooltip>
+             )}
+          </DateWrapper>
+        </div>
+        {showTags && (
+          <TagDisplay tags={restaurant.tags} />
+        )}
+      </>
+    </ItemContainer>
+  );
+}
         'toVisitRestaurants',
         restaurant.id,
         { rating: newRatingData.rating } // Simplified log details
@@ -388,14 +485,6 @@ function VisitItem({ restaurant, removeToVisit, updateToVisit }) {
     </ItemContainer>
   );
 }
-            placeholder="Restaurant Name"
-          style={{
-            fontFamily: "'aligarh', sans-serif",
-            color: '#f5f5f5',
-            fontSize: '1.7rem',
-            letterSpacing: '1px',
-            marginBottom: '2px'
-          }}
         >
               {restaurant.name}
             </h3>
