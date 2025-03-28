@@ -385,10 +385,9 @@ function VisitItem({ restaurant, removeToVisit, updateToVisit }) {
           <TagDisplay tags={restaurant.tags} />
         )}
       </>
-  </ItemContainer>
-            type="text"
-            value={editName}
-            onChange={(e) => setEditName(e.target.value)}
+    </ItemContainer>
+  );
+}
             placeholder="Restaurant Name"
           style={{
             fontFamily: "'aligarh', sans-serif",
