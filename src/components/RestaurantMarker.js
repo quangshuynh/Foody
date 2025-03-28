@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from 'react';
-import { Marker } from 'react-leaflet';
+import { Marker } from 'react-leaflet'; // Popup is passed via children
 import { useMap } from '../contexts/MapContext';
+// Removed toast, FiCopy, and scrollToItem helper
 
 function RestaurantMarker({ restaurant, icon, children }) {
   const markerRef = useRef();
@@ -23,6 +24,7 @@ function RestaurantMarker({ restaurant, icon, children }) {
       position={[restaurant.location.lat, restaurant.location.lng]}
       icon={icon}
     >
+      {/* Simply render children (which includes the Popup defined in RestaurantMap) */}
       {children}
     </Marker>
   );

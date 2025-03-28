@@ -1,6 +1,6 @@
 // src/services/toVisitService.js - Firestore Version
 import { db, auth } from '../firebaseConfig';
-import { collection, getDocs, addDoc, deleteDoc, doc, Timestamp } from 'firebase/firestore';
+import { collection, getDocs, addDoc, deleteDoc, doc, Timestamp, updateDoc } from 'firebase/firestore'; // Added updateDoc
 import { logAuditEvent } from './auditLogService'; // Import audit log service
 
 // Collection reference
@@ -52,6 +52,37 @@ export const addToVisit = async (restaurant) => {
     return { ...newToVisitData, id: docRef.id, dateAdded: new Date() }; // Optimistic update
   } catch (error) {
     console.error("Add 'to visit' restaurant error:", error);
+    throw error; // Re-throw error after logging failure or handling
+  }
+};
+
+// Update an existing 'to visit' restaurant document in Firestore
+export const updateToVisit = async (restaurant) => {
+  const user = auth.currentUser;
+  if (!user) throw new Error('Authentication required');
+  if (!restaurant.id) throw new Error('Restaurant ID is required for update');
+
+  try {
+    const restaurantDocRef = doc(db, 'toVisitRestaurants', restaurant.id);
+    // Prepare data for update, adding an updatedAt timestamp
+    const updateData = {
+      ...restaurant,
+      updatedAt: Timestamp.fromDate(new Date()) // Use client-side Timestamp for consistency or serverTimestamp()
+    };
+    // Remove id and potentially userId/dateAdded if they shouldn't be updated
+    delete updateData.id;
+    // delete updateData.userId; // Keep userId check in Firestore rules
+    // delete updateData.dateAdded;
+
+    await updateDoc(restaurantDocRef, updateData);
+    // Log the audit event *after* successful update
+    await logAuditEvent('UPDATE', 'toVisitRestaurants', restaurant.id, { updatedFields: Object.keys(updateData) });
+
+    // Return the updated restaurant data (or just success)
+    // Convert updatedAt to ISO string for consistency with fetch
+    return { ...restaurant, updatedAt: new Date().toISOString() }; // Return optimistic update as ISO string
+  } catch (error) {
+    console.error("Update 'to visit' restaurant error:", error);
     throw error; // Re-throw error after logging failure or handling
   }
 };

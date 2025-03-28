@@ -5,9 +5,10 @@ import { MapProvider } from './contexts/MapContext';
 import LoginForm from './components/auth/LoginForm';
 import RegisterForm from './components/auth/RegisterForm';
 import { fetchVisitedRestaurants, addRestaurant as addRestaurantApi, updateRestaurant as updateRestaurantApi, removeRestaurant as removeRestaurantApi } from './services/restaurantService';
-import { fetchToVisitRestaurants, addToVisit as addToVisitApi, removeToVisit as removeToVisitApi } from './services/toVisitService';
+// Import updateToVisit service function
+import { fetchToVisitRestaurants, addToVisit as addToVisitApi, removeToVisit as removeToVisitApi, updateToVisit as updateToVisitApi } from './services/toVisitService';
 import { fetchRecommendedRestaurants } from './services/recommendedService';
-import { logout } from './services/authService'; 
+import { logout } from './services/authService';
 import styled from 'styled-components';
 import SearchBar from './components/SearchBar';
 import RestaurantList from './components/RestaurantList';
@@ -18,7 +19,9 @@ import Footer from './components/Footer';
 import ModalOverlay from './components/ModalOverlay';
 import Navbar from './components/Navbar';
 import AddRestaurant from './components/AddRestaurant';
-import './App.css'; 
+import './App.css';
+import { ToastContainer, toast } from 'react-toastify'; // Import toast
+import 'react-toastify/dist/ReactToastify.css'; // Import toast CSS
 
 const AppContainer = styled.div`
   font-family: 'Roboto', sans-serif;
@@ -39,8 +42,13 @@ function App() {
 
   const [filteredRestaurants, setFilteredRestaurants] = useState(restaurants);
   const [selectedSection, setSelectedSection] = useState('visited');
-  const [displayLimit, setDisplayLimit] = useState(5);
-  const [isPoopMode, setIsPoopMode] = useState(false);
+  // State for Visited display limit
+  const [visitedDisplayLimit, setVisitedDisplayLimit] = useState(5);
+  const [isVisitedPoopMode, setIsVisitedPoopMode] = useState(false);
+  // State for ToVisit display limit
+  const [toVisitDisplayLimit, setToVisitDisplayLimit] = useState(5);
+  const [isToVisitPoopMode, setIsToVisitPoopMode] = useState(false);
+
 
   const sectionOrder = ['visited', 'toVisit', 'recommended'];
   const nodeRefs = useRef({});
@@ -92,7 +100,7 @@ function App() {
       setRestaurants(prev => [savedRestaurant, ...prev]);
     } catch (err) {
       console.error('Failed to add visited restaurant:', err);
-      alert(`Failed to add visited restaurant: ${err.message}. Please try again.`);
+      toast.error(`Failed to add visited restaurant: ${err.message}. Please try again.`); // Use toast.error
     }
   };
 
@@ -109,7 +117,7 @@ function App() {
       setRestaurants(updatedList);
     } catch (err) {
       console.error('Failed to update visited restaurant:', err);
-      alert(`Failed to update visited restaurant: ${err.message}. Please try again.`);
+      toast.error(`Failed to update visited restaurant: ${err.message}. Please try again.`); // Use toast.error
     }
   };
 
@@ -124,18 +132,31 @@ function App() {
       setRestaurants(updatedList);
     } catch (err) {
       console.error('Failed to remove visited restaurant:', err);
-      alert(`Failed to remove visited restaurant: ${err.message}. Please try again.`);
+      toast.error(`Failed to remove visited restaurant: ${err.message}. Please try again.`); // Use toast.error
     }
   };
 
-  const handleDisplayLimitChange = (e) => {
+  // Handler for Visited display limit
+  const handleVisitedDisplayLimitChange = (e) => {
     const value = e.target.value;
     if (value === "poop") {
-      setIsPoopMode(true);
-      setDisplayLimit(5);
+      setIsVisitedPoopMode(true);
+      setVisitedDisplayLimit(5);
     } else {
-      setIsPoopMode(false);
-      setDisplayLimit(Number(value));
+      setIsVisitedPoopMode(false);
+      setVisitedDisplayLimit(Number(value));
+    }
+  };
+
+  // Handler for ToVisit display limit
+  const handleToVisitDisplayLimitChange = (e) => {
+    const value = e.target.value;
+    if (value === "poop") {
+      setIsToVisitPoopMode(true);
+      setToVisitDisplayLimit(5);
+    } else {
+      setIsToVisitPoopMode(false);
+      setToVisitDisplayLimit(Number(value));
     }
   };
 
@@ -169,7 +190,7 @@ function App() {
       setRestaurantsToVisit(prev => [savedToVisit, ...prev]);
     } catch (err) {
       console.error('Failed to add to-visit restaurant:', err);
-      alert(`Failed to add to-visit restaurant: ${err.message}. Please try again.`);
+      toast.error(`Failed to add to-visit restaurant: ${err.message}. Please try again.`); // Use toast.error
     }
   };
 
@@ -184,11 +205,30 @@ function App() {
       setRestaurantsToVisit(updatedList);
     } catch (err) {
       console.error('Failed to remove to-visit restaurant:', err);
-      alert(`Failed to remove to-visit restaurant: ${err.message}. Please try again.`);
+      toast.error(`Failed to remove to-visit restaurant: ${err.message}. Please try again.`); // Use toast.error
     }
   };
 
-  const isAuthenticated = !!user; 
+  // Handler for updating a 'to visit' restaurant
+  const updateToVisit = async (updatedToVisit) => {
+    if (!isAuthenticated) {
+      alert("Please log in to update a restaurant.");
+      return;
+    }
+    try {
+      const savedToVisit = await updateToVisitApi(updatedToVisit);
+      const updatedList = restaurantsToVisit.map((rest) =>
+        rest.id === savedToVisit.id ? { ...rest, ...savedToVisit } : rest
+      );
+      setRestaurantsToVisit(updatedList);
+    } catch (err) {
+      console.error('Failed to update to-visit restaurant:', err);
+      toast.error(`Failed to update to-visit restaurant: ${err.message}. Please try again.`); // Use toast.error
+    }
+  };
+
+
+  const isAuthenticated = !!user;
   const [showLogin, setShowLogin] = useState(false);
   const [showRegister, setShowRegister] = useState(false);
 
@@ -198,7 +238,7 @@ function App() {
       console.log("User logged out successfully.");
     } catch (error) {
       console.error("Logout failed:", error);
-      alert(`Logout failed: ${error.message}`);
+      toast.error(`Logout failed: ${error.message}`); // Use toast.error
     }
   };
 
@@ -208,6 +248,19 @@ function App() {
 
   return (
     <MapProvider>
+      {/* Add ToastContainer here */}
+      <ToastContainer
+        position="top-center"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="dark" // Use dark theme
+      />
       <Navbar
         selectedSection={selectedSection}
         setSelectedSection={setSelectedSection}
@@ -258,10 +311,11 @@ function App() {
                       <AddRestaurant addRestaurant={addRestaurant} />
                     )}
                     <RestaurantList
-                      restaurants={filteredRestaurants.slice(0, displayLimit)}
+                      // Use visitedDisplayLimit and isVisitedPoopMode
+                      restaurants={filteredRestaurants.slice(0, visitedDisplayLimit)}
                       updateRestaurant={isAuthenticated ? updateRestaurant : null}
                       removeRestaurant={isAuthenticated ? removeRestaurant : null}
-                      isPoopMode={isPoopMode}
+                      isPoopMode={isVisitedPoopMode}
                     />
                   </>
                 )}
@@ -270,9 +324,14 @@ function App() {
                   <>
                     <h2>Restaurants to Visit</h2>
                     <RestaurantsToVisit
-                      restaurantsToVisit={restaurantsToVisit}
+                      // Use toVisitDisplayLimit
+                      restaurantsToVisit={restaurantsToVisit.slice(0, toVisitDisplayLimit)}
                       addToVisit={isAuthenticated ? addToVisit : null}
                       removeToVisit={isAuthenticated ? removeToVisit : null}
+                      // Pass updateToVisit handler
+                      updateToVisit={isAuthenticated ? updateToVisit : null}
+                      // Pass poop mode state
+                      isPoopMode={isToVisitPoopMode}
                     />
                   </>
                 )}
@@ -309,9 +368,9 @@ function App() {
                       </label>
 
                       <select
-                        id="display-limit"
-                        onChange={handleDisplayLimitChange}
-                        value={isPoopMode ? "poop" : displayLimit}
+                        id="visited-display-limit" // Unique ID
+                        onChange={handleVisitedDisplayLimitChange} // Use specific handler
+                        value={isVisitedPoopMode ? "poop" : visitedDisplayLimit} // Use specific state
                         style={{
                           padding: '0.5rem 1rem',
                           borderRadius: '0.375rem',
@@ -344,13 +403,64 @@ function App() {
                       </select>
                     </div>
                   )}
+                  {/* Add Display Limit Dropdown for To Visit */}
+                  {selectedSection === 'toVisit' && (
+                    <div
+                      className={`dropdown-container ${selectedSection === 'toVisit' ? 'visible' : ''}`}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        marginTop: '50px', // Adjust as needed
+                        gap: '12px',
+                        marginLeft: '100px' // Adjust as needed
+                      }}
+                    >
+                      <label
+                        htmlFor="to-visit-display-limit"
+                        style={{
+                          fontWeight: '500',
+                          fontSize: '1rem',
+                          color: '#ccc',
+                          letterSpacing: '0.5px',
+                        }}
+                      >
+                        Display Limit:
+                      </label>
+                      <select
+                        id="to-visit-display-limit" // Unique ID
+                        onChange={handleToVisitDisplayLimitChange} // Use specific handler
+                        value={isToVisitPoopMode ? "poop" : toVisitDisplayLimit} // Use specific state
+                        style={{
+                          padding: '0.5rem 1rem',
+                          borderRadius: '0.375rem',
+                          background: '#2a2a2a',
+                          color: '#f5f5f5',
+                          border: '1px solid #00bcd4',
+                          cursor: 'pointer',
+                          boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
+                          transition: 'background 0.3s, border-color 0.3s',
+                        }}
+                        // Add hover/focus styles similar to the other dropdown
+                        onMouseEnter={(e) => { e.target.style.borderColor = '#00e5ff'; }}
+                        onMouseLeave={(e) => { e.target.style.borderColor = '#00bcd4'; }}
+                        onFocus={(e) => { e.target.style.borderColor = '#00e5ff'; }}
+                        onBlur={(e) => { e.target.style.borderColor = '#00bcd4'; }}
+                      >
+                        <option value="5">5</option>
+                        <option value="10">10</option>
+                        <option value="15">15</option>
+                        <option value="20">20</option>
+                        <option value="50">50</option>
+                        <option value="poop">💩</option>
+                      </select>
+                    </div>
+                  )}
 
+                  {/* Pass separate arrays to RestaurantMap */}
                   <RestaurantMap
-                    restaurants={[
-                      ...restaurants,
-                      ...restaurantsToVisit,
-                      ...recommendedRestaurants
-                    ]}
+                    visitedRestaurants={restaurants}
+                    toVisitRestaurants={restaurantsToVisit}
+                    recommendedRestaurants={recommendedRestaurants}
                   />
                 </div>
 

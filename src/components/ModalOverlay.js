@@ -10,7 +10,7 @@ const ModalOverlay = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 1000; 
+  z-index: 1100; /* Increase z-index to be above Leaflet UI (usually ~1000) */
 `;
 
 export default ModalOverlay;

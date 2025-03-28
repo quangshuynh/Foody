@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import styled from 'styled-components';
 import Rating from './Rating';
 import Comments from './Comments';
@@ -9,7 +9,8 @@ import { useAuth } from '../contexts/AuthContext';
 import { useMap } from '../contexts/MapContext';
 import { db } from '../firebaseConfig';
 import { doc, updateDoc, arrayUnion, arrayRemove, getDoc, Timestamp } from 'firebase/firestore';
-import { logAuditEvent } from '../services/auditLogService'; 
+import { logAuditEvent } from '../services/auditLogService';
+import { toast } from 'react-toastify'; // Import toast
 
 const ItemContainer = styled.div`
   background: #2a2a2a;
@@ -169,14 +170,20 @@ function RestaurantItem({ restaurant, updateRestaurant, removeRestaurant }) {
   const [showRatingModal, setShowRatingModal] = useState(false);
   const { user, isAuthenticated } = useAuth();
   const { focusLocation } = useMap();
-  
+  const itemRef = useRef(null); // Add a ref for the item container
+
   const handleMapFocus = (location) => {
-    focusLocation(location);
-    const mapElement = document.getElementById('restaurant-map');
-    if (mapElement) {
-      setTimeout(() => {
-        mapElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }, 100);
+    if (location) {
+      focusLocation(location); // Trigger map flyTo
+      // Scroll the item into view
+      if (itemRef.current) {
+        // Use a slight delay to allow map animation to start
+        setTimeout(() => {
+          itemRef.current.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }, 100);
+      }
+    } else {
+      console.warn("Attempted to focus map with no location data.");
     }
   };
 
@@ -262,7 +269,7 @@ function RestaurantItem({ restaurant, updateRestaurant, removeRestaurant }) {
       setShowRatingModal(false);
     } catch (error) {
       console.error('Failed to update rating:', error);
-      alert(`Failed to update rating: ${error.message}. Please try again.`); // Keep user feedback
+      toast.error(`Failed to update rating: ${error.message}. Please try again.`); // Use toast.error
     }
   };
 
@@ -325,10 +332,11 @@ function RestaurantItem({ restaurant, updateRestaurant, removeRestaurant }) {
   };
 
   return (
-    <ItemContainer>
+    // Attach the ref and an ID to the main container
+    <ItemContainer ref={itemRef} id={`restaurant-item-${restaurant.id}`}>
       <IconContainer>
-        <FaMapMarkerAlt 
-          onClick={() => handleMapFocus(restaurant.location)} 
+        <FaMapMarkerAlt
+          onClick={() => handleMapFocus(restaurant.location)}
           title="Show on Map"
           style={{ color: '#ff4081' }}
         />
@@ -406,10 +414,10 @@ function RestaurantItem({ restaurant, updateRestaurant, removeRestaurant }) {
               >
                 {capitalizeWords(restaurant.address)}
               </a>
-              <FiCopy 
+              <FiCopy
                 onClick={() => {
                   navigator.clipboard.writeText(restaurant.address);
-                  alert('Address copied to clipboard!');
+                  toast.info('Address copied to clipboard!'); // Use toast
                 }}
                 title="Copy address to clipboard"
                 style={{ color: '#00bcd4', cursor: 'pointer', marginLeft: '10px', fontSize: '1rem' }}

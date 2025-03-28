@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react'; // Re-added useState, useEffect
 import styled from 'styled-components';
 import { FaThumbsUp, FaThumbsDown, FaStar } from 'react-icons/fa';
-import { getUsernamesByIds } from '../services/userService'; // Import service
+import { getUsernamesByIds } from '../services/userService'; // Re-added userService import
 
 const CommentsContainer = styled.div`
   margin-top: 20px;
@@ -39,6 +39,8 @@ function Comments({ comments }) {
         } catch (error) {
           console.error("Failed to fetch usernames for comments:", error);
           // Keep existing usernames or clear? Decide based on desired behavior.
+          // For now, we'll clear on error to avoid showing stale/incorrect names
+          setUsernames({});
         } finally {
           setLoadingUsernames(false);
         }
@@ -68,8 +70,10 @@ function Comments({ comments }) {
       {loadingUsernames && <p>Loading usernames...</p>}
       {comments && comments.length > 0 ? (
         comments.map((comment, index) => {
-          // Get username from state, fallback to email, then generic user
-          const displayName = usernames[comment.userId] || comment.userEmail || `User (${comment.userId?.substring(0, 6)}...)`;
+          // Prioritize fetched username, then email, then generic user ID
+          const displayName = usernames[comment.userId] // Use fetched username if available
+                             || comment.userEmail       // Fallback to email
+                             || `User (${comment.userId?.substring(0, 6)}...)`; // Fallback to partial ID
           return (
             <CommentItem key={index}>
               <strong>{displayName}</strong> - {formatDate(comment.date)}
