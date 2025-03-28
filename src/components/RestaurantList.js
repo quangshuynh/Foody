@@ -6,7 +6,8 @@ const ListContainer = styled.div`
   margin: 20px 0;
 `;
 
-function RestaurantList({ restaurants, updateRestaurant, removeRestaurant, isPoopMode }) {
+// Removed updateRestaurant prop, added openEditModal prop
+function RestaurantList({ restaurants, openEditModal, removeRestaurant, isPoopMode }) {
   let uniqueNames = [];
   let uniqueAddresses = [];
 
@@ -89,8 +90,10 @@ function RestaurantList({ restaurants, updateRestaurant, removeRestaurant, isPoo
                 }
               : restaurant
           }
-          updateRestaurant={updateRestaurant}
+          openEditModal={openEditModal} // Pass edit modal trigger
           removeRestaurant={removeRestaurant}
+          // Pass updateRestaurant prop specifically for rating updates if needed, or handle rating updates differently
+          // For now, let's assume rating updates are handled within RestaurantItem or via App.js re-render
         />
       ))}
       {restaurants.length === 0 && (
