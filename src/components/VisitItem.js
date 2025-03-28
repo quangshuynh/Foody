@@ -444,12 +444,13 @@ function VisitItem({ restaurant, removeToVisit, updateToVisit }) {
               {restaurant.updatedAt && (
                 <Tooltip className="tooltip"> Updated on: {restaurant.updatedAt ? (restaurant.updatedAt.toDate ? restaurant.updatedAt.toDate().toLocaleString() : new Date(restaurant.updatedAt).toLocaleString()) : 'N/A'}</Tooltip>
               )}
-            </DateWrapper>
-          </div>
-          {/* Removed conditional Comments display */}
-        </>
-      )}
-    </ItemContainer>
+           </DateWrapper>
+         </div>
+         {showTags && (
+           <TagDisplay tags={restaurant.tags} />
+         )}
+       </>
+   </ItemContainer>
   );
 }
 

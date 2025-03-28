@@ -28,6 +28,8 @@ const ItemContainer = styled.div`
   }
 `;
 
+// Removed Button, Input1, Input2 styled components as they are no longer used for inline editing
+
 const IconContainer = styled.div`
   position: absolute;
   top: 15px;
@@ -160,14 +162,12 @@ function capitalizeWords(str) {
     .join(' ');
 }
 
-function RestaurantItem({ restaurant, updateRestaurant, removeRestaurant }) {
-  const [isEditing, setIsEditing] = useState(false);
-  const [editName, setEditName] = useState(restaurant.name);
-  const [editAddress, setEditAddress] = useState(restaurant.address);
-  const [editError, setEditError] = useState('');
-  const [editLoading, setEditLoading] = useState(false);
+// Removed updateRestaurant prop, added openEditModal
+function RestaurantItem({ restaurant, openEditModal, removeRestaurant }) {
+  // Removed inline editing state: isEditing, editName, editAddress, editError, editLoading
   const [showComments, setShowComments] = useState(false);
   const [showRatingModal, setShowRatingModal] = useState(false);
+  const [showTags, setShowTags] = useState(false); // State for showing tags
   const { user, isAuthenticated } = useAuth();
   const { focusLocation } = useMap();
   const itemRef = useRef(null); // Add a ref for the item container
@@ -248,15 +248,10 @@ function RestaurantItem({ restaurant, updateRestaurant, removeRestaurant }) {
         averageRating: Math.round(averageRating * 10) / 10
       });
 
-      // Update local state via the prop from App.js
-      updateRestaurant({
-        ...restaurant,
-        ratings: ratingsUpdate.map(r => ({ // Convert Timestamps back for local state if needed
-          ...r,
-          date: r.date.toDate()
-        })),
-        averageRating: Math.round(averageRating * 10) / 10
-      });
+      // NOTE: Removed direct call to updateRestaurant prop here.
+      // The parent component (App.js) should re-render based on the Firestore update
+      // or listen to Firestore changes if real-time updates are implemented.
+      // This avoids potential state inconsistencies if the prop isn't passed correctly.
 
       // Log the audit event *after* successful rating update/add
       await logAuditEvent(
@@ -279,56 +274,11 @@ function RestaurantItem({ restaurant, updateRestaurant, removeRestaurant }) {
     }
   };
 
-  const handleEdit = () => {
-    setIsEditing(true);
-  };
-
-  const handleEditCancel = () => {
-    setIsEditing(false);
-    setEditName(restaurant.name);
-    setEditAddress(restaurant.address);
-    setEditError('');
-  };
-
-  const handleEditSave = async () => {
-    if (!editName || !editAddress) {
-      setEditError('Please fill in all fields');
-      return;
+  // Trigger the modal via the prop
+  const handleEditClick = () => {
+    if (openEditModal) {
+      openEditModal(restaurant);
     }
-    setEditLoading(true);
-    setEditError('');
-    try {
-      if (editAddress !== restaurant.address) {
-        const res = await fetch(
-          `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(editAddress)}`
-        );
-        const data = await res.json();
-        if (data && data.length > 0) {
-          const { lat, lon } = data[0];
-          // Call the updateRestaurant prop (which calls the service)
-          // The service handles the updateDoc call and adds timestamps
-          updateRestaurant({
-            ...restaurant, // Pass existing data
-            name: editName.trim(), // Trim name
-            address: editAddress.trim(), // Trim address
-            location: { lat: parseFloat(lat), lng: parseFloat(lon) },
-          });
-          setIsEditing(false);
-        } else {
-          setEditError('Address not found. Please enter a valid address.');
-        }
-      } else {
-        // Only name changed, update that
-        updateRestaurant({
-          ...restaurant, // Pass existing data
-          name: editName.trim() // Trim name
-        });
-        setIsEditing(false);
-      }
-    } catch (err) {
-      setEditError('Error fetching location. Please try again.');
-    }
-    setEditLoading(false);
   };
 
   return (
@@ -342,11 +292,13 @@ function RestaurantItem({ restaurant, updateRestaurant, removeRestaurant }) {
         />
         {isAuthenticated && (
           <>
-            <FaEdit onClick={handleEdit} title="Edit" />
+            <FaEdit onClick={handleEditClick} title="Edit" /> {/* Updated onClick */}
             <FaStar onClick={() => setShowRatingModal(true)} title="Rate" />
             <FaTrash onClick={handleRemove} title="Remove" />
           </>
         )}
+        {/* Add Tags button - always visible */}
+        <FaTags onClick={() => setShowTags(!showTags)} title="Show Tags" />
         <FaComment onClick={() => setShowComments(!showComments)} title="Comments" />
       </IconContainer>
 
@@ -359,33 +311,11 @@ function RestaurantItem({ restaurant, updateRestaurant, removeRestaurant }) {
           currentRating={(restaurant.ratings || []).find(r => r?.userId === user?.uid)?.rating || 0}
         />
       )}
-
-      {isEditing ? (
-        <>
-          <Input1
-            type="text"
-            value={editName}
-            onChange={(e) => setEditName(e.target.value)}
-            placeholder="Restaurant Name (e.g., Dogtown)" 
-          />
-          <Input2
-            type="text"
-            value={editAddress}
-            onChange={(e) => setEditAddress(e.target.value)}
-            placeholder="Street Address (e.g., 691 Monroe Ave)" 
-          />
-          {editError && <p style={{ color: '#ff4081' }}>{editError}</p>}
-          <Button onClick={handleEditSave} disabled={editLoading}>
-            {editLoading ? 'Saving...' : 'Save'}
-          </Button>
-          <Button onClick={handleEditCancel} style={{ marginLeft: '10px', background: '#ff4081' }}>
-            Cancel
-          </Button>
-        </>
-      ) : (
+ 
+      {/* Always show display view now */}
         <>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <h3 style={{ 
+            <h3 style={{
               fontFamily: "'aligarh', sans-serif", 
               color: '#f5f5f5', 
               fontSize: '1.7rem',
@@ -435,6 +365,9 @@ function RestaurantItem({ restaurant, updateRestaurant, removeRestaurant }) {
           <div style={{ textAlign: 'center', margin: '8px 0' }}>
             <Rating rating={restaurant.averageRating} />
           </div>
+          {showTags && (
+            <TagDisplay tags={restaurant.tags} />
+          )}
           {showComments && (
             <Comments
               comments={(restaurant.ratings || [])
@@ -443,7 +376,6 @@ function RestaurantItem({ restaurant, updateRestaurant, removeRestaurant }) {
             />
           )}
         </>
-      )}
     </ItemContainer>
   );
 }

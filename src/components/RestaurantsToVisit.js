@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import AddToVisit from './AddToVisit';
+// Removed AddToVisit import
 import VisitItem from './VisitItem';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -8,8 +8,8 @@ const Container = styled.div`
   margin: 20px 0;
 `;
 
-// Added updateToVisit and isPoopMode props
-function RestaurantsToVisit({ restaurantsToVisit, addToVisit, removeToVisit, updateToVisit, isPoopMode }) {
+// Removed addToVisit, updateToVisit props, added openEditModal
+function RestaurantsToVisit({ restaurantsToVisit, removeToVisit, openEditModal, isPoopMode }) {
   const { isAuthenticated } = useAuth();
 
   // Poop mode logic similar to RestaurantList
@@ -58,18 +58,20 @@ function RestaurantsToVisit({ restaurantsToVisit, addToVisit, removeToVisit, upd
     });
   }
 
-  return (
-    <Container>
-      {isAuthenticated && <AddToVisit addToVisit={addToVisit} />}
-      {restaurantsToVisit.map((restaurant, index) => (
-        <VisitItem
-          key={restaurant.id}
-          // Apply poop mode overrides if active
-          restaurant={isPoopMode ? { ...restaurant, name: uniqueNames[index], address: uniqueAddresses[index] } : restaurant}
-          removeToVisit={isAuthenticated ? removeToVisit : null} // Ensure functions are passed only if authenticated
-          updateToVisit={isAuthenticated ? updateToVisit : null} // Pass update function
-        />
-      ))}
+ return (
+   <Container>
+     {/* Removed AddToVisit component */}
+     {restaurantsToVisit.map((restaurant, index) => (
+       <VisitItem
+         key={restaurant.id}
+         // Apply poop mode overrides if active
+         restaurant={isPoopMode ? { ...restaurant, name: uniqueNames[index], address: uniqueAddresses[index] } : restaurant}
+         removeToVisit={isAuthenticated ? removeToVisit : null}
+         openEditModal={isAuthenticated ? openEditModal : null} // Pass edit modal trigger
+         // Pass updateToVisit prop specifically for rating updates if needed
+         // For now, let's assume rating updates are handled within VisitItem or via App.js re-render
+       />
+     ))}
     </Container>
   );
 }

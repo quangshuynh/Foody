@@ -10,6 +10,7 @@ import { fetchToVisitRestaurants, addToVisit as addToVisitApi, removeToVisit as 
 import { fetchRecommendedRestaurants } from './services/recommendedService';
 import { logout } from './services/authService';
 import styled from 'styled-components';
+import { FaPlus } from 'react-icons/fa'; // Icon for add button
 import SearchBar from './components/SearchBar';
 import RestaurantList from './components/RestaurantList';
 import RestaurantsToVisit from './components/RestaurantsToVisit';
@@ -17,8 +18,9 @@ import RecommendedRestaurants from './components/RecommendedRestaurants';
 import RestaurantMap from './components/RestaurantMap';
 import Footer from './components/Footer';
 import ModalOverlay from './components/ModalOverlay';
+import RestaurantFormModal from './components/RestaurantFormModal'; // Import the new modal
 import Navbar from './components/Navbar';
-import AddRestaurant from './components/AddRestaurant';
+// Removed AddRestaurant import
 import './App.css';
 import { ToastContainer, toast } from 'react-toastify'; // Import toast
 import 'react-toastify/dist/ReactToastify.css'; // Import toast CSS
@@ -30,7 +32,30 @@ const AppContainer = styled.div`
   text-align: center;
   min-height: 90vh;
   padding: 6px;
-  margin-top: 20px; 
+  margin-top: 20px;
+`;
+
+// Styled button for opening the add modal
+const AddButton = styled.button`
+  background: #00bcd4;
+  color: white;
+  border: none;
+  border-radius: 50%; /* Make it circular */
+  width: 50px; /* Fixed size */
+  height: 50px; /* Fixed size */
+  font-size: 1.5rem; /* Icon size */
+  cursor: pointer;
+  margin: 20px auto; /* Center it */
+  display: flex; /* Center icon */
+  align-items: center; /* Center icon */
+  justify-content: center; /* Center icon */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  transition: background 0.3s, transform 0.2s;
+
+  &:hover {
+    background: #00a1b5;
+    transform: scale(1.1);
+  }
 `;
 
 function App() {
@@ -48,6 +73,11 @@ function App() {
   // State for ToVisit display limit
   const [toVisitDisplayLimit, setToVisitDisplayLimit] = useState(5);
   const [isToVisitPoopMode, setIsToVisitPoopMode] = useState(false);
+
+  // State for the Add/Edit Modal
+  const [isFormModalOpen, setIsFormModalOpen] = useState(false);
+  const [editingRestaurant, setEditingRestaurant] = useState(null); // null for add, restaurant object for edit
+  const [formModalListType, setFormModalListType] = useState('visited'); // 'visited' or 'toVisit'
 
 
   const sectionOrder = ['visited', 'toVisit', 'recommended'];
@@ -81,10 +111,11 @@ function App() {
     setFilteredRestaurants(restaurants);
   }, [restaurants]);
 
+  // --- Visited Restaurant Handlers ---
   const addRestaurant = async (restaurant) => {
     if (!isAuthenticated) {
-      alert("Please log in to add a restaurant.");
-      return;
+      toast.error("Please log in to add a restaurant.");
+      return Promise.reject(new Error("Authentication required")); // Return rejected promise for modal handling
     }
     const duplicate = restaurants.some(
       (r) =>
@@ -92,8 +123,8 @@ function App() {
         r.address.toLowerCase() === restaurant.address.toLowerCase()
     );
     if (duplicate) {
-      alert("This restaurant already exists in your visited list!");
-      return;
+      toast.warn("This restaurant already exists in your visited list!");
+      return Promise.reject(new Error("Duplicate restaurant")); // Return rejected promise
     }
     try {
       const savedRestaurant = await addRestaurantApi(restaurant);
@@ -101,13 +132,14 @@ function App() {
     } catch (err) {
       console.error('Failed to add visited restaurant:', err);
       toast.error(`Failed to add visited restaurant: ${err.message}. Please try again.`); // Use toast.error
+      throw err; // Re-throw error for modal handling
     }
   };
 
   const updateRestaurant = async (updatedRestaurant) => {
     if (!isAuthenticated) {
-      alert("Please log in to update a restaurant.");
-      return;
+      toast.error("Please log in to update a restaurant.");
+      return Promise.reject(new Error("Authentication required"));
     }
     try {
       const savedRestaurant = await updateRestaurantApi(updatedRestaurant); 
@@ -118,13 +150,14 @@ function App() {
     } catch (err) {
       console.error('Failed to update visited restaurant:', err);
       toast.error(`Failed to update visited restaurant: ${err.message}. Please try again.`); // Use toast.error
+      throw err; // Re-throw error for modal handling
     }
   };
 
   const removeRestaurant = async (id) => {
     if (!isAuthenticated) {
-      alert("Please log in to remove a restaurant.");
-      return;
+      toast.error("Please log in to remove a restaurant.");
+      return; // No promise needed here as it's not called from modal submit
     }
     try {
       await removeRestaurantApi(id);
@@ -136,6 +169,7 @@ function App() {
     }
   };
 
+  // --- Display Limit Handlers ---
   // Handler for Visited display limit
   const handleVisitedDisplayLimitChange = (e) => {
     const value = e.target.value;
@@ -160,6 +194,7 @@ function App() {
     }
   };
 
+  // --- To Visit Restaurant Handlers ---
   const searchRestaurants = (query) => {
     if (query.trim() === '') {
       setFilteredRestaurants(restaurants);
@@ -173,8 +208,8 @@ function App() {
 
   const addToVisit = async (restaurant) => {
     if (!isAuthenticated) {
-      alert("Please log in to add a restaurant to visit.");
-      return;
+      toast.error("Please log in to add a restaurant to visit.");
+      return Promise.reject(new Error("Authentication required"));
     }
     const duplicate = restaurantsToVisit.some(
       (r) =>
@@ -182,8 +217,8 @@ function App() {
         r.address.toLowerCase() === restaurant.address.toLowerCase()
     );
     if (duplicate) {
-      alert("This restaurant already exists in your 'to visit' list!");
-      return;
+      toast.warn("This restaurant already exists in your 'to visit' list!");
+      return Promise.reject(new Error("Duplicate restaurant"));
     }
     try {
       const savedToVisit = await addToVisitApi(restaurant);
@@ -191,13 +226,14 @@ function App() {
     } catch (err) {
       console.error('Failed to add to-visit restaurant:', err);
       toast.error(`Failed to add to-visit restaurant: ${err.message}. Please try again.`); // Use toast.error
+      throw err; // Re-throw error for modal handling
     }
   };
 
   const removeToVisit = async (id) => {
     if (!isAuthenticated) {
-      alert("Please log in to remove a restaurant from the 'to visit' list.");
-      return;
+      toast.error("Please log in to remove a restaurant from the 'to visit' list.");
+      return; // Not called from modal submit
     }
     try {
       await removeToVisitApi(id);
@@ -212,8 +248,8 @@ function App() {
   // Handler for updating a 'to visit' restaurant
   const updateToVisit = async (updatedToVisit) => {
     if (!isAuthenticated) {
-      alert("Please log in to update a restaurant.");
-      return;
+      toast.error("Please log in to update a restaurant.");
+      return Promise.reject(new Error("Authentication required"));
     }
     try {
       const savedToVisit = await updateToVisitApi(updatedToVisit);
@@ -224,10 +260,27 @@ function App() {
     } catch (err) {
       console.error('Failed to update to-visit restaurant:', err);
       toast.error(`Failed to update to-visit restaurant: ${err.message}. Please try again.`); // Use toast.error
+      throw err; // Re-throw error for modal handling
     }
   };
 
+  // --- Modal Handlers ---
+  const openAddModal = (listType) => {
+    setFormModalListType(listType);
+    setEditingRestaurant(null); // Ensure we are in "add" mode
+    setIsFormModalOpen(true);
+  };
 
+  const openEditModal = (restaurant, listType) => {
+    setFormModalListType(listType);
+    setEditingRestaurant(restaurant); // Set the restaurant to edit
+    setIsFormModalOpen(true);
+  };
+
+  const closeFormModal = () => {
+    setIsFormModalOpen(false);
+    setEditingRestaurant(null); // Clear editing state when closing
+  };
   const isAuthenticated = !!user;
   const [showLogin, setShowLogin] = useState(false);
   const [showRegister, setShowRegister] = useState(false);
@@ -291,6 +344,16 @@ function App() {
           </ModalOverlay>
         )}
 
+        {/* Add/Edit Restaurant Modal */}
+        {isFormModalOpen && isAuthenticated && (
+          <RestaurantFormModal
+            restaurantToEdit={editingRestaurant}
+            onSubmit={editingRestaurant ? (formModalListType === 'visited' ? updateRestaurant : updateToVisit) : (formModalListType === 'visited' ? addRestaurant : addToVisit)}
+            onClose={closeFormModal}
+            listType={formModalListType}
+          />
+        )}
+
         <div style={{ position: 'relative' }}>
           <TransitionGroup component={null}>
             <CSSTransition
@@ -307,13 +370,15 @@ function App() {
                     <div style={{ width: '80%', margin: '0 auto' }}>
                       <SearchBar searchRestaurants={searchRestaurants} />
                     </div>
+                    {/* Replace AddRestaurant component with a button */}
                     {isAuthenticated && (
-                      <AddRestaurant addRestaurant={addRestaurant} />
+                      <AddButton onClick={() => openAddModal('visited')} title="Add Visited Restaurant">
+                        <FaPlus />
+                      </AddButton>
                     )}
                     <RestaurantList
-                      // Use visitedDisplayLimit and isVisitedPoopMode
                       restaurants={filteredRestaurants.slice(0, visitedDisplayLimit)}
-                      updateRestaurant={isAuthenticated ? updateRestaurant : null}
+                      openEditModal={isAuthenticated ? (restaurant) => openEditModal(restaurant, 'visited') : null} // Pass function to open edit modal
                       removeRestaurant={isAuthenticated ? removeRestaurant : null}
                       isPoopMode={isVisitedPoopMode}
                     />
@@ -323,13 +388,16 @@ function App() {
                 {selectedSection === 'toVisit' && (
                   <>
                     <h2>Restaurants to Visit</h2>
+                    {/* Replace AddToVisit component with a button */}
+                    {isAuthenticated && (
+                      <AddButton onClick={() => openAddModal('toVisit')} title="Add Restaurant To Visit">
+                        <FaPlus />
+                      </AddButton>
+                    )}
                     <RestaurantsToVisit
-                      // Use toVisitDisplayLimit
                       restaurantsToVisit={restaurantsToVisit.slice(0, toVisitDisplayLimit)}
-                      addToVisit={isAuthenticated ? addToVisit : null}
                       removeToVisit={isAuthenticated ? removeToVisit : null}
-                      // Pass updateToVisit handler
-                      updateToVisit={isAuthenticated ? updateToVisit : null}
+                      openEditModal={isAuthenticated ? (restaurant) => openEditModal(restaurant, 'toVisit') : null} // Pass function to open edit modal
                       // Pass poop mode state
                       isPoopMode={isToVisitPoopMode}
                     />
