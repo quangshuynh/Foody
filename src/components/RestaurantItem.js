@@ -2,16 +2,16 @@ import React, { useState, useRef } from 'react';
 import styled from 'styled-components';
 import Rating from './Rating';
 import Comments from './Comments';
-import TagDisplay from './TagDisplay'; // Import TagDisplay
-import { FaTrash, FaEdit, FaStar, FaComment, FaMapMarkerAlt, FaTags } from 'react-icons/fa'; // Added FaTags
+import TagDisplay from './TagDisplay'; 
+import { FaTrash, FaEdit, FaStar, FaComment, FaMapMarkerAlt, FaTags } from 'react-icons/fa'; 
 import { FiCopy } from 'react-icons/fi';
 import RatingModal from './RatingModal';
 import { useAuth } from '../contexts/AuthContext';
 import { useMap } from '../contexts/MapContext';
 import { db } from '../firebaseConfig';
-import { doc, updateDoc, arrayUnion, arrayRemove, getDoc, Timestamp, serverTimestamp } from 'firebase/firestore'; // Added serverTimestamp
+import { doc, updateDoc, arrayUnion, arrayRemove, getDoc, Timestamp } from 'firebase/firestore';
 import { logAuditEvent } from '../services/auditLogService';
-import { toast } from 'react-toastify'; // Import toast
+import { toast } from 'react-toastify'; 
 
 const ItemContainer = styled.div`
   background: #2a2a2a;
@@ -29,8 +29,6 @@ const ItemContainer = styled.div`
   }
 `;
 
-// Removed Button, Input1, Input2 styled components as they are no longer used for inline editing
-
 const IconContainer = styled.div`
   position: absolute;
   top: 15px;
@@ -44,64 +42,6 @@ const IconContainer = styled.div`
     &:hover {
       color: #00a1b5;
     }
-  }
-`;
-
-const Button = styled.button`
-  background: #00bcd4;
-  border: none;
-  color: #fff;
-  padding: 10px 15px;
-  border-radius: 5px;
-  cursor: pointer;
-  margin-top: 10px;
-  transition: background 0.3s;
-  &:hover {
-    background: #00a1b5;
-  }
-`;
-
-const Input1 = styled.input`
-  width: 100%;
-  padding: 11px 4px;
-  margin: 8px 0;
-  text-indent: 5px;
-  border: 1px solid #00bcd4;
-  border-radius: 8px;
-  background: #1e1e1e;
-  color: #fff;
-  transition: border 0.3s ease, box-shadow 0.3s ease;
-  outline: none;
-  margin-top: 25px;
-
-  font-family: 'Roboto', sans-serif;
-  font-size: 16px;
-  
-  &:focus {
-    border-color: #ff4081;
-    box-shadow: 0 0 8px rgba(255, 64, 129, 0.5);
-  }
-`;
-
-const Input2 = styled.input`
-  width: 100%;
-  padding: 11px 4px;
-  margin: 8px 0;
-  text-indent: 5px;
-  border: 1px solid #00bcd4;
-  border-radius: 8px;
-  background: #1e1e1e;
-  color: #fff;
-  transition: border 0.3s ease, box-shadow 0.3s ease;
-  outline: none;
-  margin-top: 4px;
-
-  font-family: 'Roboto', sans-serif;
-  font-size: 16px;
-  
-  &:focus {
-    border-color: #ff4081;
-    box-shadow: 0 0 8px rgba(255, 64, 129, 0.5);
   }
 `;
 
@@ -163,9 +103,18 @@ function capitalizeWords(str) {
     .join(' ');
 }
 
-// Removed updateRestaurant prop, added openEditModal
+function formatDate(date) {
+  if (!date) return 'N/A';
+  if (typeof date === 'string' || date instanceof Date) {
+    return new Date(date).toLocaleString();
+  }
+  if (typeof date === 'object' && typeof date.toDate === 'function') {
+    return date.toDate().toLocaleString();
+  }
+  return new Date(date).toLocaleString();
+}
+
 function RestaurantItem({ restaurant, openEditModal, removeRestaurant }) {
-  // Removed inline editing state: isEditing, editName, editAddress, editError, editLoading
   const [showComments, setShowComments] = useState(false);
   const [showRatingModal, setShowRatingModal] = useState(false);
   const [showTags, setShowTags] = useState(false); // State for showing tags
@@ -221,22 +170,22 @@ function RestaurantItem({ restaurant, openEditModal, removeRestaurant }) {
       let averageRating = 0;
 
       if (existingRating) {
-        // Atomically remove the old rating and add the new one
         await updateDoc(restaurantDocRef, {
-          ratings: arrayRemove(existingRating)
+          ratings: arrayRemove(existingRating),
+          updatedAt: Timestamp.fromDate(new Date())
         });
         await updateDoc(restaurantDocRef, {
-          ratings: arrayUnion(newRatingData)
+          ratings: arrayUnion(newRatingData),
+          updatedAt: Timestamp.fromDate(new Date())
         });
-        // Recalculate based on the new state (fetch again or calculate locally)
-        const updatedDocSnap = await getDoc(restaurantDocRef); // Fetch again to be safe
+        const updatedDocSnap = await getDoc(restaurantDocRef);
         ratingsUpdate = updatedDocSnap.data().ratings || [];
       } else {
-        // Atomically add the new rating
         await updateDoc(restaurantDocRef, {
-          ratings: arrayUnion(newRatingData)
+          ratings: arrayUnion(newRatingData),
+          updatedAt: Timestamp.fromDate(new Date())
         });
-        ratingsUpdate = [...currentRatings, newRatingData]; // Optimistic local update
+        ratingsUpdate = [...currentRatings, newRatingData]; 
       }
 
       // Calculate new average rating
@@ -244,17 +193,13 @@ function RestaurantItem({ restaurant, openEditModal, removeRestaurant }) {
         averageRating = ratingsUpdate.reduce((acc, r) => acc + r.rating, 0) / ratingsUpdate.length;
       }
 
-      // Update the average rating in Firestore
+      // Update the average rating in Firestore and update updatedAt
       await updateDoc(restaurantDocRef, {
-        averageRating: Math.round(averageRating * 10) / 10
+        averageRating: Math.round(averageRating * 10) / 10,
+        updatedAt: Timestamp.fromDate(new Date())
       });
 
-      // NOTE: Removed direct call to updateRestaurant prop here.
-      // The parent component (App.js) should re-render based on the Firestore update
-      // or listen to Firestore changes if real-time updates are implemented.
-      // This avoids potential state inconsistencies if the prop isn't passed correctly.
-
-      // Log the audit event *after* successful rating update/add
+      // Log the audit event after successful rating update/add
       await logAuditEvent(
         existingRating ? 'UPDATE_RATING' : 'CREATE_RATING',
         'visitedRestaurants',
@@ -265,7 +210,7 @@ function RestaurantItem({ restaurant, openEditModal, removeRestaurant }) {
       setShowRatingModal(false);
     } catch (error) {
       console.error('Failed to update rating:', error);
-      toast.error(`Failed to update rating: ${error.message}. Please try again.`); // Use toast.error
+      toast.error(`Failed to update rating: ${error.message}. Please try again.`);
     }
   };
 
@@ -275,7 +220,6 @@ function RestaurantItem({ restaurant, openEditModal, removeRestaurant }) {
     }
   };
 
-  // Trigger the modal via the prop
   const handleEditClick = () => {
     if (openEditModal) {
       openEditModal(restaurant);
@@ -283,7 +227,6 @@ function RestaurantItem({ restaurant, openEditModal, removeRestaurant }) {
   };
 
   return (
-    // Attach the ref and an ID to the main container
     <ItemContainer ref={itemRef} id={`restaurant-item-${restaurant.id}`}>
       <IconContainer>
         <FaMapMarkerAlt
@@ -293,7 +236,7 @@ function RestaurantItem({ restaurant, openEditModal, removeRestaurant }) {
         />
         {isAuthenticated && (
           <>
-            <FaEdit onClick={handleEditClick} title="Edit" /> {/* Updated onClick */}
+            <FaEdit onClick={handleEditClick} title="Edit" />
             <FaStar onClick={() => setShowRatingModal(true)} title="Rate" />
             <FaTrash onClick={handleRemove} title="Remove" />
           </>
@@ -303,7 +246,6 @@ function RestaurantItem({ restaurant, openEditModal, removeRestaurant }) {
         <FaComment onClick={() => setShowComments(!showComments)} title="Comments" />
       </IconContainer>
 
-
       {showRatingModal && (
         <RatingModal
           onSubmit={handleRatingSubmit}
@@ -312,71 +254,72 @@ function RestaurantItem({ restaurant, openEditModal, removeRestaurant }) {
           currentRating={(restaurant.ratings || []).find(r => r?.userId === user?.uid)?.rating || 0}
         />
       )}
- 
-      {/* Always show display view now */}
-        <>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <h3 style={{
-              fontFamily: "'aligarh', sans-serif", 
-              color: '#f5f5f5', 
-              fontSize: '1.7rem',
-              letterSpacing: '1px',
-              marginBottom: '2px'
-            }}>
-              {restaurant.name}
-            </h3>
-          </div>
-          {restaurant.address && (
-            <p style={{ 
-              fontFamily: "'playfair', sans-serif", 
-              fontSize: '1.1rem', 
-              color: '#fff',
-              marginTop: '0',
-              textAlign: 'center',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center'
-            }}>
-              <a 
-                href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(restaurant.name)} ${encodeURIComponent(restaurant.address)}`}
-                target="_blank" 
-                rel="noopener noreferrer"
-                style={{ color: '#b4c2fa', textDecoration: 'none', fontWeight: 'bold' }}
-              >
-                {capitalizeWords(restaurant.address)}
-              </a>
-              <FiCopy
-                onClick={() => {
-                  navigator.clipboard.writeText(restaurant.address);
-                  toast.info('Address copied to clipboard!'); // Use toast
-                }}
-                title="Copy address to clipboard"
-                style={{ color: '#00bcd4', cursor: 'pointer', marginLeft: '10px', fontSize: '1rem' }}
-              />
-            </p>
-          )}
-          <div style={{ textAlign: 'center', marginTop: '10px' }}>
-            <DateWrapper>
-            <DateText>Added on: {restaurant.dateAdded ? (restaurant.dateAdded.toDate ? restaurant.dateAdded.toDate().toLocaleString() : new Date(restaurant.dateAdded).toLocaleString()) : 'N/A'}</DateText>
-              {restaurant.updatedAt && (
-                <Tooltip className="tooltip"> Updated on: {restaurant.updatedAt ? (restaurant.updatedAt.toDate ? restaurant.updatedAt.toDate().toLocaleString() : new Date(restaurant.updatedAt).toLocaleString()) : 'N/A'}</Tooltip>              
-              )}
-            </DateWrapper>
-          </div>
-          <div style={{ textAlign: 'center', margin: '8px 0' }}>
-            <Rating rating={restaurant.averageRating} />
-          </div>
-          {showTags && (
-            <TagDisplay tags={restaurant.tags} />
-          )}
-          {showComments && (
-            <Comments
-              comments={(restaurant.ratings || [])
-                .filter(r => r?.comment)
-                .sort((a, b) => new Date(b.date) - new Date(a.date))}
+
+      <>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <h3 style={{
+            fontFamily: "'aligarh', sans-serif", 
+            color: '#f5f5f5', 
+            fontSize: '1.7rem',
+            letterSpacing: '1px',
+            marginBottom: '2px'
+          }}>
+            {restaurant.name}
+          </h3>
+        </div>
+        {restaurant.address && (
+          <p style={{ 
+            fontFamily: "'playfair', sans-serif", 
+            fontSize: '1.1rem', 
+            color: '#fff',
+            marginTop: '0',
+            textAlign: 'center',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}>
+            <a 
+              href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(restaurant.name)} ${encodeURIComponent(restaurant.address)}`}
+              target="_blank" 
+              rel="noopener noreferrer"
+              style={{ color: '#b4c2fa', textDecoration: 'none', fontWeight: 'bold' }}
+            >
+              {capitalizeWords(restaurant.address)}
+            </a>
+            <FiCopy
+              onClick={() => {
+                navigator.clipboard.writeText(restaurant.address);
+                toast.info('Address copied to clipboard!');
+              }}
+              title="Copy address to clipboard"
+              style={{ color: '#00bcd4', cursor: 'pointer', marginLeft: '10px', fontSize: '1rem' }}
             />
-          )}
-        </>
+          </p>
+        )}
+        <div style={{ textAlign: 'center', marginTop: '10px' }}>
+          <DateWrapper>
+            <DateText>Added on: {formatDate(restaurant.dateAdded)}</DateText>
+            {restaurant.updatedAt && (
+              <Tooltip className="tooltip">
+                Updated on: {formatDate(restaurant.updatedAt)}
+              </Tooltip>
+            )}
+          </DateWrapper>
+        </div>
+        <div style={{ textAlign: 'center', margin: '8px 0' }}>
+          <Rating rating={restaurant.averageRating} />
+        </div>
+        {showTags && (
+          <TagDisplay tags={restaurant.tags} />
+        )}
+        {showComments && (
+          <Comments
+            comments={(restaurant.ratings || [])
+              .filter(r => r?.comment)
+              .sort((a, b) => new Date(b.date) - new Date(a.date))}
+          />
+        )}
+      </>
     </ItemContainer>
   );
 }

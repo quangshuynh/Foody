@@ -1,12 +1,10 @@
 import React, { useState, useRef } from 'react';
 import styled from 'styled-components';
-// Import necessary icons and components
 import { FaTrash, FaMapMarkerAlt, FaEdit, FaStar, FaTags } from 'react-icons/fa'; // Added FaTags
 import { FiCopy } from 'react-icons/fi';
 import { useAuth } from '../contexts/AuthContext';
 import { useMap } from '../contexts/MapContext';
 import Rating from './Rating'; // Import Rating component
-import Comments from './Comments'; // Import Comments component
 import RatingModal from './RatingModal'; // Import RatingModal component
 import TagDisplay from './TagDisplay'; // Import TagDisplay
 import { db } from '../firebaseConfig'; // Import db for potential direct updates if needed
@@ -31,66 +29,6 @@ const ItemContainer = styled.div`
     padding: 15px;
   }
 `;
-
-// Reusing styles from RestaurantItem for consistency
-const Input1 = styled.input`
-  width: 100%;
-  padding: 11px 4px;
-  margin: 8px 0;
-  text-indent: 5px;
-  border: 1px solid #00bcd4;
-  border-radius: 8px;
-  background: #1e1e1e;
-  color: #fff;
-  transition: border 0.3s ease, box-shadow 0.3s ease;
-  outline: none;
-  margin-top: 25px;
-
-  font-family: 'Roboto', sans-serif;
-  font-size: 16px;
-
-  &:focus {
-    border-color: #ff4081;
-    box-shadow: 0 0 8px rgba(255, 64, 129, 0.5);
-  }
-`;
-
-const Input2 = styled.input`
-  width: 100%;
-  padding: 11px 4px;
-  margin: 8px 0;
-  text-indent: 5px;
-  border: 1px solid #00bcd4;
-  border-radius: 8px;
-  background: #1e1e1e;
-  color: #fff;
-  transition: border 0.3s ease, box-shadow 0.3s ease;
-  outline: none;
-  margin-top: 4px;
-
-  font-family: 'Roboto', sans-serif;
-  font-size: 16px;
-
-  &:focus {
-    border-color: #ff4081;
-    box-shadow: 0 0 8px rgba(255, 64, 129, 0.5);
-  }
-`;
-
-const Button = styled.button`
-  background: #00bcd4;
-  border: none;
-  color: #fff;
-  padding: 10px 15px;
-  border-radius: 5px;
-  cursor: pointer;
-  margin-top: 10px;
-  transition: background 0.3s;
-  &:hover {
-    background: #00a1b5;
-  }
-`;
-
 
 const IconContainer = styled.div`
   position: absolute;

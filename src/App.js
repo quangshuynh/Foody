@@ -5,12 +5,11 @@ import { MapProvider } from './contexts/MapContext';
 import LoginForm from './components/auth/LoginForm';
 import RegisterForm from './components/auth/RegisterForm';
 import { fetchVisitedRestaurants, addRestaurant as addRestaurantApi, updateRestaurant as updateRestaurantApi, removeRestaurant as removeRestaurantApi } from './services/restaurantService';
-// Import updateToVisit service function
 import { fetchToVisitRestaurants, addToVisit as addToVisitApi, removeToVisit as removeToVisitApi, updateToVisit as updateToVisitApi } from './services/toVisitService';
 import { fetchRecommendedRestaurants } from './services/recommendedService';
 import { logout } from './services/authService';
 import styled from 'styled-components';
-import { FaPlus } from 'react-icons/fa'; // Icon for add button
+import { FaPlus } from 'react-icons/fa'; 
 import SearchBar from './components/SearchBar';
 import RestaurantList from './components/RestaurantList';
 import RestaurantsToVisit from './components/RestaurantsToVisit';
@@ -18,9 +17,8 @@ import RecommendedRestaurants from './components/RecommendedRestaurants';
 import RestaurantMap from './components/RestaurantMap';
 import Footer from './components/Footer';
 import ModalOverlay from './components/ModalOverlay';
-import RestaurantFormModal from './components/RestaurantFormModal'; // Import the new modal
+import RestaurantFormModal from './components/RestaurantFormModal';
 import Navbar from './components/Navbar';
-// Removed AddRestaurant import
 import './App.css';
 import { ToastContainer, toast } from 'react-toastify'; // Import toast
 import 'react-toastify/dist/ReactToastify.css'; // Import toast CSS
@@ -40,15 +38,15 @@ const AddButton = styled.button`
   background: #00bcd4;
   color: white;
   border: none;
-  border-radius: 50%; /* Make it circular */
-  width: 50px; /* Fixed size */
-  height: 50px; /* Fixed size */
-  font-size: 1.5rem; /* Icon size */
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  font-size: 1.5rem;
   cursor: pointer;
-  margin: 20px auto; /* Center it */
-  display: flex; /* Center icon */
-  align-items: center; /* Center icon */
-  justify-content: center; /* Center icon */
+  margin: 20px auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
   transition: background 0.3s, transform 0.2s;
 
@@ -56,7 +54,21 @@ const AddButton = styled.button`
     background: #00a1b5;
     transform: scale(1.1);
   }
+
+  @media (max-width: 768px) {
+    width: 40px;
+    height: 40px;
+    font-size: 1.2rem;
+  }
+
+
+  @media (max-width: 480px) {
+    width: 35px;
+    height: 35px;
+    font-size: 1rem;
+  }
 `;
+
 
 function App() {
   const { user, authLoading, profileLoading } = useAuth();
@@ -370,7 +382,6 @@ function App() {
                     <div style={{ width: '80%', margin: '0 auto' }}>
                       <SearchBar searchRestaurants={searchRestaurants} />
                     </div>
-                    {/* Replace AddRestaurant component with a button */}
                     {isAuthenticated && (
                       <AddButton onClick={() => openAddModal('visited')} title="Add Visited Restaurant">
                         <FaPlus />
