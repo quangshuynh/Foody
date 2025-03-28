@@ -13,6 +13,8 @@ import { doc, updateDoc, arrayUnion, arrayRemove, getDoc, Timestamp } from 'fire
 import { logAuditEvent } from '../services/auditLogService';
 import { toast } from 'react-toastify'; // Import toast
 
+export default VisitItem;
+
 const ItemContainer = styled.div`
   background: #2a2a2a;
   margin: 15px auto;
@@ -375,8 +377,4 @@ function VisitItem({ restaurant, removeToVisit, updateToVisit }) {
       </>
     </ItemContainer>
   );
-}
-    
-export default VisitItem;
-
-export default VisitItem;
+ }
