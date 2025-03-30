@@ -127,7 +127,7 @@ function App() {
   const addRestaurant = async (restaurant) => {
     if (!isAuthenticated) {
       toast.error("Please log in to add a restaurant.");
-      return Promise.reject(new Error("Authentication required")); // Return rejected promise for modal handling
+      return Promise.reject(new Error("Authentication required")); 
     }
     const duplicate = restaurants.some(
       (r) =>
@@ -136,15 +136,15 @@ function App() {
     );
     if (duplicate) {
       toast.warn("This restaurant already exists in your visited list!");
-      return Promise.reject(new Error("Duplicate restaurant")); // Return rejected promise
+      return Promise.reject(new Error("Duplicate restaurant")); 
     }
     try {
       const savedRestaurant = await addRestaurantApi(restaurant);
       setRestaurants(prev => [savedRestaurant, ...prev]);
     } catch (err) {
       console.error('Failed to add visited restaurant:', err);
-      toast.error(`Failed to add visited restaurant: ${err.message}. Please try again.`); // Use toast.error
-      throw err; // Re-throw error for modal handling
+      toast.error(`Failed to add visited restaurant: ${err.message} Please try again.`); 
+      throw err; 
     }
   };
 
@@ -161,15 +161,15 @@ function App() {
       setRestaurants(updatedList);
     } catch (err) {
       console.error('Failed to update visited restaurant:', err);
-      toast.error(`Failed to update visited restaurant: ${err.message}. Please try again.`); // Use toast.error
-      throw err; // Re-throw error for modal handling
+      toast.error(`Failed to update visited restaurant: ${err.message} Please try again.`); 
+      throw err; 
     }
   };
 
   const removeRestaurant = async (id) => {
     if (!isAuthenticated) {
       toast.error("Please log in to remove a restaurant.");
-      return; // No promise needed here as it's not called from modal submit
+      return; 
     }
     try {
       await removeRestaurantApi(id);
@@ -177,12 +177,11 @@ function App() {
       setRestaurants(updatedList);
     } catch (err) {
       console.error('Failed to remove visited restaurant:', err);
-      toast.error(`Failed to remove visited restaurant: ${err.message}. Please try again.`); // Use toast.error
+      toast.error(`Failed to remove visited restaurant: ${err.message} Please try again.`);
     }
   };
 
   // --- Display Limit Handlers ---
-  // Handler for Visited display limit
   const handleVisitedDisplayLimitChange = (e) => {
     const value = e.target.value;
     if (value === "poop") {
@@ -237,15 +236,15 @@ function App() {
       setRestaurantsToVisit(prev => [savedToVisit, ...prev]);
     } catch (err) {
       console.error('Failed to add to-visit restaurant:', err);
-      toast.error(`Failed to add to-visit restaurant: ${err.message}. Please try again.`); // Use toast.error
-      throw err; // Re-throw error for modal handling
+      toast.error(`Failed to add to-visit restaurant: ${err.message} Please try again.`); 
+      throw err; 
     }
   };
 
   const removeToVisit = async (id) => {
     if (!isAuthenticated) {
       toast.error("Please log in to remove a restaurant from the 'to visit' list.");
-      return; // Not called from modal submit
+      return; 
     }
     try {
       await removeToVisitApi(id);
@@ -253,7 +252,7 @@ function App() {
       setRestaurantsToVisit(updatedList);
     } catch (err) {
       console.error('Failed to remove to-visit restaurant:', err);
-      toast.error(`Failed to remove to-visit restaurant: ${err.message}. Please try again.`); // Use toast.error
+      toast.error(`Failed to remove to-visit restaurant: ${err.message} Please try again.`); 
     }
   };
 
@@ -271,27 +270,27 @@ function App() {
       setRestaurantsToVisit(updatedList);
     } catch (err) {
       console.error('Failed to update to-visit restaurant:', err);
-      toast.error(`Failed to update to-visit restaurant: ${err.message}. Please try again.`); // Use toast.error
-      throw err; // Re-throw error for modal handling
+      toast.error(`Failed to update to-visit restaurant: ${err.message} Please try again.`);
+      throw err;
     }
   };
 
   // --- Modal Handlers ---
   const openAddModal = (listType) => {
     setFormModalListType(listType);
-    setEditingRestaurant(null); // Ensure we are in "add" mode
+    setEditingRestaurant(null); 
     setIsFormModalOpen(true);
   };
 
   const openEditModal = (restaurant, listType) => {
     setFormModalListType(listType);
-    setEditingRestaurant(restaurant); // Set the restaurant to edit
+    setEditingRestaurant(restaurant); 
     setIsFormModalOpen(true);
   };
 
   const closeFormModal = () => {
     setIsFormModalOpen(false);
-    setEditingRestaurant(null); // Clear editing state when closing
+    setEditingRestaurant(null);
   };
   const isAuthenticated = !!user;
   const [showLogin, setShowLogin] = useState(false);
@@ -313,7 +312,6 @@ function App() {
 
   return (
     <MapProvider>
-      {/* Add ToastContainer here */}
       <ToastContainer
         position="top-center"
         autoClose={3000}
@@ -324,7 +322,7 @@ function App() {
         pauseOnFocusLoss
         draggable
         pauseOnHover
-        theme="dark" // Use dark theme
+        theme="dark" 
       />
       <Navbar
         selectedSection={selectedSection}
