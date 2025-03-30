@@ -2,8 +2,8 @@ import React, { useState, useRef } from 'react';
 import styled from 'styled-components';
 import Rating from './Rating';
 import Comments from './Comments';
-import TagDisplay from './TagDisplay'; 
-import { FaTrash, FaEdit, FaStar, FaComment, FaMapMarkerAlt, FaTags } from 'react-icons/fa'; 
+import TagDisplay from './TagDisplay';
+import { FaTrash, FaEdit, FaStar, FaComment, FaMapMarkerAlt, FaTags } from 'react-icons/fa';
 import { FiCopy } from 'react-icons/fi';
 import RatingModal from './RatingModal';
 import { useAuth } from '../contexts/AuthContext';
@@ -11,7 +11,7 @@ import { useMap } from '../contexts/MapContext';
 import { db } from '../firebaseConfig';
 import { doc, updateDoc, arrayUnion, arrayRemove, getDoc, Timestamp } from 'firebase/firestore';
 import { logAuditEvent } from '../services/auditLogService';
-import { toast } from 'react-toastify'; 
+import { toast } from 'react-toastify';
 
 const ItemContainer = styled.div`
   background: #2a2a2a;
@@ -117,17 +117,24 @@ function formatDate(date) {
 function RestaurantItem({ restaurant, openEditModal, removeRestaurant }) {
   const [showComments, setShowComments] = useState(false);
   const [showRatingModal, setShowRatingModal] = useState(false);
-  const [showTags, setShowTags] = useState(false); // State for showing tags
+  const [showTags, setShowTags] = useState(false); 
   const { user, isAuthenticated } = useAuth();
   const { focusLocation } = useMap();
-  const itemRef = useRef(null); // Add a ref for the item container
+  const itemRef = useRef(null); 
+
+  const [originalDateAdded] = useState(() => {
+    if (restaurant.dateAdded && typeof restaurant.dateAdded.toDate === 'function') {
+      return restaurant.dateAdded;
+    } else if (restaurant.dateAdded) {
+      return Timestamp.fromDate(new Date(restaurant.dateAdded));
+    }
+    return null;
+  });
 
   const handleMapFocus = (location) => {
     if (location) {
-      focusLocation(location); // Trigger map flyTo
-      // Scroll the item into view
+      focusLocation(location);
       if (itemRef.current) {
-        // Use a slight delay to allow map animation to start
         setTimeout(() => {
           itemRef.current.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         }, 100);
@@ -146,7 +153,6 @@ function RestaurantItem({ restaurant, openEditModal, removeRestaurant }) {
     const restaurantDocRef = doc(db, 'visitedRestaurants', restaurant.id);
 
     try {
-      // Fetch the current document to get the latest ratings array
       const docSnap = await getDoc(restaurantDocRef);
       if (!docSnap.exists()) {
         throw new Error("Restaurant document not found.");
@@ -154,16 +160,15 @@ function RestaurantItem({ restaurant, openEditModal, removeRestaurant }) {
       const currentData = docSnap.data();
       const currentRatings = currentData.ratings || [];
 
-      // Find existing rating by the current user
       const existingRating = currentRatings.find(r => r.userId === user.uid);
 
       const newRatingData = {
-        userId: user.uid, // Use uid
-        userEmail: user.email, // Store email (or displayName if available)
+        userId: user.uid,
+        userEmail: user.email,
         rating,
         wouldReturn,
-        comment: comment.trim(), // Trim comment
-        date: Timestamp.fromDate(new Date()) // Use Firestore Timestamp
+        comment: comment.trim(),
+        date: Timestamp.fromDate(new Date())
       };
 
       let ratingsUpdate = [];
@@ -188,18 +193,15 @@ function RestaurantItem({ restaurant, openEditModal, removeRestaurant }) {
         ratingsUpdate = [...currentRatings, newRatingData]; 
       }
 
-      // Calculate new average rating
       if (ratingsUpdate.length > 0) {
         averageRating = ratingsUpdate.reduce((acc, r) => acc + r.rating, 0) / ratingsUpdate.length;
       }
 
-      // Update the average rating in Firestore and update updatedAt
       await updateDoc(restaurantDocRef, {
         averageRating: Math.round(averageRating * 10) / 10,
         updatedAt: Timestamp.fromDate(new Date())
       });
 
-      // Log the audit event after successful rating update/add
       await logAuditEvent(
         existingRating ? 'UPDATE_RATING' : 'CREATE_RATING',
         'visitedRestaurants',
@@ -222,7 +224,10 @@ function RestaurantItem({ restaurant, openEditModal, removeRestaurant }) {
 
   const handleEditClick = () => {
     if (openEditModal) {
-      openEditModal(restaurant);
+      openEditModal({
+        ...restaurant,
+        dateAdded: originalDateAdded,
+      });
     }
   };
 
@@ -241,7 +246,6 @@ function RestaurantItem({ restaurant, openEditModal, removeRestaurant }) {
             <FaTrash onClick={handleRemove} title="Remove" />
           </>
         )}
-        {/* Add Tags button - always visible */}
         <FaTags onClick={() => setShowTags(!showTags)} title="Show Tags" />
         <FaComment onClick={() => setShowComments(!showComments)} title="Comments" />
       </IconContainer>
@@ -250,7 +254,6 @@ function RestaurantItem({ restaurant, openEditModal, removeRestaurant }) {
         <RatingModal
           onSubmit={handleRatingSubmit}
           onClose={() => setShowRatingModal(false)}
-          // Use user.uid to find the current user's rating
           currentRating={(restaurant.ratings || []).find(r => r?.userId === user?.uid)?.rating || 0}
         />
       )}
@@ -298,7 +301,7 @@ function RestaurantItem({ restaurant, openEditModal, removeRestaurant }) {
         )}
         <div style={{ textAlign: 'center', marginTop: '10px' }}>
           <DateWrapper>
-            <DateText>Added on: {formatDate(restaurant.dateAdded)}</DateText>
+            <DateText>Added on: {formatDate(originalDateAdded)}</DateText>
             {restaurant.updatedAt && (
               <Tooltip className="tooltip">
                 Updated on: {formatDate(restaurant.updatedAt)}

@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import { FiCopy } from 'react-icons/fi';
-import { FaMapMarkerAlt } from 'react-icons/fa'; // <-- New: Import FaMapMarkerAlt
+import { FaMapMarkerAlt } from 'react-icons/fa';
 import { toast } from 'react-toastify';
-import { useMap } from '../contexts/MapContext'; // <-- New: Import useMap context
+import { useMap } from '../contexts/MapContext';
 
 const Container = styled.div`
   margin: 20px auto;
@@ -63,7 +63,6 @@ const List = styled.ul`
   padding: 0;
 `;
 
-// Modified: Add position: relative so the absolute IconContainer works as expected
 const ListItem = styled.li`
   background: #2a2a2a;
   margin: 15px 0;
@@ -100,7 +99,6 @@ const RestaurantAddress = styled.p`
   }
 `;
 
-// New: IconContainer with styling similar to VisitItem
 const IconContainer = styled.div`
   position: absolute;
   top: 15px;
