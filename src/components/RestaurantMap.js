@@ -6,28 +6,24 @@ import '../styles/MapDarkMode.css';
 import L from 'leaflet';
 import { useMap } from '../contexts/MapContext';
 import RestaurantMarker from './RestaurantMarker';
-import { toast } from 'react-toastify'; // Import toast
-import { FiCopy } from 'react-icons/fi'; // Import FiCopy
+import { toast } from 'react-toastify'; 
+import { FiCopy } from 'react-icons/fi'; 
 
-// Helper function to scroll to an element by ID (copied from RestaurantMarker attempt)
 const scrollToItem = (id) => {
   const element = document.getElementById(`restaurant-item-${id}`);
   if (element) {
     element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    // Optional: Add a visual cue like a temporary highlight
     element.style.transition = 'background-color 0.5s ease-in-out';
     element.style.backgroundColor = 'rgba(0, 188, 212, 0.3)';
     setTimeout(() => {
-      element.style.backgroundColor = ''; // Reset background
-    }, 1500); // Remove highlight after 1.5 seconds
+      element.style.backgroundColor = ''; 
+    }, 1500); 
   } else {
     console.warn(`Element with ID restaurant-item-${id} not found. It might be on a different page or section.`);
-    // Optionally, provide feedback to the user that the item isn't visible
-    toast.warn("Restaurant not currently visible in the list. It might be in a different section or page."); // Use toast for feedback
+    toast.warn("Restaurant not currently visible in the list. It might be in a different section or page.");
   }
 };
 
-// Create custom icons for different types of restaurants
 const createCustomIcon = (color) => {
   return L.divIcon({
     className: 'custom-pin',
@@ -42,7 +38,6 @@ const createCustomIcon = (color) => {
   });
 };
 
-// Define icons for different restaurant types
 const visitedIcon = createCustomIcon('#00bcd4');
 const toVisitIcon = createCustomIcon('#ff4081');
 const recommendedIcon = createCustomIcon('#ffc107');
@@ -91,7 +86,6 @@ const MapLegend = styled.div`
   }
 `;
 
-// Helper function to capitalize the first letter of each word in the address
 function capitalizeWords(str) {
   if (!str) return '';
   return str
@@ -100,41 +94,35 @@ function capitalizeWords(str) {
     .join(' ');
 }
 
-// Component to handle map view changes
 function MapController({ selectedLocation, focusId }) {
   const map = useLeafletMap();
-  const mapElementRef = map.getContainer(); // Get map container element
+  const mapElementRef = map.getContainer(); 
 
   useEffect(() => {
     if (selectedLocation) {
       map.flyTo(
         [selectedLocation.lat, selectedLocation.lng],
-        16, // Zoom level
-        { animate: true, duration: 1.5, easeLinearity: 0.5 } // Adjusted duration/easing
+        16, 
+        { animate: true, duration: 1.5, easeLinearity: 0.5 } 
       );
 
-      // Scroll map container into view
       if (mapElementRef) {
-        // Use a slight delay to ensure flyTo starts
         setTimeout(() => {
             mapElementRef.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }, 150); // Delay slightly longer than item scroll
+        }, 150);
       }
     }
-    // focusId dependency ensures this runs even if selectedLocation object is the same
   }, [selectedLocation, focusId, map, mapElementRef]);
 
-  return null; // This component does not render anything itself
+  return null;
 }
 
-// Accept separate props for each list type
+
 function RestaurantMap({ visitedRestaurants, toVisitRestaurants, recommendedRestaurants }) {
-  const position = [43.1566, -77.6088]; // center on Rochester, NY
+  const position = [43.1566, -77.6088];
   const { selectedLocation, focusId } = useMap();
   const mapRef = useRef(null);
   const wrapperRef = useRef(null);
-
-  // No need to filter internally anymore
 
   return (
     <MapWrapper ref={wrapperRef} id="restaurant-map">
@@ -150,7 +138,6 @@ function RestaurantMap({ visitedRestaurants, toVisitRestaurants, recommendedRest
           attribution="&copy; OpenStreetMap contributors"
         />
         
-        {/* Visited Restaurants */}
         {visitedRestaurants.map((restaurant) =>
           restaurant.location && restaurant.location.lat && restaurant.location.lng ? (
             <RestaurantMarker
@@ -159,16 +146,14 @@ function RestaurantMap({ visitedRestaurants, toVisitRestaurants, recommendedRest
               icon={visitedIcon}
             >
               <Popup>
-                {/* Make name clickable */}
                 <strong
                   style={{ cursor: 'pointer', color: '#00bcd4' }}
-                  onClick={() => scrollToItem(restaurant.id)} // Use helper function
+                  onClick={() => scrollToItem(restaurant.id)}
                   title="Scroll to item in list"
                 >
                   {restaurant.name}
                 </strong>
                 <br />
-                {/* Make address clickable */}
                 <span
                   style={{ cursor: 'pointer' }}
                   onClick={() => {
@@ -184,12 +169,14 @@ function RestaurantMap({ visitedRestaurants, toVisitRestaurants, recommendedRest
                     ? `Rating: ${restaurant.averageRating} / 5`
                     : 'No ratings available'}
                 </div>
+                <div style={{ marginTop: '5px', color: '#00bcd4' }}>
+                  On your "To Visit" list
+                </div>
               </Popup>
             </RestaurantMarker>
           ) : null
         )}
 
-        {/* To Visit Restaurants */}
         {toVisitRestaurants.map((restaurant) =>
           restaurant.location && restaurant.location.lat && restaurant.location.lng ? (
             <RestaurantMarker
@@ -198,16 +185,15 @@ function RestaurantMap({ visitedRestaurants, toVisitRestaurants, recommendedRest
               icon={toVisitIcon}
             >
               <Popup>
-                {/* Make name clickable */}
                 <strong
-                  style={{ cursor: 'pointer', color: '#00bcd4' }}
-                  onClick={() => scrollToItem(restaurant.id)} // Use helper function
+                  style={{ cursor: 'pointer', color: '#ff4081' }}
+                  onClick={() => scrollToItem(restaurant.id)} 
                   title="Scroll to item in list"
                 >
                   {restaurant.name}
                 </strong>
                 <br />
-                {/* Make address clickable */}
+
                 <span
                   style={{ cursor: 'pointer' }}
                   onClick={() => {
@@ -226,7 +212,6 @@ function RestaurantMap({ visitedRestaurants, toVisitRestaurants, recommendedRest
           ) : null
         )}
 
-        {/* Recommended Restaurants */}
         {recommendedRestaurants.map((restaurant) =>
           restaurant.location && restaurant.location.lat && restaurant.location.lng ? (
             <RestaurantMarker
@@ -235,16 +220,14 @@ function RestaurantMap({ visitedRestaurants, toVisitRestaurants, recommendedRest
               icon={recommendedIcon}
             >
               <Popup>
-                {/* Make name clickable */}
                 <strong
                   style={{ cursor: 'pointer', color: '#00bcd4' }}
-                  onClick={() => scrollToItem(restaurant.id)} // Use helper function
+                  onClick={() => scrollToItem(restaurant.id)} 
                   title="Scroll to item in list"
                 >
                   {restaurant.name}
                 </strong>
                 <br />
-                {/* Make address clickable */}
                 <span
                   style={{ cursor: 'pointer' }}
                   onClick={() => {
@@ -256,7 +239,7 @@ function RestaurantMap({ visitedRestaurants, toVisitRestaurants, recommendedRest
                   {capitalizeWords(restaurant.address)} <FiCopy size="0.8em" style={{ verticalAlign: 'middle', marginLeft: '4px' }}/>
                 </span>
                 <div style={{ marginTop: '5px', color: '#ffc107' }}>
-                  Recommended
+                  On your "Recommended" list
                 </div>
               </Popup>
             </RestaurantMarker>
