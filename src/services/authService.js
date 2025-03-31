@@ -8,7 +8,9 @@ import {
   linkWithPopup,
   updateProfile,
   updateEmail,
-  updatePassword
+  updatePassword,
+  EmailAuthProvider,
+  reauthenticateWithCredential
 } from "firebase/auth";
 import { auth } from '../firebaseConfig';
 import { createUserProfile, checkUsernameExists } from './userService';
@@ -142,11 +144,26 @@ export const unlinkGoogleAccount = async () => {
   }
 };
 
-
 export const updateUserProfile = async (updates) => {
   const user = auth.currentUser;
   if (!user) throw new Error("No user is signed in");
+
   try {
+    if ((updates.email && updates.email !== user.email) || updates.password) {
+      if (!updates.currentPassword) {
+        throw new Error("Current password is required to update sensitive information.");
+      }
+      const credential = EmailAuthProvider.credential(user.email, updates.currentPassword);
+      try {
+        await reauthenticateWithCredential(user, credential);
+      } catch (reauthError) {
+        if (reauthError.code === 'auth/wrong-password') {
+          throw new Error("The current password you entered is incorrect.");
+        }
+        throw reauthError;
+      }
+    }
+
     if (updates.username) {
       await updateProfile(user, { displayName: updates.username });
     }
