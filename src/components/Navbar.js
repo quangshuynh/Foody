@@ -1,19 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { useAuth } from '../contexts/AuthContext';
+import ProfileForm from './auth/ProfileForm';
+
 
 const NavContainer = styled.nav`
   background-color: #1a1a1a;
   position: sticky;
   top: 0;
   z-index: 1000;
-  padding: 0 20px; /* Default padding for desktop */
+  padding: 0 20px; 
   height: 60px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-  transition: padding 0.3s ease; /* Smooth transition */
+  transition: padding 0.3s ease; 
 
   @media (max-width: 768px) {
-    padding: 0 10px; /* Reduced padding on mobile */
+    padding: 0 10px; 
   }
   display: flex;
   align-items: center;
@@ -30,10 +32,10 @@ const Logo = styled.div`
   color: #00bcd4;
   cursor: pointer;
   text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
-  transition: font-size 0.3s ease; /* Smooth transition */
+  transition: font-size 0.3s ease;
 
   @media (max-width: 768px) {
-    font-size: 2.5rem; /* Slightly smaller logo on mobile */
+    font-size: 2.5rem; 
   }
 `;
 
@@ -201,11 +203,12 @@ const UserInfo = styled.span`
   font-size: 1.05rem;
   font-family: 'saucetomato', sans-serif;
   font-weight: 500;
-  align-self: center; /* Vertically center within the flex container */
+  align-self: center; 
+  cursor: pointer;
   
   @media (max-width: 768px) {
-    margin-right: 5px; /* Add small margin to separate from logout */
-    font-size: 0.9rem; /* Slightly smaller on mobile */
+    margin-right: 5px;
+    font-size: 0.9rem; 
   }
 `;
 
@@ -237,6 +240,7 @@ const Navbar = ({
 }) => {
   const { isAuthenticated, userProfile } = useAuth();
   const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [showEditProfile, setShowEditProfile] = useState(false);
 
   const toggleMobileMenu = () => {
     setMobileMenuOpen((prev) => !prev);
@@ -293,7 +297,11 @@ const Navbar = ({
               </>
             ) : (
               <>
-                {userProfile && <UserInfo>Hi, {userProfile.username}!</UserInfo>}
+                {userProfile && (
+                  <UserInfo onClick={() => setShowEditProfile(true)}>
+                    Hi, {userProfile.username || userProfile.displayName || "User"}!
+                  </UserInfo>
+                )}
                 <AuthButton onClick={onLogout}>Logout</AuthButton>
               </>
             )}
@@ -311,7 +319,11 @@ const Navbar = ({
               </>
             ) : (
               <>
-                {userProfile && <UserInfo>Hi, {userProfile.username}!</UserInfo>}
+                {userProfile && (
+                  <UserInfo onClick={() => setShowEditProfile(true)}>
+                    Hi, {userProfile.username || userProfile.displayName || "User"}!
+                  </UserInfo>
+                )}
                 <MobileAuthButton onClick={onLogout}>Logout</MobileAuthButton>
               </>
             )}
@@ -354,6 +366,12 @@ const Navbar = ({
             </NavItem>
           </NavItems>
         </MobileMenu>
+      )}
+      {showEditProfile && userProfile && (
+        <ProfileForm
+          onSuccess={() => setShowEditProfile(false)}
+          user={userProfile}
+        />
       )}
     </>
   );

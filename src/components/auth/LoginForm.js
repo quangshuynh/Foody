@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { login } from '../../services/authService';
+import { login, googleSignIn } from '../../services/authService';
 import Modal from './Modal'
 
 const FormContainer = styled.div`
@@ -71,18 +71,23 @@ const ErrorMessage = styled.p`
   text-align: center;
 `;
 
+const GoogleButton = styled(Button)`
+  background: #db4437;
+  &:hover {
+    background: #c23321;
+  }
+`;
+
 function LoginForm({ onSuccess }) {
-  const [email, setEmail] = useState(''); // Changed from username to email
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError(''); // Clear previous errors
+    setError(''); 
     try {
-      // Call login with email and password
       await login(email, password);
-      // No need to call setUser here, AuthContext listener will update the state
       if (onSuccess) onSuccess();
     } catch (err) {
       setError(err.message || 'Failed to login');
@@ -93,6 +98,15 @@ function LoginForm({ onSuccess }) {
     if (onSuccess) onSuccess();
   };
 
+  const handleGoogleSignIn = async () => {
+    try {
+      await googleSignIn();
+      if (onSuccess) onSuccess();
+    } catch (err) {
+      setError(err.message || 'Google sign in failed');
+    }
+  };
+
   return (
     <Modal onClose={onSuccess}>
       <FormContainer>
@@ -100,22 +114,25 @@ function LoginForm({ onSuccess }) {
         <h2 style={{ fontFamily: 'rushdriver, sans-serif', marginBottom: '10px' }}>Login</h2>
         <form onSubmit={handleSubmit}>
           <Input
-            type="email" // Changed type to email
-            placeholder="Email" // Changed placeholder
+            type="email" 
+            placeholder="Email" 
             value={email}
-            onChange={(e) => setEmail(e.target.value)} // Changed handler
-            required // Added required attribute
+            onChange={(e) => setEmail(e.target.value)} 
+            required 
           />
           <Input
             type="password"
             placeholder="Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            required // Added required attribute
+            required 
           />
           {error && <ErrorMessage>{error}</ErrorMessage>}
           <Button type="submit">Login</Button>
         </form>
+        <GoogleButton type="button" onClick={handleGoogleSignIn}>
+          Continue with Google
+        </GoogleButton>
         <ContinueAsGuestButton type="button" onClick={handleContinueAsGuest}>
           Continue as Guest
         </ContinueAsGuestButton>

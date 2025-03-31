@@ -1,8 +1,8 @@
 import React, { useState, useCallback } from 'react';
 import styled from 'styled-components';
-import { register } from '../../services/authService';
-import { checkUsernameExists } from '../../services/userService'; // Import username check
-import debounce from '../../utils/debounce'; // We'll create this utility
+import { register, googleSignIn } from '../../services/authService';
+import { checkUsernameExists } from '../../services/userService'; 
+import debounce from '../../utils/debounce'; 
 import Modal from './Modal'
 
 const FormContainer = styled.div`
@@ -18,7 +18,6 @@ const FormContainer = styled.div`
   position: relative;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
 `;
-
 
 const Input = styled.input`
   width: 80%;
@@ -68,6 +67,13 @@ const ErrorMessage = styled.p`
   text-align: center;
 `;
 
+const GoogleButton = styled(Button)`
+  background: #db4437;
+  &:hover {
+    background: #c23321;
+  }
+`;
+
 function RegisterForm({ onSuccess }) {
   const [username, setUsername] = useState('');
   const [usernameAvailable, setUsernameAvailable] = useState(true);
@@ -76,14 +82,12 @@ function RegisterForm({ onSuccess }) {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false); // For overall form submission
+  const [loading, setLoading] = useState(false);
 
-  // Debounced username check function
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   const debouncedCheckUsername = useCallback(
     debounce(async (name) => {
-      if (!name || name.length < 3) { // Basic validation
-        setUsernameAvailable(true); // Don't show error for short/empty names
+      if (!name || name.length < 3) {
+        setUsernameAvailable(true);
         setUsernameLoading(false);
         return;
       }
@@ -93,35 +97,34 @@ function RegisterForm({ onSuccess }) {
         setUsernameAvailable(!exists);
       } catch (err) {
         console.error("Username check failed:", err);
-        setUsernameAvailable(false); // Assume unavailable on error
-        setError("Could not verify username. Please try again."); // Show specific error
+        setUsernameAvailable(false); 
+        setError("Could not verify username. Please try again."); 
       } finally {
         setUsernameLoading(false);
       }
-    }, 500), // 500ms delay
-    [] // No dependencies, function is stable
+    }, 500), 
+    [] 
   );
 
   const handleUsernameChange = (e) => {
     const newUsername = e.target.value;
-    // Basic validation for allowed characters (alphanumeric + underscore/dash)
     const validUsername = /^[a-zA-Z0-9_-]*$/.test(newUsername);
     if (!validUsername) {
         setError("Username can only contain letters, numbers, underscores, and dashes.");
-        return; // Don't update state or check invalid username
+        return; 
     }
-    setError(''); // Clear validation error
+    setError(''); 
     setUsername(newUsername);
-    setUsernameLoading(true); // Show loading indicator immediately
-    setUsernameAvailable(true); // Reset availability state
+    setUsernameLoading(true); 
+    setUsernameAvailable(true);
     debouncedCheckUsername(newUsername);
   };
 
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError(''); // Clear previous errors
-    setLoading(true); // Start loading indicator
+    setError(''); 
+    setLoading(true); 
 
     if (password !== confirmPassword) {
       setError('Passwords do not match');
@@ -139,7 +142,6 @@ function RegisterForm({ onSuccess }) {
         return;
     }
 
-    // Final check before submitting
     try {
         setUsernameLoading(true);
         const exists = await checkUsernameExists(username);
@@ -150,16 +152,23 @@ function RegisterForm({ onSuccess }) {
             setLoading(false);
             return;
         }
-        setUsernameAvailable(true); // Mark as available if check passes
+        setUsernameAvailable(true);
 
-        // Call register with username, email, and password
         await register(username, email, password);
-        // No need to call setUser here, AuthContext listener will update the state
         if (onSuccess) onSuccess();
     } catch (err) {
         setError(err.message || 'Failed to register');
     } finally {
-        setLoading(false); // Stop loading indicator
+        setLoading(false); 
+    }
+  };
+
+  const handleGoogleSignIn = async () => {
+    try {
+      await googleSignIn();
+      if (onSuccess) onSuccess();
+    } catch (err) {
+      setError(err.message || 'Google sign in failed');
     }
   };
 
@@ -212,6 +221,9 @@ function RegisterForm({ onSuccess }) {
             onChange={(e) => setConfirmPassword(e.target.value)}
             required
           />
+        <GoogleButton type="button" onClick={handleGoogleSignIn}>
+          Continue with Google
+        </GoogleButton>
           {error && <ErrorMessage>{error}</ErrorMessage>}
           <Button type="submit" disabled={loading || usernameLoading || !usernameAvailable}>
             {loading ? 'Registering...' : 'Register'}
