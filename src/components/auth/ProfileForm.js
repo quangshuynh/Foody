@@ -82,7 +82,7 @@ const UserIdDisplay = styled.div`
 
 function ProfileForm({ onSuccess = () => {} }) {
   const { user, userProfile } = useAuth();
-  const [username, setUsername] = useState(user.displayName || '');
+  const [username, setUsername] = useState(userProfile.username || userProfile.displayName || "");
   const [email, setEmail] = useState(user.email || '');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -133,7 +133,7 @@ function ProfileForm({ onSuccess = () => {} }) {
             id="username"
             type="text"
             placeholder="Change your username"
-            value={userProfile.username || userProfile.displayName || "User"}
+            value={username}
             onChange={(e) => setUsername(e.target.value)}
             required
           />
