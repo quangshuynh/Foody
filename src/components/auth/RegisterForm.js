@@ -3,7 +3,8 @@ import styled from 'styled-components';
 import { register, googleSignIn } from '../../services/authService';
 import { checkUsernameExists } from '../../services/userService'; 
 import debounce from '../../utils/debounce'; 
-import Modal from './Modal'
+import Modal from './Modal';
+import { FaEye } from 'react-icons/fa';
 
 const FormContainer = styled.div`
   width: 400px;          
@@ -30,6 +31,21 @@ const Input = styled.input`
   font-size: 1rem;
 `;
 
+const InputWrapper = styled.div`
+  position: relative;
+  width: 100%;
+  margin: 2px 0;
+`;
+
+const IconWrapper = styled.div`
+  position: absolute;
+  right: 45px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  color: ${props => (props.active ? 'red' : '#f5f5f5')};
+`;
+
 const Button = styled.button`
   width: 80%;
   padding: 10px;
@@ -43,6 +59,13 @@ const Button = styled.button`
   transition: background 0.2s;
   &:hover {
     background: #00a1b5;
+  }
+`;
+
+const GoogleButton = styled(Button)`
+  background: #db4437;
+  &:hover {
+    background: #c23321;
   }
 `;
 
@@ -60,18 +83,10 @@ const CloseButton = styled.button`
   }
 `;
 
-
 const ErrorMessage = styled.p`
   color: #ff4081;
   margin: 10px 0;
   text-align: center;
-`;
-
-const GoogleButton = styled(Button)`
-  background: #db4437;
-  &:hover {
-    background: #c23321;
-  }
 `;
 
 function RegisterForm({ onSuccess }) {
@@ -83,6 +98,10 @@ function RegisterForm({ onSuccess }) {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+
+  // Password visibility toggles
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const debouncedCheckUsername = useCallback(
     debounce(async (name) => {
@@ -110,8 +129,8 @@ function RegisterForm({ onSuccess }) {
     const newUsername = e.target.value;
     const validUsername = /^[a-zA-Z0-9_-]*$/.test(newUsername);
     if (!validUsername) {
-        setError("Username can only contain letters, numbers, underscores, and dashes.");
-        return; 
+      setError("Username can only contain letters, numbers, underscores, and dashes.");
+      return; 
     }
     setError(''); 
     setUsername(newUsername);
@@ -119,7 +138,6 @@ function RegisterForm({ onSuccess }) {
     setUsernameAvailable(true);
     debouncedCheckUsername(newUsername);
   };
-
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -137,29 +155,29 @@ function RegisterForm({ onSuccess }) {
       return;
     }
     if (!usernameAvailable || usernameLoading) {
-        setError('Please choose an available username.');
-        setLoading(false);
-        return;
+      setError('Please choose an available username.');
+      setLoading(false);
+      return;
     }
 
     try {
-        setUsernameLoading(true);
-        const exists = await checkUsernameExists(username);
-        setUsernameLoading(false);
-        if (exists) {
-            setUsernameAvailable(false);
-            setError('Username is already taken.');
-            setLoading(false);
-            return;
-        }
-        setUsernameAvailable(true);
+      setUsernameLoading(true);
+      const exists = await checkUsernameExists(username);
+      setUsernameLoading(false);
+      if (exists) {
+        setUsernameAvailable(false);
+        setError('Username is already taken.');
+        setLoading(false);
+        return;
+      }
+      setUsernameAvailable(true);
 
-        await register(username, email, password);
-        if (onSuccess) onSuccess();
+      await register(username, email, password);
+      if (onSuccess) onSuccess();
     } catch (err) {
-        setError(err.message || 'Failed to register');
+      setError(err.message || 'Failed to register');
     } finally {
-        setLoading(false); 
+      setLoading(false); 
     }
   };
 
@@ -171,7 +189,6 @@ function RegisterForm({ onSuccess }) {
       setError(err.message || 'Google sign in failed');
     }
   };
-
 
   return (
     <Modal onClose={onSuccess}>
@@ -207,23 +224,43 @@ function RegisterForm({ onSuccess }) {
             onChange={(e) => setEmail(e.target.value)}
             required
           />
-          <Input
-            type="password"
-            placeholder="Password (min. 6 characters)"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-          <Input
-            type="password"
-            placeholder="Confirm Password"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            required
-          />
-        <GoogleButton type="button" onClick={handleGoogleSignIn}>
-          Continue with Google
-        </GoogleButton>
+          <InputWrapper>
+            <Input
+              type={showPassword ? 'text' : 'password'}
+              placeholder="Password (min. 6 characters)"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+            {password.length > 0 && (
+              <IconWrapper
+                active={showPassword}
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                <FaEye />
+              </IconWrapper>
+            )}
+          </InputWrapper>
+          <InputWrapper>
+            <Input
+              type={showConfirmPassword ? 'text' : 'password'}
+              placeholder="Confirm Password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              required
+            />
+            {confirmPassword.length > 0 && (
+              <IconWrapper
+                active={showConfirmPassword}
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+              >
+                <FaEye />
+              </IconWrapper>
+            )}
+          </InputWrapper>
+          <GoogleButton type="button" onClick={handleGoogleSignIn}>
+            Continue with Google
+          </GoogleButton>
           {error && <ErrorMessage>{error}</ErrorMessage>}
           <Button type="submit" disabled={loading || usernameLoading || !usernameAvailable}>
             {loading ? 'Registering...' : 'Register'}
