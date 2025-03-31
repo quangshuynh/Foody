@@ -11,7 +11,7 @@ import {
   updatePassword
 } from "firebase/auth";
 import { auth } from '../firebaseConfig';
-import { createUserProfile } from './userService';
+import { createUserProfile, checkUsernameExists } from './userService';
 
 export const register = async (username, email, password) => {
   if (!username || !email || !password) {
@@ -92,6 +92,21 @@ export const googleSignIn = async () => {
   try {
     const result = await signInWithPopup(auth, provider);
     console.log("Google sign in successful:", result.user.uid);
+
+    if (result.additionalUserInfo && result.additionalUserInfo.isNewUser) {
+      const email = result.user.email;
+      const baseUsername = email.split('@')[0];
+      let availableUsername = baseUsername;
+      let count = 1;
+
+      while (await checkUsernameExists(availableUsername)) {
+        availableUsername = `${baseUsername}${count}`;
+        count++;
+      }
+
+      await createUserProfile(result.user.uid, availableUsername, email);
+      console.log("User profile created in Firestore for new Google user:", result.user.uid);
+    }
     return result.user;
   } catch (error) {
     console.error("Google sign in error:", error);
