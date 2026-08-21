@@ -1,112 +1,122 @@
 # 🍔 Foody 🍕
 
-**Foody** is a *deliciously* modern React web application that helps you and your friends explore the best food spots in
-your area. It's the perfect recipe for keeping track of your culinary adventures!
+**Foody** is a React application for keeping track of restaurant visits, building a food bucket list, sharing ratings and comments, and exploring nearby recommendations on a map.
 
-> "Life is uncertain. Eat dessert first... but track it in Foody!" 🍰
+[![CI](https://github.com/quangshuynh/foody/actions/workflows/ci.yml/badge.svg)](https://github.com/quangshuynh/foody/actions/workflows/ci.yml) ![Tests](https://img.shields.io/badge/tests-15%20passing-brightgreen) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](MIT_LICENSE)
+
+> Life is uncertain. Eat dessert first... but track it in Foody! 🍰
 
 ## 🌮 What's Cooking?
 
 With Foody, you can:
 
-- **Track Visited Restaurants:** Log places you've eaten, rate them, and leave comments
-- **Create a Food Bucket List:** Keep a wishlist of restaurants you're dying to try
-- **Discover New Spots:** View recommended restaurants based on your preferences
-- **Map Your Meals:** See all your food adventures on an interactive map
-- **Share Your Experiences:** Add comments and ratings to help others decide where to dine
+- Track visited restaurants, including ratings, comments, tags, and addresses
+- Build and maintain a list of restaurants to visit
+- Search visited restaurants by name
+- Choose how many visited and to-visit entries are displayed
+- Find nearby restaurant recommendations by ZIP code, radius, and cuisine
+- View visited, to-visit, and recommended restaurants on an interactive map
+- Open restaurant addresses in Google Maps or copy them to the clipboard
+- Browse public restaurant data as a guest and sign in to make changes
 
-## 🥑 Key Features (That's Guac-ing Awesome!)
+## 🥑 Key Features
 
 ### 🍽️ Visited Restaurants
-- Track restaurants you've visited with detailed ratings
-- Add comments about your experience
-- Mark favorites for easy reference
-- Sort and filter your culinary history
-- Limit display with customizable view options (including a secret 💩 mode!)
+
+- Add, edit, and remove restaurants while authenticated
+- Submit a rating, return preference, and optional comment
+- View average ratings and comments from other users
+- Organize restaurants with configurable tags
 
 ### 🍣 Restaurants to Visit
-- Build your foodie bucket list
-- Store location details for easy navigation
-- Prioritize your must-try spots
-- Get directions with one click
 
-### 🍗 Recommended Restaurants
-- Discover new places based on your taste preferences
-- See what's popular in your area
-- Find hidden gems you might have missed
+- Build a food bucket list with restaurant names, addresses, map coordinates, and tags
+- Edit or remove entries while authenticated
+- Jump from an entry to its map location
 
-### 🔍 Smart Search
-- Quickly find restaurants by name
-- Filter by cuisine, rating, or location
-- Never forget that amazing place you visited
+### 🍗 Nearby Recommendations
+
+- Query OpenStreetMap data by ZIP code, search radius, and cuisine
+- Randomize up to five matching results
+- Fall back to the Rochester, New York area when ZIP-code lookup fails
 
 ### 🗺️ Interactive Map
-- Visualize all restaurants on a beautiful dark-themed map
-- Different colored pins for visited, to-visit, and recommended spots
-- Click on a restaurant to see its details
-- Get directions with a single click
-- Focus the map on specific restaurants
 
-### 👤 User Accounts
-- Create a personal account to save your data
-- Continue as a guest if you prefer
-- Secure authentication system
-- Private data storage
+- Display visited, to-visit, and recommended restaurants with distinct markers
+- Focus the map on a selected restaurant
+- Open addresses in Google Maps
+- Use OpenStreetMap tiles through React Leaflet
 
-### 🎨 Delightful UI
-- Dark theme with vibrant accents
-- Responsive design works on all devices
-- Custom fonts for a unique experience
-- Smooth animations and transitions
+### 👤 Accounts and Guest Access
+
+- Register and sign in with Firebase Authentication
+- Store user profiles and restaurant data in Cloud Firestore
+- Browse restaurant lists and the map without signing in
+- Restrict data-changing controls to authenticated users
 
 ## 🍳 Technical Ingredients
 
-- **React:** The main ingredient for our frontend
-- **Styled Components:** For that special seasoning in our UI
-- **React Leaflet & OpenStreetMap:** The perfect blend for interactive maps
-- **Node.js & Express:** Our backend kitchen where the magic happens
-- **File-based Storage:** Simple yet effective data persistence
-- **Nominatim API:** For geocoding addresses (turning text into map coordinates)
-- **Context API:** For state management throughout the app
-- **Custom Hooks:** For reusable functionality
+- **React** and **Create React App**
+- **Styled Components**
+- **React Leaflet**, **Leaflet**, and **OpenStreetMap**
+- **Firebase Authentication** and **Cloud Firestore**
+- **Nominatim** for address geocoding
+- **Zippopotam.us** for ZIP-code coordinates
+- **Overpass API** for nearby restaurant recommendations
+- **Context API** for authentication and map-focus state
+- **Jest** and **React Testing Library** for automated tests
 
-## 🥞 Installation & Setup (for contributing)
+Foody is a client-side application. It does not currently include an Express server or use file-based storage for live application data.
 
-1. Clone the repository:
-   ```
-   git clone https://github.com/quangshuynh/Foody.git
+## 🥞 Installation and Setup
+
+1. Clone the repository and install its locked dependencies:
+
+   ```bash
+   git clone https://github.com/quangshuynh/foody.git
+   cd foody
+   npm ci
    ```
 
-2. Install dependencies:
-   ```
-   cd Foody
-   npm install
+2. Create a `.env.local` file with your Firebase web-app configuration:
+
+   ```dotenv
+   REACT_APP_FIREBASE_API_KEY=your_api_key
+   REACT_APP_FIREBASE_AUTH_DOMAIN=your_project.firebaseapp.com
+   REACT_APP_FIREBASE_PROJECT_ID=your_project_id
+   REACT_APP_FIREBASE_STORAGE_BUCKET=your_storage_bucket
+   REACT_APP_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
+   REACT_APP_FIREBASE_APP_ID=your_app_id
+   REACT_APP_FIREBASE_MEASUREMENT_ID=your_measurement_id
    ```
 
-3. Put your Firebase API key in firebaseConfig.js
+   Firebase web configuration identifies your Firebase project; access control must still be enforced with Firebase Authentication and Firestore Security Rules. Environment files are ignored by Git—do not commit private credentials or service-account keys.
 
-4. Start the development server:
-   ```
+3. Start the development server:
+
+   ```bash
    npm start
    ```
 
-5. Open your browser and navigate to `http://localhost:3000`
+4. Open `http://localhost:3000`.
 
-## 🍦 Cool Features You Might Miss
+## 🧪 Tests
 
-- **Copy to Clipboard:** Easily copy restaurant addresses with one click
-- **Map Focus:** Click "Show on Map" to zoom to a specific restaurant
-- **Dark Mode Map:** Custom styled map that matches the app's theme
-- **Responsive Design:** Works great on mobile devices too
-- **Guest Mode:** Use the app without creating an account
+Run the complete non-interactive test suite with:
+
+```bash
+npm test -- --watchAll=false --runInBand
+```
+
+The tests mock Firebase and external geocoding boundaries, so they do not require credentials or network access.
 
 ## 🍇 Contributing
 
-Pull requests are welcome! For major changes, please open an issue first to discuss what you'd like to change.
+Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
 
 ## 🥓 License
 
-This project is licensed under the MIT License - see the MIT_LICENSE file for details.
+This project is licensed under the [MIT License](MIT_LICENSE).
 
 ## 🍪 Acknowledgments
 
